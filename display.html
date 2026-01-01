@@ -1471,7 +1471,7 @@
                 const coPct = player.coRate.toFixed(1);
 
                 return `
-                    <tr>
+                    <tr onclick="highlightRow(this)" style="cursor: pointer; transition: background 0.2s;">
                         <td class="center rank-cell ${rankClass}">${index + 1}</td>
                         <td>
                             <div class="player-cell">
@@ -1805,6 +1805,19 @@
             if (detailsRow) {
                 detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
             }
+        }
+        
+        // Highlight row on click
+        function highlightRow(row) {
+            // Remove highlight from all rows in the same table
+            const table = row.closest('table');
+            const allRows = table.querySelectorAll('tbody tr');
+            allRows.forEach(r => {
+                r.style.background = '';
+            });
+            
+            // Highlight clicked row
+            row.style.background = 'rgba(255, 107, 0, 0.2)';
         }
 
         // Render KO bracket
