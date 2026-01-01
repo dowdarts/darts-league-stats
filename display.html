@@ -1284,7 +1284,7 @@
                         player.total100s += playerStats.scores_100plus || 0;
                         player.totalWins += playerStats.wins;
                         player.totalLosses += playerStats.losses;
-                        player.highCheckout = Math.max(player.highCheckout, playerStats.high_checkout || 0);
+                        player.highCheckout = Math.max(player.highCheckout, playerStats.high_checkout || playerStats.high_finish || 0);
                         player.coOpportunities += playerStats.co_opportunities || 0;
                         player.coCompleted += playerStats.co_completed || 0;
                     });
