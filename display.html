@@ -982,8 +982,8 @@
     <!-- Navigation -->
     <div class="nav-bar">
         <div class="nav-container">
-            <div class="nav-item active" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
-            <div class="nav-item" onclick="showTab('events')">📅 Event Results</div>
+            <div class="nav-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
+            <div class="nav-item active" onclick="showTab('events')">📅 Event Results</div>
             <div class="nav-item" onclick="showTab('players')">👥 Player Profiles</div>
         </div>
     </div>
@@ -1009,7 +1009,7 @@
     <!-- Main Content -->
     <div id="mainContent" style="display: none;" class="container">
         <!-- Leaderboard Section -->
-        <div id="section-leaderboard" class="section active">
+        <div id="section-leaderboard" class="section">
             <!-- Champion Showcase -->
             <div id="championShowcase" class="champion-showcase">
                 <div class="champion-content">
@@ -1059,7 +1059,7 @@
         </div>
 
         <!-- Events Section -->
-        <div id="section-events" class="section">
+        <div id="section-events" class="section active">
             <div class="event-selector-container">
                 <label>Select Event:</label>
                 <select id="eventSelector" onchange="showEventDetails()">
@@ -1231,7 +1231,7 @@
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
 
-                showTab('leaderboard');
+                showTab('events');
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1331,15 +1331,20 @@
         function renderLeaderboard() {
             const sortedPlayers = Object.values(careerStats).sort((a, b) => b.career3DA - a.career3DA);
 
-            // Champion showcase
-            if (sortedPlayers.length > 0) {
-                const champion = sortedPlayers[0];
-                const profile = playerProfiles.find(p => p.name === champion.name);
+            // Champion showcase - Look for Event 7 (TOC) winner
+            const event7 = eventFiles.find(e => e.metadata.event_id === 7);
+            const championShowcase = document.getElementById('championShowcase');
+            
+            if (event7 && event7.metadata.champion) {
+                const championName = formatNameForDisplay(event7.metadata.champion);
+                const champion = careerStats[championName];
+                const profile = playerProfiles.find(p => p.name === championName);
 
-                document.getElementById('championName').textContent = champion.name;
-                document.getElementById('championAvg').textContent = champion.career3DA.toFixed(2);
-                document.getElementById('champion180s').textContent = champion.total180s;
-                document.getElementById('championWins').textContent = champion.totalWins;
+                championShowcase.style.display = 'block';
+                document.getElementById('championName').textContent = championName;
+                document.getElementById('championAvg').textContent = champion?.career3DA.toFixed(2) || 'N/A';
+                document.getElementById('champion180s').textContent = champion?.total180s || 0;
+                document.getElementById('championWins').textContent = champion?.totalWins || 0;
 
                 const photoEl = document.getElementById('championPhoto');
                 if (profile?.imageBase64) {
@@ -1348,6 +1353,9 @@
                 } else {
                     photoEl.style.display = 'none';
                 }
+            } else {
+                // Hide champion showcase if Event 7 doesn't exist yet
+                championShowcase.style.display = 'none';
             }
 
             // Rankings table
