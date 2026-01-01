@@ -1423,7 +1423,18 @@
             const event = eventFiles[index];
             document.getElementById('eventDetails').style.display = 'block';
             document.getElementById('eventTitle').textContent = event.metadata.event_name;
-            document.getElementById('eventMeta').textContent = `Series ${event.metadata.series_id} - Event ${event.metadata.event_id}`;
+            
+            // Show event champion prominently if available
+            const ko = event.knockout_results || event.knockout;
+            const champion = ko?.champion;
+            const eventId = event.metadata.event_id || 0;
+            const championTitle = eventId === 7 ? 'TOC Champion' : 'Event Champion';
+            
+            const metaHtml = champion ? 
+                `Series ${event.metadata.series_id} - Event ${event.metadata.event_id} | <span style="color: var(--primary-orange); font-weight: 700;">🏆 ${championTitle}: ${formatNameForDisplay(champion)}</span>` :
+                `Series ${event.metadata.series_id} - Event ${event.metadata.event_id}`;
+            
+            document.getElementById('eventMeta').innerHTML = metaHtml;
 
             renderRRStandings(event);
             renderKOBracket(event);
@@ -1812,9 +1823,124 @@
         }
 
         // Show player details
+        // Calculate personal best ranking for a player
+        function getPersonalBest(playerName) {
+            let bestAchievement = null;
+            let bestRank = 999; // Lower is better
+            
+            // Rank hierarchy: Champion=1, Finalist=2, Semi-Finalist=3, Quarter-Finalist=4, RR=5
+            const rankValues = {
+                'Champion': 1,
+                'Finalist': 2,
+                'Semi-Finalist': 3,
+                'Quarter-Finalist': 4,
+                'RR': 5
+            };
+            
+            eventFiles.forEach(event => {
+                const ko = event.knockout_results || event.knockout;
+                const rr = event.round_robin_results || event.round_robin;
+                const metadata = event.metadata || {};
+                const eventId = metadata.event_id || 0;
+                const seriesId = metadata.series_id || 1;
+                const eventName = metadata.event_name || `Event ${eventId}`;
+                
+                // Check if champion
+                if (ko && ko.champion) {
+                    const champion = formatNameForDisplay(ko.champion);
+                    if (champion === playerName) {
+                        const achievementText = eventId === 7 ? 
+                            `Series ${seriesId} TOC Champion` : 
+                            `Series ${seriesId} Event ${eventId} Champion`;
+                        if (rankValues['Champion'] < bestRank) {
+                            bestRank = rankValues['Champion'];
+                            bestAchievement = achievementText;
+                        }
+                    }
+                }
+                
+                // Check if finalist
+                if (ko && ko.final) {
+                    const p1 = formatNameForDisplay(ko.final.player1);
+                    const p2 = formatNameForDisplay(ko.final.player2);
+                    if ((p1 === playerName || p2 === playerName) && ko.final.winner !== playerName) {
+                        const achievementText = eventId === 7 ? 
+                            `Series ${seriesId} TOC Finalist` : 
+                            `Series ${seriesId} Event ${eventId} Finalist`;
+                        if (rankValues['Finalist'] < bestRank) {
+                            bestRank = rankValues['Finalist'];
+                            bestAchievement = achievementText;
+                        }
+                    }
+                }
+                
+                // Check if semi-finalist
+                const sf = ko?.semiFinals || ko?.semi_finals;
+                if (sf && sf.length > 0) {
+                    sf.forEach(match => {
+                        const p1 = formatNameForDisplay(match.player1);
+                        const p2 = formatNameForDisplay(match.player2);
+                        const winner = formatNameForDisplay(match.winner);
+                        if ((p1 === playerName || p2 === playerName) && winner !== playerName) {
+                            const achievementText = eventId === 7 ? 
+                                `Series ${seriesId} TOC Semi-Finalist` : 
+                                `Series ${seriesId} Event ${eventId} Semi-Finalist`;
+                            if (rankValues['Semi-Finalist'] < bestRank) {
+                                bestRank = rankValues['Semi-Finalist'];
+                                bestAchievement = achievementText;
+                            }
+                        }
+                    });
+                }
+                
+                // Check if quarter-finalist
+                const qf = ko?.quarterFinals || ko?.quarter_finals;
+                if (qf && qf.length > 0) {
+                    qf.forEach(match => {
+                        const p1 = formatNameForDisplay(match.player1);
+                        const p2 = formatNameForDisplay(match.player2);
+                        const winner = formatNameForDisplay(match.winner);
+                        if ((p1 === playerName || p2 === playerName) && winner !== playerName) {
+                            const achievementText = eventId === 7 ? 
+                                `Series ${seriesId} TOC Quarter-Finalist` : 
+                                `Series ${seriesId} Event ${eventId} Quarter-Finalist`;
+                            if (rankValues['Quarter-Finalist'] < bestRank) {
+                                bestRank = rankValues['Quarter-Finalist'];
+                                bestAchievement = achievementText;
+                            }
+                        }
+                    });
+                }
+                
+                // Check if RR participant
+                if (rr) {
+                    const standings = rr.standings || {};
+                    const groupA = standings.groupA || [];
+                    const groupB = standings.groupB || [];
+                    const allPlayers = [...groupA, ...groupB];
+                    
+                    allPlayers.forEach(player => {
+                        const pName = formatNameForDisplay(player.name);
+                        if (pName === playerName) {
+                            const achievementText = eventId === 7 ? 
+                                `Series ${seriesId} TOC Qualifier` : 
+                                `Series ${seriesId} Event ${eventId} RR Participant`;
+                            if (rankValues['RR'] < bestRank) {
+                                bestRank = rankValues['RR'];
+                                bestAchievement = achievementText;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            return bestAchievement;
+        }
+
         function showPlayerDetails(playerName) {
             const player = careerStats[playerName];
             const profile = playerProfiles.find(p => p.name === playerName);
+            const personalBest = getPersonalBest(playerName);
 
             document.getElementById('modalPlayerName').textContent = playerName;
             
@@ -1828,6 +1954,7 @@
             document.getElementById('modalPlayerNickname').textContent = profile?.nickname ? `"${profile.nickname}"` : '';
             
             document.getElementById('modalPlayerDetails').innerHTML = `
+                ${personalBest ? `<p style="background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 215, 0, 0.1)); padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-orange); margin-bottom: 15px;"><strong>🏆 Personal Best:</strong> ${personalBest}</p>` : ''}
                 ${profile?.hometown ? `<p><strong>Hometown:</strong> ${profile.hometown}</p>` : ''}
                 ${profile?.dartsSetup ? `<p><strong>Setup:</strong> ${profile.dartsSetup}</p>` : ''}
                 <p><strong>High Checkout:</strong> ${player.highCheckout}</p>
