@@ -1671,15 +1671,13 @@
                         </div>
                     `;
                 }
-            
-            // Now create the standings tables
-            const standingsHTML = groups.map(group => {
+                
+                // Now create the standings table for this group
                 const groupData = standings[`group${group}`];
-                if (!groupData) return '';
-
-                // Handle both array format and object with players array
-                const players = Array.isArray(groupData) ? groupData : groupData.players;
-                if (!players) return '';
+                if (groupData) {
+                    // Handle both array format and object with players array
+                    const players = Array.isArray(groupData) ? groupData : groupData.players;
+                    if (players) {
 
                 // Calculate 3DA and CO% from individual matches for each player
                 const groupMatches = matches[`group${group}`] || [];
@@ -1716,7 +1714,7 @@
                     return bValue - aValue;
                 });
 
-                return `
+                allHTML += `
                     <div class="rr-group" style="width: 100%; max-width: 100%;">
                         <div class="rr-group-header">
                             <h3>Group ${group}</h3>
@@ -1787,9 +1785,8 @@
                         </div>
                     </div>
                 `;
-                
-                // Add standings for this group
-                allHTML += standingsHTML;
+                    }
+                }
             });
             
             // Set all HTML
