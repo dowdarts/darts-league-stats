@@ -1574,11 +1574,11 @@
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background: rgba(0, 0, 0, 0.2);">
-                                            <th class="center" style="padding: 12px; width: 60px;">#</th>
-                                            <th class="center" style="padding: 12px; width: 120px;">Round</th>
-                                            <th style="padding: 12px; min-width: 150px;">Player 1</th>
-                                            <th class="center" style="padding: 12px; width: 100px;">Score</th>
-                                            <th style="padding: 12px; min-width: 150px;">Player 2</th>
+                                            <th class="center" style="padding: 12px; width: 60px; text-align: center;">#</th>
+                                            <th class="center" style="padding: 12px; width: 120px; text-align: center;">Round</th>
+                                            <th class="center" style="padding: 12px; min-width: 150px; text-align: center;">Player 1</th>
+                                            <th class="center" style="padding: 12px; width: 100px; text-align: center;">Score</th>
+                                            <th class="center" style="padding: 12px; min-width: 150px; text-align: center;">Player 2</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1597,11 +1597,11 @@
                                                     onmouseover="this.style.background='rgba(255, 107, 0, 0.1)'" 
                                                     onmouseout="this.style.background=''"
                                                     onclick="toggleMatchDetails('${matchId}')">
-                                                    <td class="center" style="padding: 12px;">${matchNumber++}</td>
-                                                    <td class="center" style="padding: 12px;">Round Robin</td>
-                                                    <td style="padding: 12px; ${formatNameForDisplay(winner) === p1 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
-                                                    <td class="center" style="padding: 12px; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
-                                                    <td style="padding: 12px; ${formatNameForDisplay(winner) === p2 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
+                                                    <td class="center" style="padding: 12px; text-align: center;">${matchNumber++}</td>
+                                                    <td class="center" style="padding: 12px; text-align: center;">Round Robin</td>
+                                                    <td class="center" style="padding: 12px; text-align: center; ${formatNameForDisplay(winner) === p1 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
+                                                    <td class="center" style="padding: 12px; text-align: center; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
+                                                    <td class="center" style="padding: 12px; text-align: center; ${formatNameForDisplay(winner) === p2 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
                                                 </tr>
                                                 <tr id="${matchId}" class="match-details-row" style="display: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                                                     <td colspan="5" style="padding: 0;">
