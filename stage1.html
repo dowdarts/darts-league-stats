@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 1: Round Robin Entry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-6">
+            <a href="index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition">
+                <span class="text-2xl mr-2">←</span>
+                <span class="font-semibold">Back to Dashboard</span>
+            </a>
+        </div>
+        <h1 class="text-4xl font-bold text-center mb-8 text-green-400">Stage 1: Round Robin Entry</h1>
+        
+        <!-- METADATA SECTION -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-purple-500">
+            <h2 class="text-2xl font-bold mb-4 text-purple-300">Event Metadata</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Series Number</label>
+                    <select 
+                        id="seriesNumber" 
+                        class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                        <option value="1">Series 1</option>
+                        <option value="2">Series 2</option>
+                        <option value="3">Series 3</option>
+                        <option value="4">Series 4</option>
+                        <option value="5">Series 5</option>
+                        <option value="6">Series 6</option>
+                        <option value="7">Series 7</option>
+                        <option value="8">Series 8</option>
+                        <option value="9">Series 9</option>
+                        <option value="10">Series 10</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Event Number</label>
+                    <select 
+                        id="eventNumber" 
+                        class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                        <option value="1">Event 1</option>
+                        <option value="2">Event 2</option>
+                        <option value="3">Event 3</option>
+                        <option value="4">Event 4</option>
+                        <option value="5">Event 5</option>
+                        <option value="6">Event 6</option>
+                        <option value="7">Event 7 - Tournament of Champions</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- UPLOAD SECTION -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-orange-500">
+            <h2 class="text-2xl font-bold mb-4 text-orange-300">📤 Upload Existing Round Robin Data</h2>
+            <p class="text-gray-400 mb-4 text-sm">If you have a previously saved RR_Data.json file, upload it here to restore your data.</p>
+            <div class="flex gap-3 items-center mb-3">
+                <input type="file" id="uploadRRFile" accept=".json" class="flex-1 block text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700">
+                <button id="uploadRRButton" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition whitespace-nowrap">
+                    Upload
+                </button>
+            </div>
+            <div id="uploadStatus" class="hidden mt-2 p-3 bg-green-900 bg-opacity-30 rounded-lg border border-green-600">
+                <p class="text-green-400 font-bold">✓ Data uploaded and restored successfully!</p>
+            </div>
+            <div id="uploadError" class="hidden mt-2 p-3 bg-red-900 bg-opacity-30 rounded-lg border border-red-600">
+                <p class="text-red-400 font-bold">✗ Error uploading file. Please check the file format.</p>
+            </div>
+        </div>
+        
+        <!-- STAGE 1: Player Setup -->
+        <div id="stage1" class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-blue-500">
+            <h2 class="text-2xl font-bold mb-4 text-blue-300">Stage 1: Player Setup</h2>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Group A Players (5 names, one per line)</label>
+                    <textarea 
+                        id="groupAPlayers" 
+                        rows="5" 
+                        class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Player 1&#10;Player 2&#10;Player 3&#10;Player 4&#10;Player 5"
+                    ></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Group B Players (5 names, one per line)</label>
+                    <textarea 
+                        id="groupBPlayers" 
+                        rows="5" 
+                        class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Player 1&#10;Player 2&#10;Player 3&#10;Player 4&#10;Player 5"
+                    ></textarea>
+                </div>
+            </div>
+            <button 
+                id="generateRoundRobin" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg"
+            >
+                Generate Round Robin Matches
+            </button>
+            <div id="stage1Warning" class="hidden mt-4 p-4 bg-yellow-900 border border-yellow-600 rounded-lg">
+                <p class="text-yellow-200 font-semibold">⚠️ Warning: Matches have already been generated. Regenerating will reset all scores!</p>
+            </div>
+        </div>
+
+        <!-- STAGE 2: Scoring & Standings -->
+        <div id="stage2" class="hidden bg-gray-800 rounded-lg shadow-xl p-6 border-2 border-green-500">
+            <h2 class="text-2xl font-bold mb-6 text-green-300">Stage 2: Scoring & Standings</h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Group A -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-blue-300">Group A</h3>
+                    
+                    <!-- Group A Matches -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-300">Matches (Best of 5 Legs)</h4>
+                        <div id="groupAMatches" class="space-y-3"></div>
+                    </div>
+                    
+                    <!-- Group A Standings -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-gray-300">Standings</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Rank</th>
+                                        <th class="px-3 py-2 text-left">Player</th>
+                                        <th class="px-3 py-2 text-center">MP</th>
+                                        <th class="px-3 py-2 text-center">MW</th>
+                                        <th class="px-3 py-2 text-center">ML</th>
+                                        <th class="px-3 py-2 text-center">Legs Won</th>
+                                        <th class="px-3 py-2 text-center">Legs Lost</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupAStandings" class="divide-y divide-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group B -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-blue-300">Group B</h3>
+                    
+                    <!-- Group B Matches -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-300">Matches (Best of 5 Legs)</h4>
+                        <div id="groupBMatches" class="space-y-3"></div>
+                    </div>
+                    
+                    <!-- Group B Standings -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-gray-300">Standings</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Rank</th>
+                                        <th class="px-3 py-2 text-left">Player</th>
+                                        <th class="px-3 py-2 text-center">MP</th>
+                                        <th class="px-3 py-2 text-center">MW</th>
+                                        <th class="px-3 py-2 text-center">ML</th>
+                                        <th class="px-3 py-2 text-center">Legs Won</th>
+                                        <th class="px-3 py-2 text-center">Legs Lost</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupBStandings" class="divide-y divide-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STAGE 3: Export Round Robin Data -->
+        <div id="stage3" class="hidden bg-gray-800 rounded-lg shadow-xl p-6 border-2 border-green-500">
+            <h2 class="text-2xl font-bold mb-4 text-green-300">Stage 3: Finalize & Download RR Data</h2>
+            <p class="text-gray-300 mb-4">Download your Round Robin data to proceed to Stage 2 (Knockout Bracket)</p>
+            <button 
+                id="exportRRJson" 
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg"
+            >
+                Download RR_Data.json & Return to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Match Details Modal -->
+    <div id="matchModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-blue-300" id="modalTitle">Match Details</h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Player 1 Stats -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-bold mb-3 text-green-400" id="modalPlayer1">Player 1</h4>
+                        
+                        <!-- Averages Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">AVERAGES</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">3-Dart Average</label>
+                                    <input type="number" step="0.01" id="p1_3da" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0.00" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">180s</label>
+                                    <input type="number" id="p1_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scoring Counts Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">SCORING COUNTS</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">100+ Scores</label>
+                                    <input type="number" id="p1_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">140+ Scores</label>
+                                    <input type="number" id="p1_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Finishing Section -->
+                        <div>
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">FINISHING</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout Opportunities</label>
+                                    <input type="number" id="p1_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkouts Made</label>
+                                    <input type="number" id="p1_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout %</label>
+                                    <input type="text" id="p1_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" readonly placeholder="0%" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">High Finish</label>
+                                    <input type="number" id="p1_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player 2 Stats -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-bold mb-3 text-green-400" id="modalPlayer2">Player 2</h4>
+                        
+                        <!-- Averages Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">AVERAGES</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">3-Dart Average</label>
+                                    <input type="number" step="0.01" id="p2_3da" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0.00" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">180s</label>
+                                    <input type="number" id="p2_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scoring Counts Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">SCORING COUNTS</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">100+ Scores</label>
+                                    <input type="number" id="p2_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">140+ Scores</label>
+                                    <input type="number" id="p2_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Finishing Section -->
+                        <div>
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">FINISHING</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout Opportunities</label>
+                                    <input type="number" id="p2_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkouts Made</label>
+                                    <input type="number" id="p2_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout %</label>
+                                    <input type="text" id="p2_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" readonly placeholder="0%" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">High Finish</label>
+                                    <input type="number" id="p2_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="saveMatchDetails" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200">
+                        Save Match Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Details Modal -->
+    <div id="matchModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-blue-300" id="modalTitle">Match Details</h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Player 1 Stats -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-bold mb-3 text-green-400" id="modalPlayer1">Player 1</h4>
+                        
+                        <!-- Averages Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">AVERAGES</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">3-Dart Average</label>
+                                    <input type="number" step="0.01" id="p1_3da" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0.00" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">180s</label>
+                                    <input type="number" id="p1_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scoring Counts Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">SCORING COUNTS</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">100+ Scores</label>
+                                    <input type="number" id="p1_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">140+ Scores</label>
+                                    <input type="number" id="p1_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Finishing Section -->
+                        <div>
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">FINISHING</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout Opportunities</label>
+                                    <input type="number" id="p1_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkouts Made</label>
+                                    <input type="number" id="p1_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout %</label>
+                                    <input type="text" id="p1_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" readonly placeholder="0%" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">High Finish</label>
+                                    <input type="number" id="p1_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player 2 Stats -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-bold mb-3 text-green-400" id="modalPlayer2">Player 2</h4>
+                        
+                        <!-- Averages Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">AVERAGES</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">3-Dart Average</label>
+                                    <input type="number" step="0.01" id="p2_3da" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0.00" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">180s</label>
+                                    <input type="number" id="p2_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scoring Counts Section -->
+                        <div class="mb-4 pb-4 border-b border-gray-600">
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">SCORING COUNTS</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">100+ Scores</label>
+                                    <input type="number" id="p2_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">140+ Scores</label>
+                                    <input type="number" id="p2_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Finishing Section -->
+                        <div>
+                            <h5 class="text-sm font-semibold mb-2 text-gray-300">FINISHING</h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout Opportunities</label>
+                                    <input type="number" id="p2_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkouts Made</label>
+                                    <input type="number" id="p2_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">Checkout %</label>
+                                    <input type="text" id="p2_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" readonly placeholder="0%" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1 text-gray-300">High Finish</label>
+                                    <input type="number" id="p2_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded" placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="saveMatchDetails" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200">
+                        Save Match Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        let appData = {
+            metadata: {
+                seriesNumber: 1,
+                eventNumber: 1
+            },
+            groupA: {
+                players: [],
+                matches: []
+            },
+            groupB: {
+                players: [],
+                matches: []
+            }
+        };
+
+        let currentMatchEdit = null;
+        
+        // Upload RR Data Handler - Button click
+        document.getElementById('uploadRRButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('uploadRRFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first!');
+                return;
+            }
+
+            console.log('Reading file:', file.name);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    console.log('File loaded, parsing JSON...');
+                    const uploadedData = JSON.parse(event.target.result);
+                    console.log('Parsed data:', uploadedData);
+                    
+                    // Validate structure
+                    if (!uploadedData.metadata || !uploadedData.standings || !uploadedData.matches) {
+                        console.error('Invalid data structure');
+                        document.getElementById('uploadError').classList.remove('hidden');
+                        document.getElementById('uploadStatus').classList.add('hidden');
+                        setTimeout(() => {
+                            document.getElementById('uploadError').classList.add('hidden');
+                        }, 3000);
+                        return;
+                    }
+
+                    // Convert uploaded data to appData format
+                    appData.metadata.seriesNumber = uploadedData.metadata.series_id;
+                    appData.metadata.eventNumber = uploadedData.metadata.event_id;
+                    
+                    // Update metadata dropdowns
+                    document.getElementById('seriesNumber').value = uploadedData.metadata.series_id;
+                    document.getElementById('eventNumber').value = uploadedData.metadata.event_id;
+                    
+                    // Extract players from standings
+                    const groupAPlayers = uploadedData.standings.groupA.map(s => s.name);
+                    const groupBPlayers = uploadedData.standings.groupB.map(s => s.name);
+                    
+                    appData.groupA.players = groupAPlayers;
+                    appData.groupB.players = groupBPlayers;
+                    
+                    // Convert matches to appData format
+                    appData.groupA.matches = uploadedData.matches.groupA.map(m => ({
+                        player1: m.player1,
+                        player2: m.player2,
+                        player1Legs: m.player1_legs,
+                        player2Legs: m.player2_legs,
+                        details: {
+                            player1: {
+                                threeDartAvg: m.player1_details.three_dart_avg,
+                                coOpportunities: m.player1_details.co_opportunities,
+                                coCompleted: m.player1_details.co_completed,
+                                coPct: m.player1_details.co_pct,
+                                scores100plus: m.player1_details.scores_100plus,
+                                scores140plus: m.player1_details.scores_140plus,
+                                scores180: m.player1_details.scores_180,
+                                highFinish: m.player1_details.high_finish
+                            },
+                            player2: {
+                                threeDartAvg: m.player2_details.three_dart_avg,
+                                coOpportunities: m.player2_details.co_opportunities,
+                                coCompleted: m.player2_details.co_completed,
+                                coPct: m.player2_details.co_pct,
+                                scores100plus: m.player2_details.scores_100plus,
+                                scores140plus: m.player2_details.scores_140plus,
+                                scores180: m.player2_details.scores_180,
+                                highFinish: m.player2_details.high_finish
+                            }
+                        }
+                    }));
+                    
+                    appData.groupB.matches = uploadedData.matches.groupB.map(m => ({
+                        player1: m.player1,
+                        player2: m.player2,
+                        player1Legs: m.player1_legs,
+                        player2Legs: m.player2_legs,
+                        details: {
+                            player1: {
+                                threeDartAvg: m.player1_details.three_dart_avg,
+                                coOpportunities: m.player1_details.co_opportunities,
+                                coCompleted: m.player1_details.co_completed,
+                                coPct: m.player1_details.co_pct,
+                                scores100plus: m.player1_details.scores_100plus,
+                                scores140plus: m.player1_details.scores_140plus,
+                                scores180: m.player1_details.scores_180,
+                                highFinish: m.player1_details.high_finish
+                            },
+                            player2: {
+                                threeDartAvg: m.player2_details.three_dart_avg,
+                                coOpportunities: m.player2_details.co_opportunities,
+                                coCompleted: m.player2_details.co_completed,
+                                coPct: m.player2_details.co_pct,
+                                scores100plus: m.player2_details.scores_100plus,
+                                scores140plus: m.player2_details.scores_140plus,
+                                scores180: m.player2_details.scores_180,
+                                highFinish: m.player2_details.high_finish
+                            }
+                        }
+                    }));
+                    
+                    // Save to localStorage
+                    saveData();
+                    
+                    // Update UI
+                    document.getElementById('groupAPlayers').value = groupAPlayers.join('\\n');
+                    document.getElementById('groupBPlayers').value = groupBPlayers.join('\\n');
+                    document.getElementById('stage2').classList.remove('hidden');
+                    document.getElementById('stage3').classList.remove('hidden');
+                    document.getElementById('stage1Warning').classList.remove('hidden');
+                    renderMatches();
+                    updateStandings();
+                    
+                    // Show success message
+                    document.getElementById('uploadStatus').classList.remove('hidden');
+                    document.getElementById('uploadError').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('uploadStatus').classList.add('hidden');
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    document.getElementById('uploadError').classList.remove('hidden');
+                    document.getElementById('uploadStatus').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('uploadError').classList.add('hidden');
+                    }, 3000);
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        // Convert "Last, First" to "First Last" for display
+        function formatNameForDisplay(name) {
+            if (name.includes(',')) {
+                const parts = name.split(',').map(p => p.trim());
+                return `${parts[1]} ${parts[0]}`;
+            }
+            return name;
+        }
+        
+        // Generate storage key based on series and event
+        function getStorageKey() {
+            const series = document.getElementById('seriesNumber').value;
+            const event = document.getElementById('eventNumber').value;
+            return `dartsAdminData_S${series}_E${event}`;
+        }
+        
+        // Load data from localStorage for current series/event
+        function loadData() {
+            const storageKey = getStorageKey();
+            const saved = localStorage.getItem(storageKey);
+            
+            if (saved) {
+                appData = JSON.parse(saved);
+                
+                // Ensure metadata exists
+                if (!appData.metadata) {
+                    appData.metadata = {
+                        seriesNumber: parseInt(document.getElementById('seriesNumber').value) || 1,
+                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1
+                    };
+                }
+            } else {
+                // No saved data for this series/event - start fresh
+                appData = {
+                    metadata: {
+                        seriesNumber: parseInt(document.getElementById('seriesNumber').value) || 1,
+                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1
+                    },
+                    groupA: {
+                        players: [],
+                        matches: []
+                    },
+                    groupB: {
+                        players: [],
+                        matches: []
+                    }
+                };
+            }
+            
+            // Update UI with loaded data
+            document.getElementById('groupAPlayers').value = appData.groupA.players.join('\n');
+            document.getElementById('groupBPlayers').value = appData.groupB.players.join('\n');
+            
+            if (appData.groupA.matches.length > 0 || appData.groupB.matches.length > 0) {
+                document.getElementById('stage2').classList.remove('hidden');
+                document.getElementById('stage3').classList.remove('hidden');
+                document.getElementById('stage1Warning').classList.remove('hidden');
+                renderMatches();
+                updateStandings();
+            }
+        }
+
+        // Save data to localStorage for current series/event
+        function saveData() {
+            const storageKey = getStorageKey();
+            appData.metadata.seriesNumber = parseInt(document.getElementById('seriesNumber').value) || 1;
+            appData.metadata.eventNumber = parseInt(document.getElementById('eventNumber').value) || 1;
+            localStorage.setItem(storageKey, JSON.stringify(appData));
+        }
+
+        // When series/event changes, save current data and load new data
+        document.getElementById('seriesNumber').addEventListener('change', function() {
+            // Save current data before switching
+            saveData();
+            // Load data for new series/event
+            loadData();
+            // Update display
+            if (appData.groupA.matches.length > 0 || appData.groupB.matches.length > 0) {
+                document.getElementById('stage2').classList.remove('hidden');
+                document.getElementById('stage3').classList.remove('hidden');
+                document.getElementById('stage1Warning').classList.remove('hidden');
+                renderMatches();
+                updateStandings();
+            } else {
+                document.getElementById('stage2').classList.add('hidden');
+                document.getElementById('stage3').classList.add('hidden');
+                document.getElementById('stage1Warning').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('eventNumber').addEventListener('change', function() {
+            // Save current data before switching
+            saveData();
+            // Load data for new series/event
+            loadData();
+            // Update display
+            if (appData.groupA.matches.length > 0 || appData.groupB.matches.length > 0) {
+                document.getElementById('stage2').classList.remove('hidden');
+                document.getElementById('stage3').classList.remove('hidden');
+                document.getElementById('stage1Warning').classList.remove('hidden');
+                renderMatches();
+                updateStandings();
+            } else {
+                document.getElementById('stage2').classList.add('hidden');
+                document.getElementById('stage3').classList.add('hidden');
+                document.getElementById('stage1Warning').classList.add('hidden');
+            }
+        });
+
+        // Auto-save player inputs
+        document.getElementById('groupAPlayers').addEventListener('input', function() {
+            const names = this.value.trim().split('\n').filter(name => name.trim() !== '').map(name => name.trim());
+            if (appData.groupA.matches.length === 0) {
+                appData.groupA.players = names;
+            }
+            saveData();
+        });
+
+        document.getElementById('groupBPlayers').addEventListener('input', function() {
+            const names = this.value.trim().split('\n').filter(name => name.trim() !== '').map(name => name.trim());
+            if (appData.groupB.matches.length === 0) {
+                appData.groupB.players = names;
+            }
+            saveData();
+        });
+
+        // Generate round robin matches
+        function generateRoundRobin(players) {
+            const matches = [];
+            for (let i = 0; i < players.length; i++) {
+                for (let j = i + 1; j < players.length; j++) {
+                    matches.push({
+                        player1: players[i],
+                        player2: players[j],
+                        player1Legs: 0,
+                        player2Legs: 0,
+                        details: {
+                            player1: {
+                                threeDartAvg: 0,
+                                coOpportunities: 0,
+                                coCompleted: 0,
+                                coPct: 0,
+                                scores100plus: 0,
+                                scores140plus: 0,
+                                scores180: 0,
+                                highFinish: 0
+                            },
+                            player2: {
+                                threeDartAvg: 0,
+                                coOpportunities: 0,
+                                coCompleted: 0,
+                                coPct: 0,
+                                scores100plus: 0,
+                                scores140plus: 0,
+                                scores180: 0,
+                                highFinish: 0
+                            }
+                        }
+                    });
+                }
+            }
+            return matches;
+        }
+
+        // Generate matches button click
+        document.getElementById('generateRoundRobin').addEventListener('click', function() {
+            const groupAText = document.getElementById('groupAPlayers').value.trim();
+            const groupBText = document.getElementById('groupBPlayers').value.trim();
+            
+            const groupAPlayers = groupAText.split('\n').filter(name => name.trim() !== '').map(name => name.trim());
+            const groupBPlayers = groupBText.split('\n').filter(name => name.trim() !== '').map(name => name.trim());
+            
+            // Validate
+            if (groupAPlayers.length !== 5 || groupBPlayers.length !== 5) {
+                alert('Please enter exactly 5 players for each group!');
+                return;
+            }
+            
+            // Confirm if regenerating
+            if (appData.groupA.matches.length > 0) {
+                if (!confirm('This will reset all matches and scores. Are you sure?')) {
+                    return;
+                }
+            }
+            
+            // Generate matches
+            appData.groupA.players = groupAPlayers;
+            appData.groupB.players = groupBPlayers;
+            appData.groupA.matches = generateRoundRobin(groupAPlayers);
+            appData.groupB.matches = generateRoundRobin(groupBPlayers);
+            
+            saveData();
+            
+            document.getElementById('stage2').classList.remove('hidden');
+            document.getElementById('stage3').classList.remove('hidden');
+            document.getElementById('stage1Warning').classList.remove('hidden');
+            renderMatches();
+            updateStandings();
+        });
+
+        // Render matches
+        function renderMatches() {
+            renderGroupMatches('A', appData.groupA.matches);
+            renderGroupMatches('B', appData.groupB.matches);
+        }
+
+        function renderGroupMatches(group, matches) {
+            const container = document.getElementById(`group${group}Matches`);
+            container.innerHTML = '';
+            
+            matches.forEach((match, index) => {
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'bg-gray-700 p-3 rounded-lg';
+                matchDiv.innerHTML = `
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex-1 text-right font-medium">${formatNameForDisplay(match.player1)}</div>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="3" 
+                                value="${match.player1Legs}"
+                                class="w-14 p-2 bg-gray-600 border border-gray-500 rounded text-center focus:ring-2 focus:ring-blue-500"
+                                data-group="${group}"
+                                data-match="${index}"
+                                data-player="1"
+                            />
+                            <span class="text-gray-400">-</span>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="3" 
+                                value="${match.player2Legs}"
+                                class="w-14 p-2 bg-gray-600 border border-gray-500 rounded text-center focus:ring-2 focus:ring-blue-500"
+                                data-group="${group}"
+                                data-match="${index}"
+                                data-player="2"
+                            />
+                        </div>
+                        <div class="flex-1 text-left font-medium">${formatNameForDisplay(match.player2)}</div>
+                        <button 
+                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-1 px-3 rounded transition"
+                            data-group="${group}"
+                            data-match="${index}"
+                            onclick="openMatchDetails('${group}', ${index})"
+                        >
+                            Details
+                        </button>
+                    </div>
+                `;
+                container.appendChild(matchDiv);
+            });
+            
+            // Add event listeners to inputs
+            container.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', function() {
+                    handleScoreInput(this);
+                });
+            });
+        }
+
+        // Handle score input
+        function handleScoreInput(input) {
+            const group = input.dataset.group;
+            const matchIndex = parseInt(input.dataset.match);
+            const player = input.dataset.player;
+            let value = parseInt(input.value) || 0;
+            
+            // Validate: legs won should be 0-3
+            if (value < 0) value = 0;
+            if (value > 3) value = 3;
+            input.value = value;
+            
+            const matches = group === 'A' ? appData.groupA.matches : appData.groupB.matches;
+            const match = matches[matchIndex];
+            
+            if (player === '1') {
+                match.player1Legs = value;
+            } else {
+                match.player2Legs = value;
+            }
+            
+            saveData();
+            updateStandings();
+        }
+
+        // Update standings with tie-breaker logic
+        function updateStandings() {
+            updateGroupStandings('A', appData.groupA);
+            updateGroupStandings('B', appData.groupB);
+        }
+
+        function updateGroupStandings(group, groupData) {
+            const standings = {};
+            
+            // Initialize standings
+            groupData.players.forEach(player => {
+                standings[player] = {
+                    name: player,
+                    played: 0,
+                    won: 0,
+                    lost: 0,
+                    legsWon: 0,
+                    legsLost: 0,
+                    headToHead: {}
+                };
+            });
+            
+            // Calculate stats from matches
+            groupData.matches.forEach(match => {
+                const p1Legs = match.player1Legs;
+                const p2Legs = match.player2Legs;
+                
+                // Only count if match has been played (at least one leg scored)
+                if (p1Legs > 0 || p2Legs > 0) {
+                    standings[match.player1].played++;
+                    standings[match.player2].played++;
+                    standings[match.player1].legsWon += p1Legs;
+                    standings[match.player1].legsLost += p2Legs;
+                    standings[match.player2].legsWon += p2Legs;
+                    standings[match.player2].legsLost += p1Legs;
+                    
+                    // Determine winner (first to 3 legs wins the match)
+                    if (p1Legs >= 3) {
+                        standings[match.player1].won++;
+                        standings[match.player2].lost++;
+                        standings[match.player1].headToHead[match.player2] = 'won';
+                        standings[match.player2].headToHead[match.player1] = 'lost';
+                    } else if (p2Legs >= 3) {
+                        standings[match.player2].won++;
+                        standings[match.player1].lost++;
+                        standings[match.player2].headToHead[match.player1] = 'won';
+                        standings[match.player1].headToHead[match.player2] = 'lost';
+                    }
+                }
+            });
+            
+            // Convert to array and sort with tie-breaker
+            let sortedStandings = Object.values(standings);
+            sortedStandings.sort((a, b) => {
+                // Primary: Total Legs Won
+                if (b.legsWon !== a.legsWon) {
+                    return b.legsWon - a.legsWon;
+                }
+                
+                // Secondary: Head-to-Head
+                if (a.headToHead[b.name] === 'won') return -1;
+                if (b.headToHead[a.name] === 'won') return 1;
+                
+                // Tertiary: Matches won
+                if (b.won !== a.won) {
+                    return b.won - a.won;
+                }
+                
+                // Quaternary: Legs lost (fewer is better)
+                return a.legsLost - b.legsLost;
+            });
+            
+            // Render standings
+            const tbody = document.getElementById(`group${group}Standings`);
+            tbody.innerHTML = '';
+            
+            sortedStandings.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.className = index < 4 ? 'bg-green-900 bg-opacity-30' : 'bg-gray-800';
+                row.innerHTML = `
+                    <td class="px-3 py-2 font-bold">${index + 1}</td>
+                    <td class="px-3 py-2">${formatNameForDisplay(player.name)}</td>
+                    <td class="px-3 py-2 text-center">${player.played}</td>
+                    <td class="px-3 py-2 text-center">${player.won}</td>
+                    <td class="px-3 py-2 text-center">${player.lost}</td>
+                    <td class="px-3 py-2 text-center font-bold text-green-400">${player.legsWon}</td>
+                    <td class="px-3 py-2 text-center text-red-400">${player.legsLost}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Open match details modal
+        function openMatchDetails(group, matchIndex) {
+            const matches = group === 'A' ? appData.groupA.matches : appData.groupB.matches;
+            const match = matches[matchIndex];
+            
+            currentMatchEdit = { group, matchIndex };
+            
+            // Set modal title
+            document.getElementById('modalTitle').textContent = `${formatNameForDisplay(match.player1)} vs ${formatNameForDisplay(match.player2)}`;
+            document.getElementById('modalPlayer1').textContent = formatNameForDisplay(match.player1);
+            document.getElementById('modalPlayer2').textContent = formatNameForDisplay(match.player2);
+            
+            // Ensure details object exists
+            if (!match.details) {
+                match.details = {
+                    player1: {
+                        threeDartAvg: 0, coOpportunities: 0, coCompleted: 0, coPct: 0,
+                        scores100plus: 0, scores140plus: 0, scores180: 0, highFinish: 0
+                    },
+                    player2: {
+                        threeDartAvg: 0, coOpportunities: 0, coCompleted: 0, coPct: 0,
+                        scores100plus: 0, scores140plus: 0, scores180: 0, highFinish: 0
+                    }
+                };
+            }
+            
+            // Load player 1 stats
+            document.getElementById('p1_3da').value = match.details.player1.threeDartAvg || '';
+            document.getElementById('p1_co_opp').value = match.details.player1.coOpportunities || '';
+            document.getElementById('p1_co_comp').value = match.details.player1.coCompleted || '';
+            document.getElementById('p1_co_pct').value = match.details.player1.coPct ? match.details.player1.coPct + '%' : '0%';
+            document.getElementById('p1_100plus').value = match.details.player1.scores100plus || '';
+            document.getElementById('p1_140plus').value = match.details.player1.scores140plus || '';
+            document.getElementById('p1_180s').value = match.details.player1.scores180 || '';
+            document.getElementById('p1_high_finish').value = match.details.player1.highFinish || '';
+            
+            // Load player 2 stats
+            document.getElementById('p2_3da').value = match.details.player2.threeDartAvg || '';
+            document.getElementById('p2_co_opp').value = match.details.player2.coOpportunities || '';
+            document.getElementById('p2_co_comp').value = match.details.player2.coCompleted || '';
+            document.getElementById('p2_co_pct').value = match.details.player2.coPct ? match.details.player2.coPct + '%' : '0%';
+            document.getElementById('p2_100plus').value = match.details.player2.scores100plus || '';
+            document.getElementById('p2_140plus').value = match.details.player2.scores140plus || '';
+            document.getElementById('p2_180s').value = match.details.player2.scores180 || '';
+            document.getElementById('p2_high_finish').value = match.details.player2.highFinish || '';
+            
+            // Show modal
+            document.getElementById('matchModal').classList.remove('hidden');
+        }
+
+        // Calculate checkout percentage
+        function calculateCOPct(opportunities, completed) {
+            if (opportunities === 0) return 0;
+            return Math.round((completed / opportunities) * 100 * 100) / 100;
+        }
+
+        // Auto-calculate CO% for player 1
+        document.getElementById('p1_co_opp').addEventListener('input', function() {
+            const opp = parseInt(this.value) || 0;
+            const comp = parseInt(document.getElementById('p1_co_comp').value) || 0;
+            document.getElementById('p1_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        document.getElementById('p1_co_comp').addEventListener('input', function() {
+            const opp = parseInt(document.getElementById('p1_co_opp').value) || 0;
+            const comp = parseInt(this.value) || 0;
+            document.getElementById('p1_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        // Auto-calculate CO% for player 2
+        document.getElementById('p2_co_opp').addEventListener('input', function() {
+            const opp = parseInt(this.value) || 0;
+            const comp = parseInt(document.getElementById('p2_co_comp').value) || 0;
+            document.getElementById('p2_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        document.getElementById('p2_co_comp').addEventListener('input', function() {
+            const opp = parseInt(document.getElementById('p2_co_opp').value) || 0;
+            const comp = parseInt(this.value) || 0;
+            document.getElementById('p2_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        // Save match details
+        document.getElementById('saveMatchDetails').addEventListener('click', function() {
+            if (!currentMatchEdit) return;
+            
+            const { group, matchIndex } = currentMatchEdit;
+            const matches = group === 'A' ? appData.groupA.matches : appData.groupB.matches;
+            const match = matches[matchIndex];
+            
+            // Save player 1 stats
+            match.details.player1.threeDartAvg = parseFloat(document.getElementById('p1_3da').value) || 0;
+            match.details.player1.coOpportunities = parseInt(document.getElementById('p1_co_opp').value) || 0;
+            match.details.player1.coCompleted = parseInt(document.getElementById('p1_co_comp').value) || 0;
+            match.details.player1.coPct = calculateCOPct(match.details.player1.coOpportunities, match.details.player1.coCompleted);
+            match.details.player1.scores100plus = parseInt(document.getElementById('p1_100plus').value) || 0;
+            match.details.player1.scores140plus = parseInt(document.getElementById('p1_140plus').value) || 0;
+            match.details.player1.scores180 = parseInt(document.getElementById('p1_180s').value) || 0;
+            match.details.player1.highFinish = parseInt(document.getElementById('p1_high_finish').value) || 0;
+            
+            // Save player 2 stats
+            match.details.player2.threeDartAvg = parseFloat(document.getElementById('p2_3da').value) || 0;
+            match.details.player2.coOpportunities = parseInt(document.getElementById('p2_co_opp').value) || 0;
+            match.details.player2.coCompleted = parseInt(document.getElementById('p2_co_comp').value) || 0;
+            match.details.player2.coPct = calculateCOPct(match.details.player2.coOpportunities, match.details.player2.coCompleted);
+            match.details.player2.scores100plus = parseInt(document.getElementById('p2_100plus').value) || 0;
+            match.details.player2.scores140plus = parseInt(document.getElementById('p2_140plus').value) || 0;
+            match.details.player2.scores180 = parseInt(document.getElementById('p2_180s').value) || 0;
+            match.details.player2.highFinish = parseInt(document.getElementById('p2_high_finish').value) || 0;
+            
+            saveData();
+            
+            // Close modal
+            document.getElementById('matchModal').classList.add('hidden');
+            currentMatchEdit = null;
+        });
+
+        // Close modal button
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('matchModal').classList.add('hidden');
+            currentMatchEdit = null;
+        });
+
+        // Close modal on background click
+        document.getElementById('matchModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                currentMatchEdit = null;
+            }
+        });
+
+        // Export Round Robin JSON
+        document.getElementById('exportRRJson').addEventListener('click', function() {
+            // Ensure metadata exists
+            if (!appData.metadata) {
+                appData.metadata = {
+                    seriesNumber: 1,
+                    eventNumber: 1
+                };
+            }
+            
+            // Get current date
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            
+            // Generate event name
+            const eventId = appData.metadata.eventNumber || 1;
+            const seriesId = appData.metadata.seriesNumber || 1;
+            const eventName = eventId === 7 ? `Series ${seriesId} - Tournament of Champions` : `Series ${seriesId} - Event ${eventId}`;
+            
+            // Build JSON structure (Round Robin only)
+            const exportData = {
+                metadata: {
+                    series_id: seriesId,
+                    event_id: eventId,
+                    event_name: eventName,
+                    date: dateStr
+                },
+                standings: {
+                    groupA: buildStandingsArray('A', appData.groupA),
+                    groupB: buildStandingsArray('B', appData.groupB)
+                },
+                matches: {
+                    groupA: appData.groupA.matches.map(m => formatMatchForExport(m)),
+                    groupB: appData.groupB.matches.map(m => formatMatchForExport(m))
+                }
+            };
+            
+            // Download as JSON with dynamic filename
+            const filename = `RR_Series${seriesId}_Event${eventId}.json`;
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Round Robin data exported successfully! Returning to dashboard...');
+            
+            // Return to dashboard after short delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+
+        function buildStandingsArray(group, groupData) {
+            const standings = {};
+            
+            // Initialize standings
+            groupData.players.forEach(player => {
+                standings[player] = {
+                    name: player,
+                    played: 0,
+                    won: 0,
+                    lost: 0,
+                    legsWon: 0,
+                    legsLost: 0,
+                    headToHead: {}
+                };
+            });
+            
+            // Calculate stats from matches
+            groupData.matches.forEach(match => {
+                const p1Legs = match.player1Legs;
+                const p2Legs = match.player2Legs;
+                
+                if (p1Legs > 0 || p2Legs > 0) {
+                    standings[match.player1].played++;
+                    standings[match.player2].played++;
+                    standings[match.player1].legsWon += p1Legs;
+                    standings[match.player1].legsLost += p2Legs;
+                    standings[match.player2].legsWon += p2Legs;
+                    standings[match.player2].legsLost += p1Legs;
+                    
+                    if (p1Legs >= 3) {
+                        standings[match.player1].won++;
+                        standings[match.player2].lost++;
+                        standings[match.player1].headToHead[match.player2] = 'won';
+                        standings[match.player2].headToHead[match.player1] = 'lost';
+                    } else if (p2Legs >= 3) {
+                        standings[match.player2].won++;
+                        standings[match.player1].lost++;
+                        standings[match.player2].headToHead[match.player1] = 'won';
+                        standings[match.player1].headToHead[match.player2] = 'lost';
+                    }
+                }
+            });
+            
+            let sortedStandings = Object.values(standings);
+            sortedStandings.sort((a, b) => {
+                if (b.legsWon !== a.legsWon) return b.legsWon - a.legsWon;
+                if (a.headToHead[b.name] === 'won') return -1;
+                if (b.headToHead[a.name] === 'won') return 1;
+                if (b.won !== a.won) return b.won - a.won;
+                return a.legsLost - b.legsLost;
+            });
+            
+            return sortedStandings.map((player, index) => ({
+                rank: index + 1,
+                name: player.name,
+                matches_played: player.played,
+                matches_won: player.won,
+                matches_lost: player.lost,
+                legs_won: player.legsWon,
+                legs_lost: player.legsLost
+            }));
+        }
+
+        function formatMatchForExport(match) {
+            return {
+                player1: match.player1,
+                player2: match.player2,
+                player1_legs: match.player1Legs,
+                player2_legs: match.player2Legs,
+                player1_details: {
+                    three_dart_avg: match.details?.player1?.threeDartAvg || 0,
+                    co_opportunities: match.details?.player1?.coOpportunities || 0,
+                    co_completed: match.details?.player1?.coCompleted || 0,
+                    co_pct: match.details?.player1?.coPct || 0,
+                    scores_100plus: match.details?.player1?.scores100plus || 0,
+                    scores_140plus: match.details?.player1?.scores140plus || 0,
+                    scores_180: match.details?.player1?.scores180 || 0,
+                    high_finish: match.details?.player1?.highFinish || 0
+                },
+                player2_details: {
+                    three_dart_avg: match.details?.player2?.threeDartAvg || 0,
+                    co_opportunities: match.details?.player2?.coOpportunities || 0,
+                    co_completed: match.details?.player2?.coCompleted || 0,
+                    co_pct: match.details?.player2?.coPct || 0,
+                    scores_100plus: match.details?.player2?.scores100plus || 0,
+                    scores_140plus: match.details?.player2?.scores140plus || 0,
+                    scores_180: match.details?.player2?.scores180 || 0,
+                    high_finish: match.details?.player2?.highFinish || 0
+                }
+            };
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>

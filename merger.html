@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 3: Event Stats Merger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+        }
+    </style>
+</head>
+<body class="text-white p-6">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition mb-4">
+                <span class="text-2xl mr-2">←</span>
+                <span class="font-semibold">Back to Dashboard</span>
+            </a>
+            <h1 class="text-5xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text mb-2">
+                Event Stats Merger
+            </h1>
+            <p class="text-center text-gray-400">Combine Round Robin and Knockout data into a single Master Event file</p>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <!-- Round Robin Upload -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border-2 border-green-500/50 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="text-4xl">📗</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-green-400">Round Robin Data</h2>
+                        <p class="text-sm text-gray-400">Upload RR_Data.json</p>
+                    </div>
+                </div>
+                
+                <input 
+                    type="file" 
+                    id="rrFileInput" 
+                    accept=".json" 
+                    class="hidden"
+                >
+                <button 
+                    onclick="document.getElementById('rrFileInput').click()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 mb-3"
+                >
+                    📤 Upload Round Robin JSON
+                </button>
+                
+                <div id="rrStatus" class="hidden">
+                    <div class="bg-green-900/30 border border-green-600 rounded-lg p-3">
+                        <p class="text-green-400 font-bold text-sm">✓ Loaded Successfully</p>
+                        <p class="text-xs text-gray-300 mt-1" id="rrInfo"></p>
+                        <div class="mt-2 text-xs text-gray-400">
+                            <p>Group A: <span id="rrGroupACount" class="text-white font-semibold">0</span> matches</p>
+                            <p>Group B: <span id="rrGroupBCount" class="text-white font-semibold">0</span> matches</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Knockout Upload -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border-2 border-yellow-500/50 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="text-4xl">🏆</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-yellow-400">Knockout Data</h2>
+                        <p class="text-sm text-gray-400">Upload KO_Data.json</p>
+                    </div>
+                </div>
+                
+                <input 
+                    type="file" 
+                    id="koFileInput" 
+                    accept=".json" 
+                    class="hidden"
+                >
+                <button 
+                    onclick="document.getElementById('koFileInput').click()" 
+                    class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 mb-3"
+                >
+                    📤 Upload Knockout JSON
+                </button>
+                
+                <div id="koStatus" class="hidden">
+                    <div class="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3">
+                        <p class="text-yellow-400 font-bold text-sm">✓ Loaded Successfully</p>
+                        <p class="text-xs text-gray-300 mt-1" id="koInfo"></p>
+                        <div class="mt-2 text-xs text-gray-400">
+                            <p>QF Matches: <span id="koQFCount" class="text-white font-semibold">0</span></p>
+                            <p>SF Matches: <span id="koSFCount" class="text-white font-semibold">0</span></p>
+                            <p>Champion: <span id="koChampion" class="text-white font-semibold">TBD</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Merge Section -->
+        <div class="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-xl p-8 border-2 border-purple-500/50 shadow-xl">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4">⚡</div>
+                <h2 class="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text mb-2">
+                    Ready to Merge
+                </h2>
+                <p class="text-gray-300 text-sm">
+                    This will calculate Event Averages by averaging ALL individual match 3DAs from both stages
+                </p>
+            </div>
+
+            <button 
+                id="mergeBtn" 
+                disabled 
+                class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg text-xl transition duration-200 shadow-lg"
+            >
+                🔄 Merge & Download Master Event JSON
+            </button>
+            
+            <p id="mergeHint" class="text-center text-gray-400 text-sm mt-4">
+                ⏳ Upload both files to enable merging
+            </p>
+        </div>
+
+        <!-- Processing Info -->
+        <div class="mt-8 bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+            <h3 class="text-lg font-bold text-blue-400 mb-3">📊 How This Works</h3>
+            <div class="space-y-2 text-sm text-gray-300">
+                <p>✅ <strong>Event 3DA Calculation:</strong> Collects every individual match 3DA from RR and KO, then calculates the average</p>
+                <p>✅ <strong>Stat Totals:</strong> Sums all 100+, 140+, 180s, and checkout data across both stages</p>
+                <p>✅ <strong>Metadata Preserved:</strong> Series ID and Event ID maintained in final file</p>
+                <p>✅ <strong>Output:</strong> Downloads Event_Final_Stats.json with complete player statistics</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rrData = null;
+        let koData = null;
+
+        // Handle RR file upload
+        document.getElementById('rrFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    rrData = JSON.parse(event.target.result);
+                    
+                    // Validate structure
+                    if (!rrData.metadata || !rrData.matches) {
+                        alert('Invalid Round Robin data format!');
+                        rrData = null;
+                        return;
+                    }
+
+                    // Show success
+                    document.getElementById('rrInfo').textContent = `${rrData.metadata.event_name} - ${rrData.metadata.date}`;
+                    document.getElementById('rrGroupACount').textContent = rrData.matches.groupA?.length || 0;
+                    document.getElementById('rrGroupBCount').textContent = rrData.matches.groupB?.length || 0;
+                    document.getElementById('rrStatus').classList.remove('hidden');
+                    
+                    checkMergeReady();
+                } catch (error) {
+                    alert('Error loading Round Robin file: ' + error.message);
+                    rrData = null;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Handle KO file upload
+        document.getElementById('koFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    koData = JSON.parse(event.target.result);
+                    
+                    // Validate structure
+                    if (!koData.metadata || !koData.knockout) {
+                        alert('Invalid Knockout data format!');
+                        koData = null;
+                        return;
+                    }
+
+                    // Show success
+                    document.getElementById('koInfo').textContent = `${koData.metadata.event_name} - Knockout Bracket`;
+                    document.getElementById('koQFCount').textContent = koData.knockout.quarterFinals?.length || 0;
+                    document.getElementById('koSFCount').textContent = koData.knockout.semiFinals?.length || 0;
+                    document.getElementById('koChampion').textContent = koData.knockout.champion || 'TBD';
+                    document.getElementById('koStatus').classList.remove('hidden');
+                    
+                    checkMergeReady();
+                } catch (error) {
+                    alert('Error loading Knockout file: ' + error.message);
+                    koData = null;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Check if ready to merge
+        function checkMergeReady() {
+            const mergeBtn = document.getElementById('mergeBtn');
+            const hint = document.getElementById('mergeHint');
+            
+            if (rrData && koData) {
+                mergeBtn.disabled = false;
+                hint.textContent = '✅ Ready to merge! Click the button above';
+                hint.classList.remove('text-gray-400');
+                hint.classList.add('text-green-400');
+            }
+        }
+
+        // Merge button click
+        document.getElementById('mergeBtn').addEventListener('click', function() {
+            if (!rrData || !koData) {
+                alert('Please upload both files first!');
+                return;
+            }
+
+            try {
+                const mergedData = mergeData(rrData, koData);
+                downloadJSON(mergedData);
+                
+                // Return to dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } catch (error) {
+                alert('Error merging data: ' + error.message);
+                console.error(error);
+            }
+        });
+
+        // Merge data function
+        function mergeData(rr, ko) {
+            const playerStats = {};
+
+            // Helper to add match data for a player
+            function addPlayerMatch(playerName, matchDetails, isWinner) {
+                if (!playerStats[playerName]) {
+                    playerStats[playerName] = {
+                        name: playerName,
+                        matches: [],
+                        total3DA: 0,
+                        matchCount: 0,
+                        stats: {
+                            scores_100plus: 0,
+                            scores_140plus: 0,
+                            scores_180: 0,
+                            co_opportunities: 0,
+                            co_completed: 0,
+                            high_finish: 0,
+                            wins: 0,
+                            losses: 0
+                        }
+                    };
+                }
+
+                const stats = playerStats[playerName];
+                
+                // Add match 3DA
+                if (matchDetails.three_dart_avg > 0) {
+                    stats.total3DA += matchDetails.three_dart_avg;
+                    stats.matchCount++;
+                }
+                
+                // Add stats
+                stats.stats.scores_100plus += matchDetails.scores_100plus || 0;
+                stats.stats.scores_140plus += matchDetails.scores_140plus || 0;
+                stats.stats.scores_180 += matchDetails.scores_180 || 0;
+                stats.stats.co_opportunities += matchDetails.co_opportunities || 0;
+                stats.stats.co_completed += matchDetails.co_completed || 0;
+                stats.stats.high_finish = Math.max(stats.stats.high_finish, matchDetails.high_finish || 0);
+                
+                if (isWinner) {
+                    stats.stats.wins++;
+                } else {
+                    stats.stats.losses++;
+                }
+            }
+
+            // Process Round Robin matches
+            ['groupA', 'groupB'].forEach(group => {
+                if (rr.matches[group]) {
+                    rr.matches[group].forEach(match => {
+                        const p1Winner = match.player1_legs >= 3;
+                        const p2Winner = match.player2_legs >= 3;
+                        
+                        addPlayerMatch(match.player1, match.player1_details, p1Winner);
+                        addPlayerMatch(match.player2, match.player2_details, p2Winner);
+                    });
+                }
+            });
+
+            // Process Knockout matches
+            ['quarterFinals', 'semiFinals', 'final'].forEach(round => {
+                if (ko.knockout[round]) {
+                    const matches = Array.isArray(ko.knockout[round]) ? ko.knockout[round] : [ko.knockout[round]];
+                    matches.forEach(match => {
+                        if (match.player1 && match.player1 !== 'TBD') {
+                            const p1Winner = match.winner === match.player1;
+                            const p2Winner = match.winner === match.player2;
+                            
+                            addPlayerMatch(match.player1, match.player1_details, p1Winner);
+                            if (match.player2 && match.player2 !== 'TBD') {
+                                addPlayerMatch(match.player2, match.player2_details, p2Winner);
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Calculate final event 3DA for each player
+            const players = Object.values(playerStats).map(player => {
+                const final_event_3da = player.matchCount > 0 
+                    ? parseFloat((player.total3DA / player.matchCount).toFixed(2))
+                    : 0;
+
+                const co_pct = player.stats.co_opportunities > 0
+                    ? parseFloat(((player.stats.co_completed / player.stats.co_opportunities) * 100).toFixed(2))
+                    : 0;
+
+                return {
+                    name: player.name,
+                    total_matches: player.matchCount,
+                    wins: player.stats.wins,
+                    losses: player.stats.losses,
+                    final_event_3da: final_event_3da,
+                    scores_100plus: player.stats.scores_100plus,
+                    scores_140plus: player.stats.scores_140plus,
+                    scores_180: player.stats.scores_180,
+                    co_opportunities: player.stats.co_opportunities,
+                    co_completed: player.stats.co_completed,
+                    co_pct: co_pct,
+                    high_finish: player.stats.high_finish
+                };
+            });
+
+            // Sort by event 3DA descending
+            players.sort((a, b) => b.final_event_3da - a.final_event_3da);
+
+            // Build final JSON
+            return {
+                metadata: {
+                    series_id: rr.metadata.series_id,
+                    event_id: rr.metadata.event_id,
+                    event_name: rr.metadata.event_name,
+                    date: rr.metadata.date,
+                    champion: ko.knockout.champion || 'TBD'
+                },
+                player_event_stats: players,
+                round_robin: {
+                    standings: rr.standings,
+                    matches: rr.matches
+                },
+                knockout: ko.knockout
+            };
+        }
+
+        // Download JSON file
+        function downloadJSON(data) {
+            // Generate dynamic filename from metadata
+            const seriesId = data.metadata.series_id || 1;
+            const eventId = data.metadata.event_id || 1;
+            const filename = `Final_Series${seriesId}_Event${eventId}.json`;
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`${filename} downloaded successfully! Returning to dashboard...`);
+        }
+    </script>
+</body>
+</html>

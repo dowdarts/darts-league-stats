@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 AADS Stats Director</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full">
+        <div class="text-center mb-12">
+            <div class="flex flex-col items-center justify-center mb-4">
+                <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-4">
+                    AADS STATS PROGRAM
+                </h1>
+                <img src="logos/AADS OFFIAL LOGO - Copy.png" alt="AADS Logo" class="h-64 w-auto object-contain mb-4">
+            </div>
+            <p class="text-xl text-gray-400">Darts Administration System</p>
+            <p class="text-sm text-gray-500 mt-2">Complete Event Management Workflow</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Stage 1: Round Robin -->
+            <a href="stage1.html" class="group block h-full">
+                <div class="bg-gradient-to-br from-green-600 to-green-800 p-8 rounded-2xl shadow-2xl hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 cursor-pointer h-full flex flex-col">
+                    <div class="text-center flex-1 flex flex-col justify-between">
+                        <div class="text-6xl mb-4">🎯</div>
+                        <div class="text-gray-200 text-sm font-semibold mb-2">STAGE 1</div>
+                        <h2 class="text-2xl font-bold mb-3">Round Robin</h2>
+                        <p class="text-sm text-green-100 mb-4">Group stage matches and standings</p>
+                        <div class="bg-white/20 rounded-lg p-3 text-sm">
+                            <p class="font-semibold mb-1">Process:</p>
+                            <ul class="text-xs text-left space-y-1">
+                                <li>• Enter 5 players per group</li>
+                                <li>• Score all 20 matches</li>
+                                <li>• Download RR_Data.json</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Stage 2: Knockout -->
+            <a href="stage2.html" class="group block h-full">
+                <div class="bg-gradient-to-br from-yellow-600 to-orange-800 p-8 rounded-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 cursor-pointer h-full flex flex-col">
+                    <div class="text-center flex-1 flex flex-col justify-between">
+                        <div class="text-6xl mb-4">🏆</div>
+                        <div class="text-gray-200 text-sm font-semibold mb-2">STAGE 2</div>
+                        <h2 class="text-2xl font-bold mb-3">Knockout</h2>
+                        <p class="text-sm text-yellow-100 mb-4">Bracket tournament to final</p>
+                        <div class="bg-white/20 rounded-lg p-3 text-sm">
+                            <p class="font-semibold mb-1">Process:</p>
+                            <ul class="text-xs text-left space-y-1">
+                                <li>• Upload RR_Data.json</li>
+                                <li>• Auto-seeded bracket</li>
+                                <li>• Download KO_Data.json</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Stage 3: Merger -->
+            <a href="merger.html" class="group block h-full">
+                <div class="bg-gradient-to-br from-purple-600 to-pink-800 p-8 rounded-2xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 cursor-pointer h-full flex flex-col">
+                    <div class="text-center flex-1 flex flex-col justify-between">
+                        <div class="text-6xl mb-4">📊</div>
+                        <div class="text-gray-200 text-sm font-semibold mb-2">STAGE 3</div>
+                        <h2 class="text-2xl font-bold mb-3">Stats Merger</h2>
+                        <p class="text-sm text-purple-100 mb-4">Combine & calculate final stats</p>
+                        <div class="bg-white/20 rounded-lg p-3 text-sm">
+                            <p class="font-semibold mb-1">Process:</p>
+                            <ul class="text-xs text-left space-y-1">
+                                <li>• Upload both JSON files</li>
+                                <li>• Calculate event 3DA</li>
+                                <li>• Download Final_Stats.json</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Workflow Guide -->
+        <div class="mt-12 bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <h3 class="text-xl font-bold mb-4 text-center text-blue-400">Workflow Guide</h3>
+            <div class="flex items-center justify-center space-x-4 text-sm">
+                <div class="text-center">
+                    <div class="bg-green-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">1</div>
+                    <p class="text-gray-400">Round Robin</p>
+                </div>
+                <div class="text-gray-500 text-2xl">→</div>
+                <div class="text-center">
+                    <div class="bg-yellow-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">2</div>
+                    <p class="text-gray-400">Knockout</p>
+                </div>
+                <div class="text-gray-500 text-2xl">→</div>
+                <div class="text-center">
+                    <div class="bg-purple-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">3</div>
+                    <p class="text-gray-400">Merger</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Profile Management -->
+        <div class="mt-8 grid md:grid-cols-2 gap-6">
+            <a href="profile_editor.html" class="block">
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-700 p-6 rounded-xl shadow-xl hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-102 cursor-pointer border-2 border-indigo-400 h-full">
+                    <div class="flex flex-col h-full justify-between">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="text-5xl">👤</div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-1">Player Profile Editor</h3>
+                                <p class="text-indigo-100 text-sm">Manage player bios, photos, and information</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2 text-center">
+                            <p class="text-white font-semibold text-sm">One-Time Setup</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="career.html" class="block">
+                <div class="bg-gradient-to-r from-purple-600 to-pink-700 p-6 rounded-xl shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-102 cursor-pointer border-2 border-purple-400 h-full">
+                    <div class="flex flex-col h-full justify-between">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="text-5xl">📊</div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-1">Career Stats Hub</h3>
+                                <p class="text-purple-100 text-sm">View automatic career statistics for all players</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2 text-center">
+                            <p class="text-white font-semibold text-sm">Auto-Updates</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Workflow Guide -->
+        <div class="mt-12 bg-gray-800 rounded-xl p-6 border border-gray-700 hidden">
+            <h3 class="text-xl font-bold mb-4 text-center text-blue-400">Workflow Guide</h3>
+            <div class="flex items-center justify-center space-x-4 text-sm">
+                <div class="text-center">
+                    <div class="bg-green-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">1</div>
+                    <p class="text-gray-400">Round Robin</p>
+                    <p class="text-xs text-gray-500">Download RR</p>
+                </div>
+                <div class="text-2xl text-gray-600">→</div>
+                <div class="text-center">
+                    <div class="bg-yellow-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">2</div>
+                    <p class="text-gray-400">Knockout</p>
+                    <p class="text-xs text-gray-500">Upload RR → Download KO</p>
+                </div>
+                <div class="text-2xl text-gray-600">→</div>
+                <div class="text-center">
+                    <div class="bg-purple-600 rounded-full w-12 h-12 flex items-center justify-center font-bold mb-2 mx-auto">3</div>
+                    <p class="text-gray-400">Merger</p>
+                    <p class="text-xs text-gray-500">Combine → Final Stats</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sponsors & Partners -->
+        <div class="mt-12 bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <h3 class="text-lg font-bold mb-6 text-center text-gray-400">Sponsors & Partners</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 items-center justify-items-center">
+                <a href="https://www.aadsdarts.com/" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/AADS OFFIAL LOGO - Copy.png" alt="AADS Official" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <a href="https://www.aadsdarts.com/" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/AADSDarts.com Logo.png" alt="AADSDarts.com" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <a href="https://www.youtube.com/@CGCDarts" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/CGC-TV Logo - Copy.png" alt="CGC-TV" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <a href="https://cgcdarts.com" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/cgcdarts.com logo - Copy.png" alt="CGCDarts.com" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <a href="https://share.google/RICQ8vnCpGQ5nuaGb" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/CGCVENUE LOGO.png" alt="CGC Venue" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <a href="https://www.facebook.com/groups/1029382055111128/" target="_blank" rel="noopener noreferrer">
+                    <img src="logos/LIVE STREAM CGC LOGO - Copy.png" alt="Live Stream CGC" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300 cursor-pointer">
+                </a>
+                <img src="logos/MDSTUDIOS - Copy.png" alt="MDStudios" class="h-24 w-auto object-contain opacity-70 hover:opacity-100 hover:scale-110 hover:brightness-125 transition-all duration-300">
+            </div>
+        </div>
+
+        <div class="mt-8 text-center text-gray-500 text-sm">
+            <p>© 2025 AADS Stats Director • Offline Event Management System</p>
+            <p class="mt-2 text-gray-600 text-xs">Made by MDStudios for AADSDarts.com</p>
+        </div>
+    </div>
+</body>
+</html>

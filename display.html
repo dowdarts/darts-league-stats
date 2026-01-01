@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts League Stats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-bottom: 3px solid #fbbf24;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+    <!-- Header -->
+    <div class="bg-gray-900 border-b-4 border-yellow-500 py-6 px-4 shadow-2xl">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 text-transparent bg-clip-text mb-2">
+                🎯 Darts League
+            </h1>
+            <p class="text-xl text-gray-300">Series 1 Standings & Stats</p>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="max-w-7xl mx-auto mt-12 text-center">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500"></div>
+        <p class="text-2xl text-gray-300 mt-4">Loading Stats...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden max-w-7xl mx-auto mt-12 p-8 bg-red-900 bg-opacity-30 border-2 border-red-600 rounded-xl">
+        <p class="text-2xl text-red-300 text-center">⚠️ Failed to Load Data</p>
+        <p class="text-gray-300 text-center mt-4" id="errorMessage"></p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden max-w-7xl mx-auto px-4 py-8">
+        <!-- Tabs -->
+        <div class="flex flex-wrap gap-2 mb-8 bg-gray-800 p-2 rounded-xl">
+            <button onclick="showTab('leaderboard')" id="tab-leaderboard" class="tab-active flex-1 min-w-[120px] py-3 px-6 rounded-lg font-bold text-white transition duration-200">
+                🏆 Leaderboard
+            </button>
+            <button onclick="showTab('events')" id="tab-events" class="flex-1 min-w-[120px] py-3 px-6 rounded-lg font-bold bg-gray-700 hover:bg-gray-600 text-white transition duration-200">
+                📅 Event Results
+            </button>
+            <button onclick="showTab('players')" id="tab-players" class="flex-1 min-w-[120px] py-3 px-6 rounded-lg font-bold bg-gray-700 hover:bg-gray-600 text-white transition duration-200">
+                👥 Player Profiles
+            </button>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div id="content-leaderboard" class="tab-content">
+            <div class="grid gap-6">
+                <!-- Top 3 Podium -->
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div id="podium-2" class="bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl p-6 text-center order-2 md:order-1">
+                        <div class="text-6xl mb-2">🥈</div>
+                        <div class="text-2xl font-bold mb-2">2nd Place</div>
+                    </div>
+                    <div id="podium-1" class="bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl p-6 text-center order-1 md:order-2 transform md:scale-110">
+                        <div class="text-8xl mb-2">🏆</div>
+                        <div class="text-3xl font-bold mb-2">Champion</div>
+                    </div>
+                    <div id="podium-3" class="bg-gradient-to-br from-orange-600 to-orange-800 rounded-xl p-6 text-center order-3">
+                        <div class="text-6xl mb-2">🥉</div>
+                        <div class="text-2xl font-bold mb-2">3rd Place</div>
+                    </div>
+                </div>
+
+                <!-- Full Rankings Table -->
+                <div class="bg-gray-800 rounded-xl p-6 shadow-2xl">
+                    <h2 class="text-3xl font-bold mb-6 text-yellow-400">Career Rankings</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b-2 border-gray-700">
+                                    <th class="pb-3 text-gray-400 text-sm">Rank</th>
+                                    <th class="pb-3 text-gray-400 text-sm">Player</th>
+                                    <th class="pb-3 text-gray-400 text-sm text-center">Events</th>
+                                    <th class="pb-3 text-gray-400 text-sm text-center">Career 3DA</th>
+                                    <th class="pb-3 text-gray-400 text-sm text-center">180s</th>
+                                    <th class="pb-3 text-gray-400 text-sm text-center">Wins</th>
+                                    <th class="pb-3 text-gray-400 text-sm text-center">Win %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Results Tab -->
+        <div id="content-events" class="tab-content hidden">
+            <div class="bg-gray-800 rounded-xl p-6 shadow-2xl mb-6">
+                <label class="block text-xl font-bold mb-4 text-yellow-400">Select Event:</label>
+                <select id="eventSelector" onchange="showEventDetails()" class="w-full p-4 bg-gray-700 border-2 border-gray-600 rounded-lg text-white text-lg">
+                    <option value="">Choose an event...</option>
+                </select>
+            </div>
+
+            <div id="eventDetails" class="hidden">
+                <!-- Event Info -->
+                <div class="bg-gray-800 rounded-xl p-6 shadow-2xl mb-6">
+                    <h2 id="eventTitle" class="text-3xl font-bold mb-2 text-yellow-400"></h2>
+                    <p id="eventMeta" class="text-gray-400"></p>
+                </div>
+
+                <!-- Round Robin Results -->
+                <div class="bg-gray-800 rounded-xl p-6 shadow-2xl mb-6">
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">Round Robin Standings</h3>
+                    <div id="rrStandings" class="grid md:grid-cols-2 gap-6"></div>
+                </div>
+
+                <!-- Knockout Bracket -->
+                <div class="bg-gray-800 rounded-xl p-6 shadow-2xl">
+                    <h3 class="text-2xl font-bold mb-4 text-yellow-400">Knockout Results</h3>
+                    <div id="koBracket"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Profiles Tab -->
+        <div id="content-players" class="tab-content hidden">
+            <!-- Search -->
+            <div class="bg-gray-800 rounded-xl p-6 shadow-2xl mb-6">
+                <input 
+                    type="text" 
+                    id="playerSearch" 
+                    placeholder="🔍 Search players..." 
+                    oninput="filterPlayers()"
+                    class="w-full p-4 bg-gray-700 border-2 border-gray-600 rounded-lg text-white text-lg"
+                >
+            </div>
+
+            <!-- Player Cards Grid -->
+            <div id="playerCards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Player Detail Modal -->
+            <div id="playerModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50" onclick="closePlayerModal(event)">
+                <div class="bg-gray-800 rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 id="modalPlayerName" class="text-4xl font-bold text-yellow-400"></h2>
+                        <button onclick="closePlayerModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-6">
+                        <div class="md:col-span-1">
+                            <img id="modalPlayerPhoto" src="" alt="" class="w-full rounded-xl shadow-lg mb-4">
+                            <div id="modalPlayerInfo" class="space-y-2 text-sm"></div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-blue-900 bg-opacity-50 rounded-lg p-4 text-center">
+                                    <p class="text-blue-300 text-sm font-semibold mb-1">Career 3DA</p>
+                                    <p id="modalCareer3DA" class="text-3xl font-bold"></p>
+                                </div>
+                                <div class="bg-green-900 bg-opacity-50 rounded-lg p-4 text-center">
+                                    <p class="text-green-300 text-sm font-semibold mb-1">Total 180s</p>
+                                    <p id="modalTotal180s" class="text-3xl font-bold"></p>
+                                </div>
+                                <div class="bg-yellow-900 bg-opacity-50 rounded-lg p-4 text-center">
+                                    <p class="text-yellow-300 text-sm font-semibold mb-1">Events</p>
+                                    <p id="modalEvents" class="text-3xl font-bold"></p>
+                                </div>
+                                <div class="bg-purple-900 bg-opacity-50 rounded-lg p-4 text-center">
+                                    <p class="text-purple-300 text-sm font-semibold mb-1">Win Rate</p>
+                                    <p id="modalWinRate" class="text-3xl font-bold"></p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <canvas id="modalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="modalBio" class="bg-gray-900 rounded-lg p-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventFiles = [];
+        let playerProfiles = [];
+        let careerStats = {};
+        let currentChart = null;
+
+        // Try to load up to 10 events
+        const MAX_EVENTS = 10;
+
+        // Initialize
+        async function init() {
+            try {
+                // Load player profiles
+                const profileRes = await fetch('player_profiles.json');
+                if (profileRes.ok) {
+                    playerProfiles = await profileRes.json();
+                }
+
+                // Try to load event files
+                const eventPromises = [];
+                for (let i = 1; i <= MAX_EVENTS; i++) {
+                    eventPromises.push(
+                        fetch(`results/Final_Series1_Event${i}.json`)
+                            .then(res => res.ok ? res.json() : null)
+                            .catch(() => null)
+                    );
+                }
+
+                const events = await Promise.all(eventPromises);
+                eventFiles = events.filter(e => e !== null);
+
+                if (eventFiles.length === 0) {
+                    throw new Error('No event files found. Make sure files exist in results/ folder.');
+                }
+
+                // Calculate career stats
+                calculateCareerStats();
+
+                // Populate event selector
+                populateEventSelector();
+
+                // Show content
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+                // Load leaderboard by default
+                showTab('leaderboard');
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('errorState').classList.remove('hidden');
+                document.getElementById('errorMessage').textContent = error.message;
+            }
+        }
+
+        // Calculate career statistics for all players
+        function calculateCareerStats() {
+            const playerMap = new Map();
+
+            eventFiles.forEach((event, eventIndex) => {
+                if (event.player_event_stats) {
+                    event.player_event_stats.forEach(playerStats => {
+                        const name = formatNameForDisplay(playerStats.name);
+                        
+                        if (!playerMap.has(name)) {
+                            playerMap.set(name, {
+                                name: name,
+                                events: [],
+                                totalMatches: 0,
+                                total3DASum: 0,
+                                total180s: 0,
+                                total140s: 0,
+                                total100s: 0,
+                                totalWins: 0,
+                                totalLosses: 0,
+                                highCheckout: 0,
+                                coOpportunities: 0,
+                                coCompleted: 0
+                            });
+                        }
+
+                        const player = playerMap.get(name);
+                        player.events.push({
+                            eventIndex: eventIndex,
+                            eventName: event.metadata.event_name,
+                            avg3DA: playerStats.final_event_3da,
+                            matches: playerStats.total_matches,
+                            wins: playerStats.wins,
+                            losses: playerStats.losses
+                        });
+
+                        player.totalMatches += playerStats.total_matches;
+                        player.total3DASum += playerStats.final_event_3da * playerStats.total_matches;
+                        player.total180s += playerStats.scores_180 || 0;
+                        player.total140s += playerStats.scores_140plus || 0;
+                        player.total100s += playerStats.scores_100plus || 0;
+                        player.totalWins += playerStats.wins;
+                        player.totalLosses += playerStats.losses;
+                        player.highCheckout = Math.max(player.highCheckout, playerStats.high_checkout || 0);
+                        player.coOpportunities += playerStats.co_opportunities || 0;
+                        player.coCompleted += playerStats.co_completed || 0;
+                    });
+                }
+            });
+
+            // Calculate career averages
+            playerMap.forEach((player, name) => {
+                player.career3DA = player.totalMatches > 0 ? player.total3DASum / player.totalMatches : 0;
+                player.winRate = player.totalMatches > 0 ? (player.totalWins / player.totalMatches) * 100 : 0;
+                player.coRate = player.coOpportunities > 0 ? (player.coCompleted / player.coOpportunities) * 100 : 0;
+                careerStats[name] = player;
+            });
+        }
+
+        // Format name from "Last, First" to "First Last"
+        function formatNameForDisplay(name) {
+            if (name.includes(',')) {
+                const parts = name.split(',').map(p => p.trim());
+                return `${parts[1]} ${parts[0]}`;
+            }
+            return name;
+        }
+
+        // Show tab
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+            document.getElementById(`tab-${tabName}`).classList.remove('bg-gray-700', 'hover:bg-gray-600');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+
+            // Load content
+            if (tabName === 'leaderboard') {
+                renderLeaderboard();
+            } else if (tabName === 'players') {
+                renderPlayerCards();
+            }
+        }
+
+        // Render leaderboard
+        function renderLeaderboard() {
+            const sortedPlayers = Object.values(careerStats).sort((a, b) => b.career3DA - a.career3DA);
+
+            // Render podium
+            if (sortedPlayers.length >= 3) {
+                renderPodiumPlayer(1, sortedPlayers[0]);
+                renderPodiumPlayer(2, sortedPlayers[1]);
+                renderPodiumPlayer(3, sortedPlayers[2]);
+            }
+
+            // Render table
+            const tbody = document.getElementById('leaderboardTable');
+            tbody.innerHTML = sortedPlayers.map((player, index) => {
+                const profile = playerProfiles.find(p => p.name === player.name);
+                const photoHtml = profile?.imageBase64 
+                    ? `<img src="${profile.imageBase64}" class="w-10 h-10 rounded-full object-cover inline-block mr-2">`
+                    : `<div class="w-10 h-10 rounded-full bg-gray-600 inline-flex items-center justify-center text-xl mr-2">👤</div>`;
+                
+                const rankClass = index === 0 ? 'bg-yellow-900 bg-opacity-30' : 
+                                 index === 1 ? 'bg-gray-700 bg-opacity-30' : 
+                                 index === 2 ? 'bg-orange-900 bg-opacity-30' : '';
+
+                return `
+                    <tr class="border-b border-gray-700 hover:bg-gray-700 transition ${rankClass}">
+                        <td class="py-4 text-xl font-bold">${index + 1}</td>
+                        <td class="py-4">
+                            <div class="flex items-center">
+                                ${photoHtml}
+                                <span class="font-semibold">${player.name}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 text-center">${player.events.length}</td>
+                        <td class="py-4 text-center font-bold text-yellow-400">${player.career3DA.toFixed(2)}</td>
+                        <td class="py-4 text-center">${player.total180s}</td>
+                        <td class="py-4 text-center">${player.totalWins}</td>
+                        <td class="py-4 text-center">${player.winRate.toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render podium player
+        function renderPodiumPlayer(position, player) {
+            const profile = playerProfiles.find(p => p.name === player.name);
+            const photoHtml = profile?.imageBase64 
+                ? `<img src="${profile.imageBase64}" class="w-24 h-24 rounded-full object-cover mx-auto mb-3 border-4 border-white">`
+                : `<div class="w-24 h-24 rounded-full bg-gray-600 mx-auto mb-3 flex items-center justify-center text-5xl">👤</div>`;
+
+            document.getElementById(`podium-${position}`).innerHTML += `
+                ${photoHtml}
+                <p class="text-xl font-bold mb-1">${player.name}</p>
+                <p class="text-lg text-gray-300">${player.career3DA.toFixed(2)} avg</p>
+                <p class="text-sm text-gray-400">${player.total180s} x 180s</p>
+            `;
+        }
+
+        // Populate event selector
+        function populateEventSelector() {
+            const selector = document.getElementById('eventSelector');
+            eventFiles.forEach((event, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = event.metadata.event_name;
+                selector.appendChild(option);
+            });
+        }
+
+        // Show event details
+        function showEventDetails() {
+            const index = document.getElementById('eventSelector').value;
+            if (!index) {
+                document.getElementById('eventDetails').classList.add('hidden');
+                return;
+            }
+
+            const event = eventFiles[index];
+            document.getElementById('eventDetails').classList.remove('hidden');
+            document.getElementById('eventTitle').textContent = event.metadata.event_name;
+            document.getElementById('eventMeta').textContent = `Series ${event.metadata.series_id} - Event ${event.metadata.event_id}`;
+
+            // Render RR standings
+            renderRRStandings(event);
+
+            // Render KO bracket
+            renderKOBracket(event);
+        }
+
+        // Render Round Robin standings
+        function renderRRStandings(event) {
+            const container = document.getElementById('rrStandings');
+            const groups = ['A', 'B'];
+            
+            container.innerHTML = groups.map(group => {
+                const groupData = event.round_robin_results[`group${group}`];
+                if (!groupData) return '';
+
+                const sortedPlayers = [...groupData.players].sort((a, b) => b.points - a.points);
+
+                return `
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <h4 class="text-xl font-bold mb-3 text-green-300">Group ${group}</h4>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="pb-2 text-left text-gray-400">Player</th>
+                                    <th class="pb-2 text-center text-gray-400">W-L</th>
+                                    <th class="pb-2 text-center text-gray-400">Pts</th>
+                                    <th class="pb-2 text-center text-gray-400">3DA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sortedPlayers.map((player, index) => `
+                                    <tr class="border-b border-gray-800 ${index < 4 ? 'bg-green-900 bg-opacity-20' : ''}">
+                                        <td class="py-2">${formatNameForDisplay(player.name)}</td>
+                                        <td class="py-2 text-center">${player.wins}-${player.losses}</td>
+                                        <td class="py-2 text-center font-bold">${player.points}</td>
+                                        <td class="py-2 text-center">${player.three_dart_avg.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Knockout bracket
+        function renderKOBracket(event) {
+            const ko = event.knockout_results;
+            const container = document.getElementById('koBracket');
+
+            const renderMatch = (match, title) => {
+                if (!match) return '';
+                const p1 = formatNameForDisplay(match.player1);
+                const p2 = formatNameForDisplay(match.player2);
+                const winner = match.winner ? formatNameForDisplay(match.winner) : 'TBD';
+
+                return `
+                    <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                        <h5 class="text-sm font-bold text-gray-400 mb-2">${title}</h5>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center ${match.winner === match.player1 ? 'text-green-400 font-bold' : ''}">
+                                <span>${p1}</span>
+                                <span class="text-lg">${match.player1_sets || 0}</span>
+                            </div>
+                            <div class="flex justify-between items-center ${match.winner === match.player2 ? 'text-green-400 font-bold' : ''}">
+                                <span>${p2}</span>
+                                <span class="text-lg">${match.player2_sets || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            let html = '<div class="grid md:grid-cols-3 gap-4">';
+            
+            // Quarter Finals
+            html += '<div>';
+            html += '<h4 class="text-lg font-bold mb-3 text-yellow-300">Quarter Finals</h4>';
+            ko.quarter_finals?.forEach((match, i) => {
+                html += renderMatch(match, `QF${i + 1}`);
+            });
+            html += '</div>';
+
+            // Semi Finals
+            html += '<div>';
+            html += '<h4 class="text-lg font-bold mb-3 text-yellow-300">Semi Finals</h4>';
+            ko.semi_finals?.forEach((match, i) => {
+                html += renderMatch(match, `SF${i + 1}`);
+            });
+            html += '</div>';
+
+            // Final & Champion
+            html += '<div>';
+            html += '<h4 class="text-lg font-bold mb-3 text-yellow-300">Final</h4>';
+            if (ko.final) {
+                html += renderMatch(ko.final, 'FINAL');
+            }
+            if (ko.champion) {
+                html += `
+                    <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg p-6 text-center mt-4">
+                        <div class="text-5xl mb-2">🏆</div>
+                        <p class="text-sm text-yellow-900 font-bold mb-1">CHAMPION</p>
+                        <p class="text-2xl font-bold text-gray-900">${formatNameForDisplay(ko.champion)}</p>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Render player cards
+        function renderPlayerCards() {
+            const container = document.getElementById('playerCards');
+            const sortedPlayers = Object.values(careerStats).sort((a, b) => b.career3DA - a.career3DA);
+
+            container.innerHTML = sortedPlayers.map(player => {
+                const profile = playerProfiles.find(p => p.name === player.name);
+                const photoHtml = profile?.imageBase64 
+                    ? `<img src="${profile.imageBase64}" class="w-full h-48 object-cover">`
+                    : `<div class="w-full h-48 bg-gray-700 flex items-center justify-center text-6xl">👤</div>`;
+
+                return `
+                    <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer" onclick="showPlayerDetails('${player.name}')">
+                        ${photoHtml}
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">${player.name}</h3>
+                            ${profile?.nickname ? `<p class="text-blue-300 text-sm mb-3">"${profile.nickname}"</p>` : ''}
+                            <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                                <div>
+                                    <p class="text-gray-400">3DA</p>
+                                    <p class="font-bold text-yellow-400">${player.career3DA.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400">180s</p>
+                                    <p class="font-bold">${player.total180s}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400">Events</p>
+                                    <p class="font-bold">${player.events.length}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter players
+        function filterPlayers() {
+            const search = document.getElementById('playerSearch').value.toLowerCase();
+            const cards = document.getElementById('playerCards').children;
+            
+            Array.from(cards).forEach(card => {
+                const name = card.textContent.toLowerCase();
+                card.style.display = name.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Show player details modal
+        function showPlayerDetails(playerName) {
+            const player = careerStats[playerName];
+            const profile = playerProfiles.find(p => p.name === playerName);
+
+            document.getElementById('modalPlayerName').textContent = playerName;
+            
+            const photoHtml = profile?.imageBase64 
+                ? profile.imageBase64
+                : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%234B5563" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-size="100" text-anchor="middle" dy=".3em"%3E👤%3C/text%3E%3C/svg%3E';
+            
+            document.getElementById('modalPlayerPhoto').src = photoHtml;
+
+            document.getElementById('modalPlayerInfo').innerHTML = `
+                ${profile?.nickname ? `<p><strong>Nickname:</strong> ${profile.nickname}</p>` : ''}
+                ${profile?.hometown ? `<p><strong>Hometown:</strong> ${profile.hometown}</p>` : ''}
+                ${profile?.dartsSetup ? `<p><strong>Setup:</strong> ${profile.dartsSetup}</p>` : ''}
+                <p><strong>High Checkout:</strong> ${player.highCheckout}</p>
+                <p><strong>CO%:</strong> ${player.coRate.toFixed(1)}%</p>
+            `;
+
+            document.getElementById('modalCareer3DA').textContent = player.career3DA.toFixed(2);
+            document.getElementById('modalTotal180s').textContent = player.total180s;
+            document.getElementById('modalEvents').textContent = player.events.length;
+            document.getElementById('modalWinRate').textContent = player.winRate.toFixed(1) + '%';
+
+            document.getElementById('modalBio').innerHTML = profile?.bio 
+                ? `<p class="text-gray-300">${profile.bio}</p>`
+                : '<p class="text-gray-500 italic">No bio available</p>';
+
+            // Create performance chart
+            createPlayerChart(player);
+
+            document.getElementById('playerModal').classList.remove('hidden');
+        }
+
+        // Create player performance chart
+        function createPlayerChart(player) {
+            const ctx = document.getElementById('modalChart');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: player.events.map((e, i) => `Event ${i + 1}`),
+                    datasets: [{
+                        label: '3-Dart Average',
+                        data: player.events.map(e => e.avg3DA),
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Performance Over Time',
+                            color: '#fff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Close player modal
+        function closePlayerModal(event) {
+            if (!event || event.target === event.currentTarget) {
+                document.getElementById('playerModal').classList.add('hidden');
+                if (currentChart) {
+                    currentChart.destroy();
+                    currentChart = null;
+                }
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 2: Knockout Bracket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-6">
+            <a href="index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition">
+                <span class="text-2xl mr-2">←</span>
+                <span class="font-semibold">Back to Dashboard</span>
+            </a>
+        </div>
+        <h1 class="text-4xl font-bold mb-8 text-center text-yellow-400">Stage 2: Knockout Bracket</h1>
+        
+        <!-- Upload Existing KO Data -->
+        <div class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-orange-500">
+            <h2 class="text-2xl font-bold mb-4 text-orange-300">📤 Upload Existing Knockout Data</h2>
+            <p class="text-gray-400 mb-4 text-sm">If you have a previously saved KO_Data.json file, upload it here to restore your bracket.</p>
+            <div class="flex gap-3 items-center mb-3">
+                <input type="file" id="koRestoreInput" accept=".json" class="flex-1 block text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700">
+                <button id="koRestoreButton" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition whitespace-nowrap">
+                    Upload
+                </button>
+            </div>
+            <div id="koUploadStatus" class="hidden mt-2 p-3 bg-green-900 bg-opacity-30 rounded-lg border border-green-600">
+                <p class="text-green-400 font-bold">✓ Knockout data restored successfully!</p>
+            </div>
+            <div id="koUploadError" class="hidden mt-2 p-3 bg-red-900 bg-opacity-30 rounded-lg border border-red-600">
+                <p class="text-red-400 font-bold">✗ Error uploading file. Please check the file format.</p>
+            </div>
+        </div>
+        
+        <!-- Stage 1: Upload RR Data -->
+        <div id="stage1" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Stage 1: Upload Round Robin Data</h2>
+            <input type="file" id="rrFileInput" accept=".json" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 mb-4">
+            <button id="loadRRData" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition">
+                Load RR Data & Generate Bracket
+            </button>
+            <div id="rrDataInfo" class="hidden mt-4 p-4 bg-gray-700 rounded-lg">
+                <p class="font-bold text-yellow-400">Loaded Event: <span id="eventName"></span></p>
+                <p class="text-sm text-gray-300 mt-2">Top 4 from each group will be seeded into Quarter Finals</p>
+            </div>
+        </div>
+
+        <!-- Stage 2: Knockout Bracket -->
+        <div id="stage2" class="hidden mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400">Stage 2: Knockout Bracket</h2>
+            
+            <!-- Quarter Finals -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold mb-4 text-blue-300">Quarter Finals</h3>
+                <div id="quarterFinals" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- QF matches will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Semi Finals -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold mb-4 text-blue-300">Semi Finals</h3>
+                <div id="semiFinals" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                    <!-- SF matches will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Final -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold mb-4 text-yellow-400">Final</h3>
+                <div id="final" class="max-w-2xl mx-auto">
+                    <!-- Final match will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Champion Display -->
+            <div id="championSection" class="hidden text-center p-6 bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-lg">
+                <h3 class="text-2xl font-bold mb-2 text-gray-900">🏆 Champion 🏆</h3>
+                <p id="championName" class="text-3xl font-bold text-gray-900"></p>
+            </div>
+        </div>
+
+        <!-- Stage 3: Export KO Data -->
+        <div id="stage3" class="hidden mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Stage 3: Finalize & Download KO Data</h2>
+            <p class="text-gray-300 mb-4">Download your Knockout data to proceed to Stage 3 (Stats Merger)</p>
+            <button id="exportKOJson" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition">
+                Download KO_Data.json & Return to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Match Details Modal -->
+    <div id="matchModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-2xl font-bold text-blue-400"></h3>
+                <button id="closeModal" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Player 1 Column -->
+                <div class="space-y-4">
+                    <h4 id="modalPlayer1" class="text-xl font-bold text-green-400 border-b-2 border-green-400 pb-2"></h4>
+                    
+                    <!-- Averages Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Averages</h5>
+                        <label class="block text-sm mb-1">3 Dart Average (3DA)</label>
+                        <input type="number" id="p1_3da" step="0.01" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">180s</label>
+                        <input type="number" id="p1_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+
+                    <!-- Scoring Counts Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Scoring Counts</h5>
+                        <label class="block text-sm mb-1">100+ Scores</label>
+                        <input type="number" id="p1_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">140+ Scores</label>
+                        <input type="number" id="p1_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+
+                    <!-- Finishing Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Finishing</h5>
+                        <label class="block text-sm mb-1">CO Opportunities</label>
+                        <input type="number" id="p1_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">CO Made</label>
+                        <input type="number" id="p1_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">CO%</label>
+                        <input type="text" id="p1_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3" readonly>
+                        
+                        <label class="block text-sm mb-1">High Finish</label>
+                        <input type="number" id="p1_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+                </div>
+
+                <!-- Player 2 Column -->
+                <div class="space-y-4">
+                    <h4 id="modalPlayer2" class="text-xl font-bold text-green-400 border-b-2 border-green-400 pb-2"></h4>
+                    
+                    <!-- Averages Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Averages</h5>
+                        <label class="block text-sm mb-1">3 Dart Average (3DA)</label>
+                        <input type="number" id="p2_3da" step="0.01" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">180s</label>
+                        <input type="number" id="p2_180s" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+
+                    <!-- Scoring Counts Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Scoring Counts</h5>
+                        <label class="block text-sm mb-1">100+ Scores</label>
+                        <input type="number" id="p2_100plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">140+ Scores</label>
+                        <input type="number" id="p2_140plus" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+
+                    <!-- Finishing Section -->
+                    <div class="bg-gray-700 p-4 rounded">
+                        <h5 class="font-bold text-gray-300 mb-2">Finishing</h5>
+                        <label class="block text-sm mb-1">CO Opportunities</label>
+                        <input type="number" id="p2_co_opp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">CO Made</label>
+                        <input type="number" id="p2_co_comp" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3">
+                        
+                        <label class="block text-sm mb-1">CO%</label>
+                        <input type="text" id="p2_co_pct" class="w-full p-2 bg-gray-600 border border-gray-500 rounded mb-3" readonly>
+                        
+                        <label class="block text-sm mb-1">High Finish</label>
+                        <input type="number" id="p2_high_finish" class="w-full p-2 bg-gray-600 border border-gray-500 rounded">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button id="saveMatchDetails" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition">
+                    Save Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            metadata: null,
+            knockout: {
+                quarterFinals: [],
+                semiFinals: [],
+                final: null,
+                champion: null
+            }
+        };
+
+        let currentMatchEdit = null;
+
+        // Convert old snake_case format to new camelCase format
+        function migrateOldKOFormat(data) {
+            // Check if this is old format (has snake_case properties)
+            const isOldFormat = data.knockout.quarterFinals && 
+                               data.knockout.quarterFinals.length > 0 && 
+                               'match_id' in data.knockout.quarterFinals[0];
+            
+            if (!isOldFormat) {
+                return data; // Already new format
+            }
+            
+            console.log('Migrating old KO format to new format...');
+            
+            // Helper to convert a single match
+            function convertMatch(oldMatch) {
+                if (!oldMatch) return null;
+                
+                console.log('Converting match:', oldMatch.match_id || oldMatch.matchId);
+                console.log('Old match details:', oldMatch.details);
+                console.log('Old match player1_details:', oldMatch.player1_details);
+                console.log('Old match player2_details:', oldMatch.player2_details);
+                
+                // Helper to convert player details from snake_case to camelCase
+                function convertPlayerDetails(oldDetails) {
+                    console.log('Converting player details:', oldDetails);
+                    
+                    if (!oldDetails) {
+                        return {
+                            threeDartAvg: 0,
+                            coOpportunities: 0,
+                            coCompleted: 0,
+                            coPct: 0,
+                            scores100plus: 0,
+                            scores140plus: 0,
+                            scores180: 0,
+                            highFinish: 0
+                        };
+                    }
+                    
+                    return {
+                        threeDartAvg: oldDetails.three_dart_avg || oldDetails.threeDartAvg || 0,
+                        coOpportunities: oldDetails.co_opportunities || oldDetails.coOpportunities || 0,
+                        coCompleted: oldDetails.co_completed || oldDetails.coCompleted || 0,
+                        coPct: oldDetails.co_pct || oldDetails.coPct || 0,
+                        scores100plus: oldDetails.scores_100plus || oldDetails.scores100plus || 0,
+                        scores140plus: oldDetails.scores_140plus || oldDetails.scores140plus || 0,
+                        scores180: oldDetails.scores_180 || oldDetails.scores180 || 0,
+                        highFinish: oldDetails.high_finish || oldDetails.highFinish || 0
+                    };
+                }
+                
+                // Handle both old formats: details.player1/player2 OR player1_details/player2_details
+                const player1Details = oldMatch.player1_details || oldMatch.details?.player1;
+                const player2Details = oldMatch.player2_details || oldMatch.details?.player2;
+                
+                return {
+                    matchId: oldMatch.match_id || oldMatch.matchId,
+                    player1: oldMatch.player1,
+                    player2: oldMatch.player2,
+                    player1Sets: oldMatch.player1_sets || oldMatch.player1Sets || 0,
+                    player2Sets: oldMatch.player2_sets || oldMatch.player2Sets || 0,
+                    player1TotalLegs: oldMatch.player1_total_legs || oldMatch.player1TotalLegs || 0,
+                    player2TotalLegs: oldMatch.player2_total_legs || oldMatch.player2TotalLegs || 0,
+                    winner: oldMatch.winner || null,
+                    details: {
+                        player1: convertPlayerDetails(player1Details),
+                        player2: convertPlayerDetails(player2Details)
+                    }
+                };
+            }
+            
+            // Convert all matches
+            return {
+                metadata: data.metadata,
+                knockout: {
+                    quarterFinals: data.knockout.quarterFinals.map(convertMatch),
+                    semiFinals: data.knockout.semiFinals.map(convertMatch),
+                    final: convertMatch(data.knockout.final),
+                    champion: data.knockout.champion
+                }
+            };
+        }
+
+        // Upload existing KO data for restore
+        document.getElementById('koRestoreButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('koRestoreInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first!');
+                return;
+            }
+
+            console.log('Reading KO file:', file.name);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const uploadedData = JSON.parse(event.target.result);
+                    
+                    // Validate structure
+                    if (!uploadedData.metadata || !uploadedData.knockout) {
+                        document.getElementById('koUploadError').classList.remove('hidden');
+                        document.getElementById('koUploadStatus').classList.add('hidden');
+                        setTimeout(() => {
+                            document.getElementById('koUploadError').classList.add('hidden');
+                        }, 3000);
+                        return;
+                    }
+
+                    // Migrate old format if needed
+                    const migratedData = migrateOldKOFormat(uploadedData);
+                    
+                    // Restore the data
+                    appData = migratedData;
+                    
+                    console.log('Restored appData:', appData);
+                    console.log('Quarter Finals:', appData.knockout.quarterFinals);
+                    console.log('Semi Finals:', appData.knockout.semiFinals);
+                    console.log('Final:', appData.knockout.final);
+                    console.log('Champion:', appData.knockout.champion);
+                    
+                    // Hide stage 1 and show stage 2 & 3
+                    document.getElementById('stage1').classList.add('hidden');
+                    document.getElementById('stage2').classList.remove('hidden');
+                    document.getElementById('stage3').classList.remove('hidden');
+                    
+                    // Show RR info
+                    document.getElementById('eventName').textContent = uploadedData.metadata.event_name;
+                    document.getElementById('rrDataInfo').classList.remove('hidden');
+                    
+                    // Render all matches (fixed function name)
+                    console.log('About to call renderKnockout()');
+                    renderKnockout();
+                    console.log('renderKnockout() completed');
+                    
+                    // Show success message
+                    document.getElementById('koUploadStatus').classList.remove('hidden');
+                    document.getElementById('koUploadError').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('koUploadStatus').classList.add('hidden');
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    document.getElementById('koUploadError').classList.remove('hidden');
+                    document.getElementById('koUploadStatus').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('koUploadError').classList.add('hidden');
+                    }, 3000);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Format name for display (convert "Last, First" to "First Last")
+        function formatNameForDisplay(name) {
+            if (!name || name === 'TBD') return name;
+            if (name.includes(',')) {
+                const parts = name.split(',').map(p => p.trim());
+                return `${parts[1]} ${parts[0]}`;
+            }
+            return name;
+        }
+
+        // Load RR Data
+        document.getElementById('loadRRData').addEventListener('click', function() {
+            const fileInput = document.getElementById('rrFileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a Round Robin JSON file!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const rrData = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (!rrData.metadata || !rrData.standings || !rrData.standings.groupA || !rrData.standings.groupB) {
+                        alert('Invalid Round Robin data format!');
+                        return;
+                    }
+
+                    // Store metadata
+                    appData.metadata = rrData.metadata;
+
+                    // Get top 4 from each group
+                    const standingsA = rrData.standings.groupA;
+                    const standingsB = rrData.standings.groupB;
+
+                    if (standingsA.length < 4 || standingsB.length < 4) {
+                        alert('Need at least 4 players in each group!');
+                        return;
+                    }
+
+                    // Create Quarter Finals with seeding: A1vB4, A2vB3, B1vA4, B2vA3
+                    appData.knockout.quarterFinals = [
+                        createKnockoutMatch(standingsA[0].name, standingsB[3].name, 'QF1'),
+                        createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF2'),
+                        createKnockoutMatch(standingsB[0].name, standingsA[3].name, 'QF3'),
+                        createKnockoutMatch(standingsB[1].name, standingsA[2].name, 'QF4')
+                    ];
+
+                    // Create empty Semi Finals
+                    appData.knockout.semiFinals = [
+                        createKnockoutMatch('TBD', 'TBD', 'SF1'),
+                        createKnockoutMatch('TBD', 'TBD', 'SF2')
+                    ];
+
+                    // Create empty Final
+                    appData.knockout.final = createKnockoutMatch('TBD', 'TBD', 'FINAL');
+                    appData.knockout.champion = null;
+
+                    // Show event info
+                    document.getElementById('eventName').textContent = rrData.metadata.event_name;
+                    document.getElementById('rrDataInfo').classList.remove('hidden');
+                    document.getElementById('stage2').classList.remove('hidden');
+                    document.getElementById('stage3').classList.remove('hidden');
+
+                    // Render bracket
+                    renderKnockout();
+
+                    alert('Bracket generated successfully!');
+                } catch (error) {
+                    alert('Error loading file: ' + error.message);
+                }
+            };
+
+            reader.readAsText(file);
+        });
+
+        function createKnockoutMatch(player1, player2, matchId) {
+            return {
+                matchId: matchId,
+                player1: player1,
+                player2: player2,
+                player1Sets: 0,
+                player2Sets: 0,
+                player1TotalLegs: 0,
+                player2TotalLegs: 0,
+                winner: null,
+                details: {
+                    player1: {
+                        threeDartAvg: 0,
+                        coOpportunities: 0,
+                        coCompleted: 0,
+                        coPct: 0,
+                        scores100plus: 0,
+                        scores140plus: 0,
+                        scores180: 0,
+                        highFinish: 0
+                    },
+                    player2: {
+                        threeDartAvg: 0,
+                        coOpportunities: 0,
+                        coCompleted: 0,
+                        coPct: 0,
+                        scores100plus: 0,
+                        scores140plus: 0,
+                        scores180: 0,
+                        highFinish: 0
+                    }
+                }
+            };
+        }
+
+        // Render knockout bracket
+        function renderKnockout() {
+            renderKnockoutRound('quarterFinals', appData.knockout.quarterFinals);
+            renderKnockoutRound('semiFinals', appData.knockout.semiFinals);
+            renderKnockoutMatch('final', appData.knockout.final);
+            
+            if (appData.knockout.champion) {
+                document.getElementById('championSection').classList.remove('hidden');
+                document.getElementById('championName').textContent = formatNameForDisplay(appData.knockout.champion);
+            } else {
+                document.getElementById('championSection').classList.add('hidden');
+            }
+        }
+
+        function renderKnockoutRound(containerId, matches) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            matches.forEach((match, index) => {
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'bg-gray-700 p-4 rounded-lg';
+                const p1Display = match.player1 === 'TBD' ? 'TBD' : formatNameForDisplay(match.player1);
+                const p2Display = match.player2 === 'TBD' ? 'TBD' : formatNameForDisplay(match.player2);
+                
+                matchDiv.innerHTML = `
+                    <h4 class="text-sm font-bold mb-3 text-gray-400">${match.matchId}</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex-1 font-medium ${match.winner === match.player1 ? 'text-green-400' : ''}">${p1Display}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="text-center">
+                                    <label class="text-xs text-gray-400">Sets</label>
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        value="${match.player1Sets}"
+                                        class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                        onchange="updateKnockoutScore('${containerId}', ${index}, 1, 'sets', this.value)"
+                                        ${match.player1 === 'TBD' ? 'disabled' : ''}
+                                    />
+                                </div>
+                                <div class="text-center">
+                                    <label class="text-xs text-gray-400">Legs</label>
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        value="${match.player1TotalLegs}"
+                                        class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                        onchange="updateKnockoutScore('${containerId}', ${index}, 1, 'legs', this.value)"
+                                        ${match.player1 === 'TBD' ? 'disabled' : ''}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex-1 font-medium ${match.winner === match.player2 ? 'text-green-400' : ''}">${p2Display}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="text-center">
+                                    <label class="text-xs text-gray-400">Sets</label>
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        value="${match.player2Sets}"
+                                        class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                        onchange="updateKnockoutScore('${containerId}', ${index}, 2, 'sets', this.value)"
+                                        ${match.player2 === 'TBD' ? 'disabled' : ''}
+                                    />
+                                </div>
+                                <div class="text-center">
+                                    <label class="text-xs text-gray-400">Legs</label>
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        value="${match.player2TotalLegs}"
+                                        class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                        onchange="updateKnockoutScore('${containerId}', ${index}, 2, 'legs', this.value)"
+                                        ${match.player2 === 'TBD' ? 'disabled' : ''}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <button 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-3 rounded transition"
+                            onclick="openKnockoutDetails('${containerId}', ${index})"
+                            ${match.player1 === 'TBD' || match.player2 === 'TBD' ? 'disabled' : ''}
+                        >
+                            Detailed Stats
+                        </button>
+                    </div>
+                `;
+                container.appendChild(matchDiv);
+            });
+        }
+
+        function renderKnockoutMatch(containerId, match) {
+            if (!match) return;
+            
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'bg-gray-700 p-4 rounded-lg max-w-2xl mx-auto';
+            const p1Display = match.player1 === 'TBD' ? 'TBD' : formatNameForDisplay(match.player1);
+            const p2Display = match.player2 === 'TBD' ? 'TBD' : formatNameForDisplay(match.player2);
+            
+            matchDiv.innerHTML = `
+                <h4 class="text-lg font-bold mb-3 text-yellow-400 text-center">${match.matchId}</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex-1 font-medium ${match.winner === match.player1 ? 'text-green-400' : ''}">${p1Display}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-center">
+                                <label class="text-xs text-gray-400">Sets</label>
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    value="${match.player1Sets}"
+                                    class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                    onchange="updateKnockoutScore('final', 0, 1, 'sets', this.value)"
+                                    ${match.player1 === 'TBD' ? 'disabled' : ''}
+                                />
+                            </div>
+                            <div class="text-center">
+                                <label class="text-xs text-gray-400">Legs</label>
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    value="${match.player1TotalLegs}"
+                                    class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                    onchange="updateKnockoutScore('final', 0, 1, 'legs', this.value)"
+                                    ${match.player1 === 'TBD' ? 'disabled' : ''}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex-1 font-medium ${match.winner === match.player2 ? 'text-green-400' : ''}">${p2Display}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-center">
+                                <label class="text-xs text-gray-400">Sets</label>
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    value="${match.player2Sets}"
+                                    class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                    onchange="updateKnockoutScore('final', 0, 2, 'sets', this.value)"
+                                    ${match.player2 === 'TBD' ? 'disabled' : ''}
+                                />
+                            </div>
+                            <div class="text-center">
+                                <label class="text-xs text-gray-400">Legs</label>
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    value="${match.player2TotalLegs}"
+                                    class="w-16 p-2 bg-gray-600 border border-gray-500 rounded text-center"
+                                    onchange="updateKnockoutScore('final', 0, 2, 'legs', this.value)"
+                                    ${match.player2 === 'TBD' ? 'disabled' : ''}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <button 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-3 rounded transition"
+                        onclick="openKnockoutDetails('final', 0)"
+                        ${match.player1 === 'TBD' || match.player2 === 'TBD' ? 'disabled' : ''}
+                    >
+                        Detailed Stats
+                    </button>
+                </div>
+            `;
+            container.appendChild(matchDiv);
+        }
+
+        // Update knockout score
+        function updateKnockoutScore(round, matchIndex, player, type, value) {
+            let match;
+            if (round === 'final') {
+                match = appData.knockout.final;
+            } else {
+                match = appData.knockout[round][matchIndex];
+            }
+            
+            const numValue = parseInt(value) || 0;
+            
+            if (type === 'sets') {
+                if (player === 1) {
+                    match.player1Sets = numValue;
+                } else {
+                    match.player2Sets = numValue;
+                }
+            } else if (type === 'legs') {
+                if (player === 1) {
+                    match.player1TotalLegs = numValue;
+                } else {
+                    match.player2TotalLegs = numValue;
+                }
+            }
+            
+            // Determine winner (best of 5 sets = first to 3)
+            if (match.player1Sets >= 3) {
+                match.winner = match.player1;
+            } else if (match.player2Sets >= 3) {
+                match.winner = match.player2;
+            } else {
+                match.winner = null;
+            }
+            
+            // Progress winner to next round
+            if (match.winner) {
+                if (round === 'quarterFinals') {
+                    // QF1 winner -> SF1 player1, QF2 winner -> SF1 player2
+                    // QF3 winner -> SF2 player1, QF4 winner -> SF2 player2
+                    if (matchIndex === 0) {
+                        appData.knockout.semiFinals[0].player1 = match.winner;
+                    } else if (matchIndex === 1) {
+                        appData.knockout.semiFinals[0].player2 = match.winner;
+                    } else if (matchIndex === 2) {
+                        appData.knockout.semiFinals[1].player1 = match.winner;
+                    } else if (matchIndex === 3) {
+                        appData.knockout.semiFinals[1].player2 = match.winner;
+                    }
+                } else if (round === 'semiFinals') {
+                    // SF1 winner -> Final player1, SF2 winner -> Final player2
+                    if (matchIndex === 0) {
+                        appData.knockout.final.player1 = match.winner;
+                    } else if (matchIndex === 1) {
+                        appData.knockout.final.player2 = match.winner;
+                    }
+                } else if (round === 'final') {
+                    appData.knockout.champion = match.winner;
+                }
+            }
+            
+            renderKnockout();
+        }
+
+        // Open knockout match details
+        function openKnockoutDetails(round, matchIndex) {
+            console.log('Opening details for round:', round, 'matchIndex:', matchIndex);
+            
+            let match;
+            if (round === 'final') {
+                match = appData.knockout.final;
+            } else {
+                match = appData.knockout[round][matchIndex];
+            }
+            
+            console.log('Match object:', match);
+            console.log('Match details:', match.details);
+            
+            currentMatchEdit = { round, matchIndex };
+            
+            // Set modal title
+            document.getElementById('modalTitle').textContent = `${formatNameForDisplay(match.player1)} vs ${formatNameForDisplay(match.player2)}`;
+            document.getElementById('modalPlayer1').textContent = formatNameForDisplay(match.player1);
+            document.getElementById('modalPlayer2').textContent = formatNameForDisplay(match.player2);
+            
+            // Ensure details object exists
+            if (!match.details) {
+                match.details = {
+                    player1: {
+                        threeDartAvg: 0, coOpportunities: 0, coCompleted: 0, coPct: 0,
+                        scores100plus: 0, scores140plus: 0, scores180: 0, highFinish: 0
+                    },
+                    player2: {
+                        threeDartAvg: 0, coOpportunities: 0, coCompleted: 0, coPct: 0,
+                        scores100plus: 0, scores140plus: 0, scores180: 0, highFinish: 0
+                    }
+                };
+            }
+            
+            console.log('Player1 details:', match.details.player1);
+            console.log('Player2 details:', match.details.player2);
+            
+            // Load player 1 stats
+            document.getElementById('p1_3da').value = match.details.player1.threeDartAvg || '';
+            document.getElementById('p1_co_opp').value = match.details.player1.coOpportunities || '';
+            document.getElementById('p1_co_comp').value = match.details.player1.coCompleted || '';
+            document.getElementById('p1_co_pct').value = match.details.player1.coPct ? match.details.player1.coPct + '%' : '0%';
+            document.getElementById('p1_100plus').value = match.details.player1.scores100plus || '';
+            document.getElementById('p1_140plus').value = match.details.player1.scores140plus || '';
+            document.getElementById('p1_180s').value = match.details.player1.scores180 || '';
+            document.getElementById('p1_high_finish').value = match.details.player1.highFinish || '';
+            
+            // Load player 2 stats
+            document.getElementById('p2_3da').value = match.details.player2.threeDartAvg || '';
+            document.getElementById('p2_co_opp').value = match.details.player2.coOpportunities || '';
+            document.getElementById('p2_co_comp').value = match.details.player2.coCompleted || '';
+            document.getElementById('p2_co_pct').value = match.details.player2.coPct ? match.details.player2.coPct + '%' : '0%';
+            document.getElementById('p2_100plus').value = match.details.player2.scores100plus || '';
+            document.getElementById('p2_140plus').value = match.details.player2.scores140plus || '';
+            document.getElementById('p2_180s').value = match.details.player2.scores180 || '';
+            document.getElementById('p2_high_finish').value = match.details.player2.highFinish || '';
+            
+            // Show modal
+            document.getElementById('matchModal').classList.remove('hidden');
+        }
+
+        // Calculate checkout percentage
+        function calculateCOPct(opportunities, completed) {
+            if (opportunities === 0) return 0;
+            return Math.round((completed / opportunities) * 100 * 100) / 100;
+        }
+
+        // Auto-calculate CO% for player 1
+        document.getElementById('p1_co_opp').addEventListener('input', function() {
+            const opp = parseInt(this.value) || 0;
+            const comp = parseInt(document.getElementById('p1_co_comp').value) || 0;
+            document.getElementById('p1_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        document.getElementById('p1_co_comp').addEventListener('input', function() {
+            const opp = parseInt(document.getElementById('p1_co_opp').value) || 0;
+            const comp = parseInt(this.value) || 0;
+            document.getElementById('p1_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        // Auto-calculate CO% for player 2
+        document.getElementById('p2_co_opp').addEventListener('input', function() {
+            const opp = parseInt(this.value) || 0;
+            const comp = parseInt(document.getElementById('p2_co_comp').value) || 0;
+            document.getElementById('p2_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        document.getElementById('p2_co_comp').addEventListener('input', function() {
+            const opp = parseInt(document.getElementById('p2_co_opp').value) || 0;
+            const comp = parseInt(this.value) || 0;
+            document.getElementById('p2_co_pct').value = calculateCOPct(opp, comp) + '%';
+        });
+
+        // Save match details
+        document.getElementById('saveMatchDetails').addEventListener('click', function() {
+            if (!currentMatchEdit) return;
+            
+            const { round, matchIndex } = currentMatchEdit;
+            let match;
+            if (round === 'final') {
+                match = appData.knockout.final;
+            } else {
+                match = appData.knockout[round][matchIndex];
+            }
+            
+            // Save player 1 stats
+            match.details.player1.threeDartAvg = parseFloat(document.getElementById('p1_3da').value) || 0;
+            match.details.player1.coOpportunities = parseInt(document.getElementById('p1_co_opp').value) || 0;
+            match.details.player1.coCompleted = parseInt(document.getElementById('p1_co_comp').value) || 0;
+            match.details.player1.coPct = calculateCOPct(match.details.player1.coOpportunities, match.details.player1.coCompleted);
+            match.details.player1.scores100plus = parseInt(document.getElementById('p1_100plus').value) || 0;
+            match.details.player1.scores140plus = parseInt(document.getElementById('p1_140plus').value) || 0;
+            match.details.player1.scores180 = parseInt(document.getElementById('p1_180s').value) || 0;
+            match.details.player1.highFinish = parseInt(document.getElementById('p1_high_finish').value) || 0;
+            
+            // Save player 2 stats
+            match.details.player2.threeDartAvg = parseFloat(document.getElementById('p2_3da').value) || 0;
+            match.details.player2.coOpportunities = parseInt(document.getElementById('p2_co_opp').value) || 0;
+            match.details.player2.coCompleted = parseInt(document.getElementById('p2_co_comp').value) || 0;
+            match.details.player2.coPct = calculateCOPct(match.details.player2.coOpportunities, match.details.player2.coCompleted);
+            match.details.player2.scores100plus = parseInt(document.getElementById('p2_100plus').value) || 0;
+            match.details.player2.scores140plus = parseInt(document.getElementById('p2_140plus').value) || 0;
+            match.details.player2.scores180 = parseInt(document.getElementById('p2_180s').value) || 0;
+            match.details.player2.highFinish = parseInt(document.getElementById('p2_high_finish').value) || 0;
+            
+            // Close modal
+            document.getElementById('matchModal').classList.add('hidden');
+            currentMatchEdit = null;
+        });
+
+        // Close modal button
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('matchModal').classList.add('hidden');
+            currentMatchEdit = null;
+        });
+
+        // Close modal on background click
+        document.getElementById('matchModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                currentMatchEdit = null;
+            }
+        });
+
+        // Export Knockout JSON
+        document.getElementById('exportKOJson').addEventListener('click', function() {
+            if (!appData.metadata) {
+                alert('No RR data loaded! Please upload Round Robin data first.');
+                return;
+            }
+
+            function formatKnockoutMatchForExport(match) {
+                if (!match) return null;
+                return {
+                    match_id: match.matchId,
+                    player1: match.player1,
+                    player2: match.player2,
+                    player1_sets: match.player1Sets,
+                    player2_sets: match.player2Sets,
+                    player1_total_legs: match.player1TotalLegs,
+                    player2_total_legs: match.player2TotalLegs,
+                    winner: match.winner,
+                    player1_details: {
+                        three_dart_avg: match.details?.player1?.threeDartAvg || 0,
+                        co_opportunities: match.details?.player1?.coOpportunities || 0,
+                        co_completed: match.details?.player1?.coCompleted || 0,
+                        co_pct: match.details?.player1?.coPct || 0,
+                        scores_100plus: match.details?.player1?.scores100plus || 0,
+                        scores_140plus: match.details?.player1?.scores140plus || 0,
+                        scores_180: match.details?.player1?.scores180 || 0,
+                        high_finish: match.details?.player1?.highFinish || 0
+                    },
+                    player2_details: {
+                        three_dart_avg: match.details?.player2?.threeDartAvg || 0,
+                        co_opportunities: match.details?.player2?.coOpportunities || 0,
+                        co_completed: match.details?.player2?.coCompleted || 0,
+                        co_pct: match.details?.player2?.coPct || 0,
+                        scores_100plus: match.details?.player2?.scores100plus || 0,
+                        scores_140plus: match.details?.player2?.scores140plus || 0,
+                        scores_180: match.details?.player2?.scores180 || 0,
+                        high_finish: match.details?.player2?.highFinish || 0
+                    }
+                };
+            }
+
+            const exportData = {
+                metadata: appData.metadata,
+                knockout: {
+                    quarterFinals: appData.knockout.quarterFinals.map(m => formatKnockoutMatchForExport(m)),
+                    semiFinals: appData.knockout.semiFinals.map(m => formatKnockoutMatchForExport(m)),
+                    final: formatKnockoutMatchForExport(appData.knockout.final),
+                    champion: appData.knockout.champion
+                }
+            };
+
+            // Download as JSON
+            // Generate dynamic filename from metadata
+            const seriesId = appData.metadata.series_id || 1;
+            const eventId = appData.metadata.event_id || 1;
+            const filename = `KO_Series${seriesId}_Event${eventId}.json`;
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('Knockout data exported successfully! Returning to dashboard...');
+            
+            // Return to dashboard after short delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
