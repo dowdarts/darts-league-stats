@@ -1684,13 +1684,10 @@
                     const players = Array.isArray(groupData) ? groupData : groupData.players;
                     if (players) {
                         const groupMatches = matches[`group${group}`] || [];
-
-                        // Calculate 3DA and CO% from individual matches for each player
-                const groupMatches = matches[`group${group}`] || [];
-                const playerAvgs = {};
-                const playerCO = {};
-                
-                groupMatches.forEach(match => {
+                        const playerAvgs = {};
+                        const playerCO = {};
+                        
+                        groupMatches.forEach(match => {
                     const p1 = formatNameForDisplay(match.player1);
                     const p2 = formatNameForDisplay(match.player2);
                     const p1Details = match.player1_details || match.details?.player1 || {};
