@@ -1559,7 +1559,7 @@
             const matches = rrData.matches || {};
             
             // Create match results in one container
-            let matchResultsHTML = '<div class="table-header"><h2>Match Results</h2></div><div style="padding: 20px;">';
+            let matchResultsHTML = '<div class="table-header"><h2>Match Results</h2></div><div style="padding: 20px;"><div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">';
             let matchNumber = 1;
             
             groups.forEach(group => {
@@ -1568,17 +1568,16 @@
                 // Match results for this group
                 if (groupMatches.length > 0) {
                     matchResultsHTML += `
-                        <div style="margin-bottom: ${group === 'B' ? '0' : '30px'};">
+                        <div style="flex: 1; min-width: 500px; max-width: 650px;">
                             <h3 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Group ${group}</h3>
                             <div style="overflow-x: auto;">
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background: rgba(0, 0, 0, 0.2);">
-                                            <th class="center" style="padding: 12px; width: 60px; text-align: center;">#</th>
-                                            <th class="center" style="padding: 12px; width: 120px; text-align: center;">Round</th>
-                                            <th class="center" style="padding: 12px; min-width: 150px; text-align: center;">Player 1</th>
-                                            <th class="center" style="padding: 12px; width: 100px; text-align: center;">Score</th>
-                                            <th class="center" style="padding: 12px; min-width: 150px; text-align: center;">Player 2</th>
+                                            <th class="center" style="padding: 10px; width: 50px; text-align: center;">#</th>
+                                            <th class="center" style="padding: 10px; text-align: center;">Player 1</th>
+                                            <th class="center" style="padding: 10px; width: 80px; text-align: center;">Score</th>
+                                            <th class="center" style="padding: 10px; text-align: center;">Player 2</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1597,14 +1596,13 @@
                                                     onmouseover="this.style.background='rgba(255, 107, 0, 0.1)'" 
                                                     onmouseout="this.style.background=''"
                                                     onclick="toggleMatchDetails('${matchId}')">
-                                                    <td class="center" style="padding: 12px; text-align: center;">${matchNumber++}</td>
-                                                    <td class="center" style="padding: 12px; text-align: center;">Round Robin</td>
-                                                    <td class="center" style="padding: 12px; text-align: center; ${formatNameForDisplay(winner) === p1 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
-                                                    <td class="center" style="padding: 12px; text-align: center; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
-                                                    <td class="center" style="padding: 12px; text-align: center; ${formatNameForDisplay(winner) === p2 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
+                                                    <td class="center" style="padding: 10px; text-align: center;">${matchNumber++}</td>
+                                                    <td class="center" style="padding: 10px; text-align: center; ${formatNameForDisplay(winner) === p1 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
+                                                    <td class="center" style="padding: 10px; text-align: center; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
+                                                    <td class="center" style="padding: 10px; text-align: center; ${formatNameForDisplay(winner) === p2 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
                                                 </tr>
                                                 <tr id="${matchId}" class="match-details-row" style="display: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                                                    <td colspan="5" style="padding: 0;">
+                                                    <td colspan="4" style="padding: 0;">
                                                         <div style="background: rgba(255, 107, 0, 0.05); padding: 20px; border-left: 4px solid var(--primary-orange);">
                                                             <h4 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Match Details</h4>
                                                             <table style="width: 100%; max-width: 600px; margin: 0 auto; font-size: 0.95em; border-collapse: collapse;">
@@ -1672,7 +1670,7 @@
                 }
             });
             
-            matchResultsHTML += '</div></div>';
+            matchResultsHTML += '</div></div></div>';
             
             // Now create standings in a separate container
             let standingsHTML = '';
