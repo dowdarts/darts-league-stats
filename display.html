@@ -509,7 +509,7 @@
         /* Player Cards */
         .players-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 30px;
             margin-top: 30px;
         }
@@ -531,14 +531,14 @@
 
         .player-card-photo {
             width: 100%;
-            height: 250px;
+            height: 400px;
             object-fit: cover;
             background: #2a2a2a;
         }
 
         .player-card-placeholder {
             width: 100%;
-            height: 250px;
+            height: 400px;
             background: #2a2a2a;
             display: flex;
             align-items: center;
@@ -623,19 +623,23 @@
 
         .modal.active {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
         }
 
         .modal-content {
             background: var(--card-bg);
             border: 2px solid var(--primary-orange);
             border-radius: 20px;
-            max-width: 1200px;
+            max-width: 900px;
             width: 100%;
+            max-height: calc(100vh - 80px);
             padding: 40px;
             position: relative;
             animation: modalSlideIn 0.3s ease;
+            overflow-y: auto;
         }
 
         @keyframes modalSlideIn {
@@ -668,24 +672,26 @@
         }
 
         .modal-photo {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             border-radius: 15px;
             object-fit: cover;
             border: 3px solid var(--primary-orange);
             box-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
+            flex-shrink: 0;
         }
 
         .modal-photo-placeholder {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             border-radius: 15px;
             background: #2a2a2a;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 5em;
+            font-size: 4em;
             border: 3px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .modal-player-info h2 {
@@ -718,23 +724,23 @@
         .modal-stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin: 30px 0;
+            gap: 15px;
+            margin: 25px 0;
         }
 
         .modal-stat-card {
             background: rgba(255, 107, 0, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
 
         .modal-stat-value {
-            font-size: 2.5em;
+            font-size: 2em;
             color: var(--primary-orange);
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .modal-stat-label {
