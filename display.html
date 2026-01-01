@@ -1310,11 +1310,22 @@
 
         // Show tab
         function showTab(tabName) {
+            // Update nav items
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.target.classList.add('active');
+            
+            // Find and activate the correct nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            if (tabName === 'leaderboard') {
+                navItems[0].classList.add('active');
+            } else if (tabName === 'events') {
+                navItems[1].classList.add('active');
+            } else if (tabName === 'players') {
+                navItems[2].classList.add('active');
+            }
 
+            // Update sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
@@ -1423,11 +1434,29 @@
             const container = document.getElementById('rrStandings');
             const groups = ['A', 'B'];
             
+            // Handle both old and new data structures
+            const rrData = event.round_robin_results || event.round_robin;
+            if (!rrData) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No round robin data available</p>';
+                return;
+            }
+            
+            const standings = rrData.standings || rrData;
+            
             container.innerHTML = groups.map(group => {
-                const groupData = event.round_robin_results[`group${group}`];
+                const groupData = standings[`group${group}`];
                 if (!groupData) return '';
 
-                const sortedPlayers = [...groupData.players].sort((a, b) => b.points - a.points);
+                // Handle both array format and object with players array
+                const players = Array.isArray(groupData) ? groupData : groupData.players;
+                if (!players) return '';
+
+                const sortedPlayers = [...players].sort((a, b) => {
+                    // Sort by points if available, otherwise by matches_won
+                    const aValue = a.points !== undefined ? a.points : a.matches_won || 0;
+                    const bValue = b.points !== undefined ? b.points : b.matches_won || 0;
+                    return bValue - aValue;
+                });
 
                 return `
                     <div class="rr-group">
@@ -1444,14 +1473,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${sortedPlayers.map((player, index) => `
-                                    <tr class="${index < 4 ? 'qualified' : ''}">
-                                        <td class="player-name">${formatNameForDisplay(player.name)}</td>
-                                        <td class="center">${player.wins}-${player.losses}</td>
-                                        <td class="center highlight-stat">${player.points}</td>
-                                        <td class="center">${player.three_dart_avg.toFixed(2)}</td>
-                                    </tr>
-                                `).join('')}
+                                ${sortedPlayers.map((player, index) => {
+                                    const wins = player.wins !== undefined ? player.wins : player.matches_won || 0;
+                                    const losses = player.losses !== undefined ? player.losses : player.matches_lost || 0;
+                                    const points = player.points !== undefined ? player.points : (wins * 2);
+                                    const avg3DA = player.three_dart_avg !== undefined ? player.three_dart_avg.toFixed(2) : 'N/A';
+                                    
+                                    return `
+                                        <tr class="${index < 4 ? 'qualified' : ''}">
+                                            <td class="player-name">${formatNameForDisplay(player.name)}</td>
+                                            <td class="center">${wins}-${losses}</td>
+                                            <td class="center highlight-stat">${points}</td>
+                                            <td class="center">${avg3DA}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>
