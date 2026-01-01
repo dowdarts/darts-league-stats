@@ -1095,12 +1095,12 @@
                     </div>
                 </div>
 
-                <!-- Round Robin -->
-                <div class="data-table">
-                    <div class="table-header">
-                        <h2>Round Robin Standings</h2>
-                    </div>
-                    <div id="rrStandings" class="rr-groups" style="padding: 30px;"></div>
+                <!-- Round Robin Match Results -->
+                <div id="rrMatchResults" class="data-table">
+                </div>
+
+                <!-- Round Robin Standings -->
+                <div id="rrStandings" class="data-table">
                 </div>
 
                 <!-- Knockout -->
@@ -1792,11 +1792,13 @@
                 }
             });
             
-            // Combine match results and standings with standings in its own container
-            const allHTML = matchResultsHTML + '<div class="data-table"><div class="table-header"><h2>Standings</h2></div><div style="padding: 20px;">' + standingsHTML + '</div></div>';
+            // Set match results in its own container
+            const matchResultsContainer = document.getElementById('rrMatchResults');
+            matchResultsContainer.innerHTML = matchResultsHTML;
             
-            // Set all HTML
-            container.innerHTML = allHTML;
+            // Set standings in its own container
+            const standingsContainer = document.getElementById('rrStandings');
+            standingsContainer.innerHTML = '<div class="table-header"><h2>Standings</h2></div><div style="padding: 20px;">' + standingsHTML + '</div>';
         }
         
         // Toggle match details
