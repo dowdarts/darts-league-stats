@@ -1052,12 +1052,16 @@
                             <th class="center">MP</th>
                             <th class="center">MW</th>
                             <th class="center">ML</th>
+                            <th class="center">MW%</th>
                             <th class="center">SP</th>
                             <th class="center">SW</th>
                             <th class="center">SL</th>
+                            <th class="center">SW%</th>
                             <th class="center">LP</th>
                             <th class="center">LW</th>
                             <th class="center">LL</th>
+                            <th class="center">LW%</th>
+                            <th class="center">CO%</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboardTable">
@@ -1456,6 +1460,12 @@
                     photoHtml = `<div class="player-photo-placeholder">👤</div>`;
                 }
 
+                // Calculate percentages
+                const mwPct = player.totalMatches > 0 ? ((player.totalWins / player.totalMatches) * 100).toFixed(1) : '0.0';
+                const swPct = player.totalSets > 0 ? ((player.totalSetsWon / player.totalSets) * 100).toFixed(1) : '0.0';
+                const lwPct = player.totalLegs > 0 ? ((player.totalLegsWon / player.totalLegs) * 100).toFixed(1) : '0.0';
+                const coPct = player.coRate.toFixed(1);
+
                 return `
                     <tr>
                         <td class="center rank-cell ${rankClass}">${index + 1}</td>
@@ -1473,12 +1483,16 @@
                         <td class="center">${player.totalMatches}</td>
                         <td class="center">${player.totalWins}</td>
                         <td class="center">${player.totalLosses}</td>
+                        <td class="center" style="font-weight: 600; color: var(--primary-orange);">${mwPct}%</td>
                         <td class="center">${player.totalSets}</td>
                         <td class="center">${player.totalSetsWon}</td>
                         <td class="center">${player.totalSetsLost}</td>
+                        <td class="center" style="font-weight: 600; color: var(--primary-orange);">${swPct}%</td>
                         <td class="center">${player.totalLegs}</td>
                         <td class="center">${player.totalLegsWon}</td>
                         <td class="center">${player.totalLegsLost}</td>
+                        <td class="center" style="font-weight: 600; color: var(--primary-orange);">${lwPct}%</td>
+                        <td class="center" style="font-weight: 600; color: var(--primary-orange);">${coPct}%</td>
                     </tr>
                 `;
             }).join('');
