@@ -1442,6 +1442,7 @@
             }
             
             const standings = rrData.standings || rrData;
+            const matches = rrData.matches || {};
             
             container.innerHTML = groups.map(group => {
                 const groupData = standings[`group${group}`];
@@ -1451,10 +1452,30 @@
                 const players = Array.isArray(groupData) ? groupData : groupData.players;
                 if (!players) return '';
 
+                // Calculate 3DA from individual matches for each player
+                const groupMatches = matches[`group${group}`] || [];
+                const playerAvgs = {};
+                
+                groupMatches.forEach(match => {
+                    const p1 = formatNameForDisplay(match.player1);
+                    const p2 = formatNameForDisplay(match.player2);
+                    const p1Details = match.player1_details || match.details?.player1 || {};
+                    const p2Details = match.player2_details || match.details?.player2 || {};
+                    
+                    if (!playerAvgs[p1]) playerAvgs[p1] = [];
+                    if (!playerAvgs[p2]) playerAvgs[p2] = [];
+                    
+                    if (p1Details.three_dart_avg || p1Details.threeDartAvg) {
+                        playerAvgs[p1].push(p1Details.three_dart_avg || p1Details.threeDartAvg);
+                    }
+                    if (p2Details.three_dart_avg || p2Details.threeDartAvg) {
+                        playerAvgs[p2].push(p2Details.three_dart_avg || p2Details.threeDartAvg);
+                    }
+                });
+
                 const sortedPlayers = [...players].sort((a, b) => {
-                    // Sort by points if available, otherwise by matches_won
-                    const aValue = a.points !== undefined ? a.points : a.matches_won || 0;
-                    const bValue = b.points !== undefined ? b.points : b.matches_won || 0;
+                    const aValue = a.points !== undefined ? a.points : (a.matches_won || 0) * 2;
+                    const bValue = b.points !== undefined ? b.points : (b.matches_won || 0) * 2;
                     return bValue - aValue;
                 });
 
@@ -1468,8 +1489,9 @@
                                 <tr>
                                     <th>Player</th>
                                     <th class="center">W-L</th>
+                                    <th class="center">Legs</th>
                                     <th class="center">Pts</th>
-                                    <th class="center">3DA</th>
+                                    <th class="center">RR 3DA</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1477,12 +1499,21 @@
                                     const wins = player.wins !== undefined ? player.wins : player.matches_won || 0;
                                     const losses = player.losses !== undefined ? player.losses : player.matches_lost || 0;
                                     const points = player.points !== undefined ? player.points : (wins * 2);
-                                    const avg3DA = player.three_dart_avg !== undefined ? player.three_dart_avg.toFixed(2) : 'N/A';
+                                    const legsWon = player.legs_won || 0;
+                                    const legsLost = player.legs_lost || 0;
+                                    
+                                    // Calculate average 3DA from matches
+                                    const playerName = formatNameForDisplay(player.name);
+                                    const avgs = playerAvgs[playerName] || [];
+                                    const avg3DA = avgs.length > 0 
+                                        ? (avgs.reduce((sum, avg) => sum + avg, 0) / avgs.length).toFixed(2)
+                                        : 'N/A';
                                     
                                     return `
                                         <tr class="${index < 4 ? 'qualified' : ''}">
-                                            <td class="player-name">${formatNameForDisplay(player.name)}</td>
+                                            <td class="player-name">${playerName}</td>
                                             <td class="center">${wins}-${losses}</td>
+                                            <td class="center">${legsWon}-${legsLost}</td>
                                             <td class="center highlight-stat">${points}</td>
                                             <td class="center">${avg3DA}</td>
                                         </tr>
@@ -1490,6 +1521,70 @@
                                 }).join('')}
                             </tbody>
                         </table>
+                        
+                        <!-- Round Robin Match Results -->
+                        <div style="margin-top: 20px; padding: 0 20px 20px;">
+                            <h4 style="color: var(--primary-orange); font-size: 1.1em; margin-bottom: 15px;">Match Results</h4>
+                            ${groupMatches.map(match => {
+                                const p1 = formatNameForDisplay(match.player1);
+                                const p2 = formatNameForDisplay(match.player2);
+                                const p1Legs = match.player1_legs || 0;
+                                const p2Legs = match.player2_legs || 0;
+                                const p1Details = match.player1_details || match.details?.player1 || {};
+                                const p2Details = match.player2_details || match.details?.player2 || {};
+                                
+                                const winner = p1Legs > p2Legs ? p1 : p2;
+                                
+                                return `
+                                    <div style="background: rgba(255, 107, 0, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <span style="font-weight: 600; ${winner === p1 ? 'color: var(--success-green);' : ''}">${p1}</span>
+                                            <span style="font-size: 1.3em; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</span>
+                                            <span style="font-weight: 600; ${winner === p2 ? 'color: var(--success-green);' : ''}">${p2}</span>
+                                        </div>
+                                        <table style="width: 100%; font-size: 0.9em;">
+                                            <thead>
+                                                <tr style="background: rgba(0, 0, 0, 0.2);">
+                                                    <th style="padding: 6px; text-align: left;">Stat</th>
+                                                    <th style="padding: 6px; text-align: center;">${p1}</th>
+                                                    <th style="padding: 6px; text-align: center;">${p2}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding: 4px;"><strong>3DA</strong></td>
+                                                    <td style="padding: 4px; text-align: center;">${(p1Details.three_dart_avg || p1Details.threeDartAvg || 0).toFixed(2)}</td>
+                                                    <td style="padding: 4px; text-align: center;">${(p2Details.three_dart_avg || p2Details.threeDartAvg || 0).toFixed(2)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px;"><strong>CO%</strong></td>
+                                                    <td style="padding: 4px; text-align: center;">${(p1Details.co_pct || p1Details.coPct || 0).toFixed(1)}%</td>
+                                                    <td style="padding: 4px; text-align: center;">${(p2Details.co_pct || p2Details.coPct || 0).toFixed(1)}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px;"><strong>180s / 140+ / 100+</strong></td>
+                                                    <td style="padding: 4px; text-align: center;">
+                                                        ${p1Details.scores_180 || p1Details.scores180 || 0} / 
+                                                        ${p1Details.scores_140plus || p1Details.scores140plus || 0} / 
+                                                        ${p1Details.scores_100plus || p1Details.scores100plus || 0}
+                                                    </td>
+                                                    <td style="padding: 4px; text-align: center;">
+                                                        ${p2Details.scores_180 || p2Details.scores180 || 0} / 
+                                                        ${p2Details.scores_140plus || p2Details.scores140plus || 0} / 
+                                                        ${p2Details.scores_100plus || p2Details.scores100plus || 0}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px;"><strong>High Finish</strong></td>
+                                                    <td style="padding: 4px; text-align: center;">${p1Details.high_finish || p1Details.highFinish || 0}</td>
+                                                    <td style="padding: 4px; text-align: center;">${p2Details.high_finish || p2Details.highFinish || 0}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1497,8 +1592,13 @@
 
         // Render KO bracket
         function renderKOBracket(event) {
-            const ko = event.knockout_results;
+            const ko = event.knockout_results || event.knockout;
             const container = document.getElementById('koBracket');
+
+            if (!ko) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No knockout data available</p>';
+                return;
+            }
 
             const renderMatch = (match, title) => {
                 if (!match) return '';
@@ -1506,8 +1606,14 @@
                 const p2 = formatNameForDisplay(match.player2);
                 
                 // Get match details (handle both old and new formats)
-                const p1Details = match.details?.player1 || {};
-                const p2Details = match.details?.player2 || {};
+                const p1Details = match.player1_details || match.details?.player1 || {};
+                const p2Details = match.player2_details || match.details?.player2 || {};
+                
+                // Get sets and legs
+                const p1Sets = match.player1_sets || match.player1Sets || 0;
+                const p2Sets = match.player2_sets || match.player2Sets || 0;
+                const p1Legs = match.player1_total_legs || match.player1TotalLegs || 0;
+                const p2Legs = match.player2_total_legs || match.player2TotalLegs || 0;
 
                 return `
                     <div class="ko-match-card">
@@ -1517,11 +1623,29 @@
                         <div class="ko-score-section">
                             <div class="ko-player-score ${match.winner === match.player1 ? 'winner' : ''}">
                                 <span class="ko-player-name">${p1}</span>
-                                <span class="ko-sets">${match.player1_sets || match.player1Sets || 0}</span>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 0.75em; color: var(--text-secondary);">Sets</div>
+                                        <span class="ko-sets">${p1Sets}</span>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 0.75em; color: var(--text-secondary);">Legs</div>
+                                        <span style="font-size: 1.2em; font-weight: 600;">${p1Legs}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="ko-player-score ${match.winner === match.player2 ? 'winner' : ''}">
                                 <span class="ko-player-name">${p2}</span>
-                                <span class="ko-sets">${match.player2_sets || match.player2Sets || 0}</span>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 0.75em; color: var(--text-secondary);">Sets</div>
+                                        <span class="ko-sets">${p2Sets}</span>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 0.75em; color: var(--text-secondary);">Legs</div>
+                                        <span style="font-size: 1.2em; font-weight: 600;">${p2Legs}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1540,6 +1664,16 @@
                                         <td><strong>3DA</strong></td>
                                         <td class="center highlight-stat">${(p1Details.threeDartAvg || p1Details.three_dart_avg || 0).toFixed(2)}</td>
                                         <td class="center highlight-stat">${(p2Details.threeDartAvg || p2Details.three_dart_avg || 0).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CO Opportunities</strong></td>
+                                        <td class="center">${p1Details.coOpportunities || p1Details.co_opportunities || 0}</td>
+                                        <td class="center">${p2Details.coOpportunities || p2Details.co_opportunities || 0}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CO Completed</strong></td>
+                                        <td class="center">${p1Details.coCompleted || p1Details.co_completed || 0}</td>
+                                        <td class="center">${p2Details.coCompleted || p2Details.co_completed || 0}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>CO%</strong></td>
@@ -1576,22 +1710,24 @@
             let html = '<div class="ko-rounds-container">';
             
             // Quarter Finals
-            if (ko.quarter_finals && ko.quarter_finals.length > 0) {
+            const qf = ko.quarterFinals || ko.quarter_finals;
+            if (qf && qf.length > 0) {
                 html += '<div class="ko-round-section">';
                 html += '<h3 class="ko-round-title">Quarter Finals</h3>';
                 html += '<div class="ko-matches-grid">';
-                ko.quarter_finals.forEach((match, i) => {
+                qf.forEach((match, i) => {
                     html += renderMatch(match, `QF${i + 1}`);
                 });
                 html += '</div></div>';
             }
 
             // Semi Finals
-            if (ko.semi_finals && ko.semi_finals.length > 0) {
+            const sf = ko.semiFinals || ko.semi_finals;
+            if (sf && sf.length > 0) {
                 html += '<div class="ko-round-section">';
                 html += '<h3 class="ko-round-title">Semi Finals</h3>';
                 html += '<div class="ko-matches-grid">';
-                ko.semi_finals.forEach((match, i) => {
+                sf.forEach((match, i) => {
                     html += renderMatch(match, `SF${i + 1}`);
                 });
                 html += '</div></div>';
