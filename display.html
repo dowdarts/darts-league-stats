@@ -1798,7 +1798,7 @@
             }).join('');
             
             // Combine match results (top) and standings (bottom)
-            container.innerHTML = matchResultsHTML + standingsHTML;
+            container.innerHTML = matchResultsHTML + '<div class="rr-groups-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; margin-top: 30px;">' + standingsHTML + '</div>';
         }
         
         // Toggle match details
