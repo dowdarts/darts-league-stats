@@ -1558,21 +1558,19 @@
             const standings = rrData.standings || rrData;
             const matches = rrData.matches || {};
             
-            // Create match results and standings for each group vertically
-            let allHTML = '';
+            // Create match results in one container
+            let matchResultsHTML = '<div class="data-table" style="margin-bottom: 30px;"><div class="table-header"><h2>Match Results</h2></div><div style="padding: 20px;">';
+            let matchNumber = 1;
             
             groups.forEach(group => {
                 const groupMatches = matches[`group${group}`] || [];
-                let matchNumber = 1;
                 
                 // Match results for this group
                 if (groupMatches.length > 0) {
-                    allHTML += `
-                        <div class="data-table" style="margin-bottom: 30px;">
-                            <div class="table-header">
-                                <h2>Group ${group} - Match Results</h2>
-                            </div>
-                            <div style="padding: 20px; overflow-x: auto;">
+                    matchResultsHTML += `
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="color: var(--primary-orange); margin-bottom: 15px;">Group ${group}</h3>
+                            <div style="overflow-x: auto;">
                                 <table style="width: 100%;">
                                     <thead>
                                         <tr>
@@ -1670,16 +1668,24 @@
                             </div>
                         </div>
                     `;
+                    matchNumber += groupMatches.length;
                 }
-                
-                // Now create the standings table for this group
+            });
+            
+            matchResultsHTML += '</div></div>';
+            
+            // Now create standings in a separate container
+            let standingsHTML = '';
+            
+            groups.forEach(group => {
                 const groupData = standings[`group${group}`];
                 if (groupData) {
                     // Handle both array format and object with players array
                     const players = Array.isArray(groupData) ? groupData : groupData.players;
                     if (players) {
+                        const groupMatches = matches[`group${group}`] || [];
 
-                // Calculate 3DA and CO% from individual matches for each player
+                        // Calculate 3DA and CO% from individual matches for each player
                 const groupMatches = matches[`group${group}`] || [];
                 const playerAvgs = {};
                 const playerCO = {};
@@ -1708,20 +1714,20 @@
                     playerCO[p2].completed += p2Details.co_completed || p2Details.coCompleted || 0;
                 });
 
-                const sortedPlayers = [...players].sort((a, b) => {
-                    const aValue = a.points !== undefined ? a.points : (a.matches_won || 0) * 2;
-                    const bValue = b.points !== undefined ? b.points : (b.matches_won || 0) * 2;
-                    return bValue - aValue;
-                });
+                        const sortedPlayers = [...players].sort((a, b) => {
+                            const aValue = a.points !== undefined ? a.points : (a.matches_won || 0) * 2;
+                            const bValue = b.points !== undefined ? b.points : (b.matches_won || 0) * 2;
+                            return bValue - aValue;
+                        });
 
-                allHTML += `
-                    <div class="rr-group" style="width: 100%; max-width: 100%;">
-                        <div class="rr-group-header">
-                            <h3>Group ${group}</h3>
-                        </div>
-                        <div style="overflow-x: auto; width: 100%;">
-                            <table style="width: 100%; min-width: 900px;">
-                                <thead>
+                        standingsHTML += `
+                            <div class="rr-group" style="width: 100%; max-width: 100%; margin-bottom: 20px;">
+                                <div class="rr-group-header">
+                                    <h3>Group ${group}</h3>
+                                </div>
+                                <div style="overflow-x: auto; width: 100%;">
+                                    <table style="width: 100%; min-width: 900px;">
+                                        <thead>
                                     <tr>
                                         <th>Player</th>
                                         <th class="center">MP</th>
@@ -1780,14 +1786,17 @@
                                         </tr>
                                     `;
                                 }).join('')}
-                            </tbody>
-                        </table>
-                        </div>
-                    </div>
-                `;
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
                     }
                 }
             });
+            
+            // Combine match results and standings with standings in its own container
+            const allHTML = matchResultsHTML + '<div class="data-table"><div class="table-header"><h2>Standings</h2></div><div style="padding: 20px;">' + standingsHTML + '</div></div>';
             
             // Set all HTML
             container.innerHTML = allHTML;
