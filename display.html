@@ -1046,9 +1046,18 @@
                             <th>Player</th>
                             <th class="center">Events</th>
                             <th class="center">Career 3DA</th>
+                            <th class="center">100+</th>
+                            <th class="center">140+</th>
                             <th class="center">180s</th>
-                            <th class="center">Wins</th>
-                            <th class="center">Win %</th>
+                            <th class="center">MP</th>
+                            <th class="center">MW</th>
+                            <th class="center">ML</th>
+                            <th class="center">SP</th>
+                            <th class="center">SW</th>
+                            <th class="center">SL</th>
+                            <th class="center">LP</th>
+                            <th class="center">LW</th>
+                            <th class="center">LL</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboardTable">
@@ -1263,7 +1272,13 @@
                                 totalLosses: 0,
                                 highCheckout: 0,
                                 coOpportunities: 0,
-                                coCompleted: 0
+                                coCompleted: 0,
+                                totalSets: 0,
+                                totalSetsWon: 0,
+                                totalSetsLost: 0,
+                                totalLegs: 0,
+                                totalLegsWon: 0,
+                                totalLegsLost: 0
                             });
                         }
 
@@ -1287,6 +1302,65 @@
                         player.highCheckout = Math.max(player.highCheckout, playerStats.high_checkout || playerStats.high_finish || 0);
                         player.coOpportunities += playerStats.co_opportunities || 0;
                         player.coCompleted += playerStats.co_completed || 0;
+                    });
+                }
+                
+                // Aggregate legs and sets from round robin
+                const rr = event.round_robin_results || event.round_robin;
+                if (rr && rr.standings) {
+                    const allPlayers = [...(rr.standings.groupA || []), ...(rr.standings.groupB || [])];
+                    allPlayers.forEach(p => {
+                        const name = formatNameForDisplay(p.name);
+                        if (playerMap.has(name)) {
+                            const player = playerMap.get(name);
+                            const matchesPlayed = p.matches_played || 0;
+                            const matchesWon = p.matches_won || 0;
+                            const matchesLost = p.matches_lost || 0;
+                            // In RR, each match = 1 set
+                            player.totalSets += matchesPlayed;
+                            player.totalSetsWon += matchesWon;
+                            player.totalSetsLost += matchesLost;
+                            player.totalLegsWon += p.legs_won || 0;
+                            player.totalLegsLost += p.legs_lost || 0;
+                            player.totalLegs += (p.legs_won || 0) + (p.legs_lost || 0);
+                        }
+                    });
+                }
+                
+                // Aggregate legs and sets from knockout
+                const ko = event.knockout_results || event.knockout;
+                if (ko) {
+                    const allMatches = [
+                        ...(ko.quarterFinals || ko.quarter_finals || []),
+                        ...(ko.semiFinals || ko.semi_finals || []),
+                        ...(ko.final ? [ko.final] : [])
+                    ];
+                    allMatches.forEach(match => {
+                        const p1Name = formatNameForDisplay(match.player1);
+                        const p2Name = formatNameForDisplay(match.player2);
+                        const p1Sets = match.player1_sets || match.player1Sets || 0;
+                        const p2Sets = match.player2_sets || match.player2Sets || 0;
+                        const p1Legs = match.player1_total_legs || match.player1TotalLegs || 0;
+                        const p2Legs = match.player2_total_legs || match.player2TotalLegs || 0;
+                        
+                        if (playerMap.has(p1Name)) {
+                            const player = playerMap.get(p1Name);
+                            player.totalSets += p1Sets + p2Sets;
+                            player.totalSetsWon += p1Sets;
+                            player.totalSetsLost += p2Sets;
+                            player.totalLegs += p1Legs + p2Legs;
+                            player.totalLegsWon += p1Legs;
+                            player.totalLegsLost += p2Legs;
+                        }
+                        if (playerMap.has(p2Name)) {
+                            const player = playerMap.get(p2Name);
+                            player.totalSets += p1Sets + p2Sets;
+                            player.totalSetsWon += p2Sets;
+                            player.totalSetsLost += p1Sets;
+                            player.totalLegs += p1Legs + p2Legs;
+                            player.totalLegsWon += p2Legs;
+                            player.totalLegsLost += p1Legs;
+                        }
                     });
                 }
             });
@@ -1393,9 +1467,18 @@
                         </td>
                         <td class="center">${player.events.length}</td>
                         <td class="center highlight-stat">${player.career3DA.toFixed(2)}</td>
+                        <td class="center">${player.total100s}</td>
+                        <td class="center">${player.total140s}</td>
                         <td class="center">${player.total180s}</td>
+                        <td class="center">${player.totalMatches}</td>
                         <td class="center">${player.totalWins}</td>
-                        <td class="center">${player.winRate.toFixed(1)}%</td>
+                        <td class="center">${player.totalLosses}</td>
+                        <td class="center">${player.totalSets}</td>
+                        <td class="center">${player.totalSetsWon}</td>
+                        <td class="center">${player.totalSetsLost}</td>
+                        <td class="center">${player.totalLegs}</td>
+                        <td class="center">${player.totalLegsWon}</td>
+                        <td class="center">${player.totalLegsLost}</td>
                     </tr>
                 `;
             }).join('');
@@ -1463,9 +1546,10 @@
                 const players = Array.isArray(groupData) ? groupData : groupData.players;
                 if (!players) return '';
 
-                // Calculate 3DA from individual matches for each player
+                // Calculate 3DA and CO% from individual matches for each player
                 const groupMatches = matches[`group${group}`] || [];
                 const playerAvgs = {};
+                const playerCO = {};
                 
                 groupMatches.forEach(match => {
                     const p1 = formatNameForDisplay(match.player1);
@@ -1475,6 +1559,8 @@
                     
                     if (!playerAvgs[p1]) playerAvgs[p1] = [];
                     if (!playerAvgs[p2]) playerAvgs[p2] = [];
+                    if (!playerCO[p1]) playerCO[p1] = { opportunities: 0, completed: 0 };
+                    if (!playerCO[p2]) playerCO[p2] = { opportunities: 0, completed: 0 };
                     
                     if (p1Details.three_dart_avg || p1Details.threeDartAvg) {
                         playerAvgs[p1].push(p1Details.three_dart_avg || p1Details.threeDartAvg);
@@ -1482,6 +1568,11 @@
                     if (p2Details.three_dart_avg || p2Details.threeDartAvg) {
                         playerAvgs[p2].push(p2Details.three_dart_avg || p2Details.threeDartAvg);
                     }
+                    
+                    playerCO[p1].opportunities += p1Details.co_opportunities || p1Details.coOpportunities || 0;
+                    playerCO[p1].completed += p1Details.co_completed || p1Details.coCompleted || 0;
+                    playerCO[p2].opportunities += p2Details.co_opportunities || p2Details.coOpportunities || 0;
+                    playerCO[p2].completed += p2Details.co_completed || p2Details.coCompleted || 0;
                 });
 
                 const sortedPlayers = [...players].sort((a, b) => {
@@ -1499,34 +1590,59 @@
                             <thead>
                                 <tr>
                                     <th>Player</th>
-                                    <th class="center">W-L</th>
-                                    <th class="center">Legs</th>
-                                    <th class="center">Pts</th>
+                                    <th class="center">MP</th>
+                                    <th class="center">MW</th>
+                                    <th class="center">ML</th>
+                                    <th class="center">SP</th>
+                                    <th class="center">SW</th>
+                                    <th class="center">SL</th>
+                                    <th class="center">LP</th>
+                                    <th class="center">LW</th>
+                                    <th class="center">LL</th>
+                                    <th class="center">CO%</th>
                                     <th class="center">RR 3DA</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${sortedPlayers.map((player, index) => {
+                                    const matchesPlayed = player.matches_played || 0;
                                     const wins = player.wins !== undefined ? player.wins : player.matches_won || 0;
                                     const losses = player.losses !== undefined ? player.losses : player.matches_lost || 0;
-                                    const points = player.points !== undefined ? player.points : (wins * 2);
                                     const legsWon = player.legs_won || 0;
                                     const legsLost = player.legs_lost || 0;
+                                    const legsPlayed = legsWon + legsLost;
                                     
-                                    // Calculate average 3DA from matches
+                                    // In RR, each match = 1 set
+                                    const setsPlayed = matchesPlayed;
+                                    const setsWon = wins;
+                                    const setsLost = losses;
+                                    
+                                    // Calculate average 3DA and CO% from matches
                                     const playerName = formatNameForDisplay(player.name);
                                     const avgs = playerAvgs[playerName] || [];
                                     const avg3DA = avgs.length > 0 
                                         ? (avgs.reduce((sum, avg) => sum + avg, 0) / avgs.length).toFixed(2)
                                         : 'N/A';
                                     
+                                    const coData = playerCO[playerName] || { opportunities: 0, completed: 0 };
+                                    const coPct = coData.opportunities > 0 
+                                        ? ((coData.completed / coData.opportunities) * 100).toFixed(1)
+                                        : 'N/A';
+                                    
                                     return `
                                         <tr class="${index < 4 ? 'qualified' : ''}">
                                             <td class="player-name">${playerName}</td>
-                                            <td class="center">${wins}-${losses}</td>
-                                            <td class="center">${legsWon}-${legsLost}</td>
-                                            <td class="center highlight-stat">${points}</td>
-                                            <td class="center">${avg3DA}</td>
+                                            <td class="center">${matchesPlayed}</td>
+                                            <td class="center">${wins}</td>
+                                            <td class="center">${losses}</td>
+                                            <td class="center">${setsPlayed}</td>
+                                            <td class="center">${setsWon}</td>
+                                            <td class="center">${setsLost}</td>
+                                            <td class="center">${legsPlayed}</td>
+                                            <td class="center">${legsWon}</td>
+                                            <td class="center">${legsLost}</td>
+                                            <td class="center">${coPct}${coPct !== 'N/A' ? '%' : ''}</td>
+                                            <td class="center highlight-stat">${avg3DA}</td>
                                         </tr>
                                     `;
                                 }).join('')}
