@@ -1566,7 +1566,9 @@
                 if (event.round_robin && event.round_robin.matches) {
                     ['groupA', 'groupB'].forEach(group => {
                         if (event.round_robin.matches[group]) {
+                            console.log(`Processing ${group}, matches:`, event.round_robin.matches[group].length);
                             event.round_robin.matches[group].forEach(match => {
+                                console.log('Match players:', match.player1, 'vs', match.player2);
                                 const sortKey = `${eventDate}T${match.start_time || '00:00'}`;
                                 const hasPlayerA = match.player1 === playerAName || match.player2 === playerAName;
                                 const hasPlayerB = playerBName ? (match.player1 === playerBName || match.player2 === playerBName) : true;
