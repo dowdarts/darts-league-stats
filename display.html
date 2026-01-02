@@ -884,6 +884,225 @@
             color: var(--primary-orange);
         }
 
+        /* Winners Hall of Fame */
+        .hall-of-fame-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(214, 48, 49, 0.1));
+            border-radius: 20px;
+            border: 2px solid var(--primary-orange);
+        }
+
+        .hall-of-fame-header h1 {
+            font-size: 3em;
+            color: var(--primary-orange);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+
+        .hall-of-fame-header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .winners-section {
+            margin-bottom: 60px;
+        }
+
+        .winners-section-title {
+            font-size: 2em;
+            color: var(--primary-orange);
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .winners-section-title::before,
+        .winners-section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-orange));
+        }
+
+        .winners-section-title::after {
+            background: linear-gradient(to left, transparent, var(--primary-orange));
+        }
+
+        .winner-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .winner-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid var(--primary-orange);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .winner-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 0, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+            50% { transform: translate(10%, 10%); opacity: 0.8; }
+        }
+
+        .winner-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(255, 107, 0, 0.5);
+            border-color: var(--success-green);
+        }
+
+        .winner-card-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-trophy {
+            font-size: 4em;
+            margin-bottom: 15px;
+            display: block;
+            animation: trophy-bounce 2s infinite;
+        }
+
+        @keyframes trophy-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .winner-event-name {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .winner-date {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .winner-photo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-orange);
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
+        }
+
+        .winner-photo-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--card-bg), var(--dark-bg));
+            border: 4px solid var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+        }
+
+        .winner-name {
+            font-size: 2em;
+            color: var(--primary-orange);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-stat {
+            text-align: center;
+            padding: 15px;
+            background: var(--dark-bg);
+            border-radius: 10px;
+        }
+
+        .winner-stat-value {
+            font-size: 1.8em;
+            color: var(--primary-orange);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .winner-stat-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .series-winner-card {
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(0, 255, 136, 0.15));
+            border: 4px solid var(--success-green);
+            padding: 50px;
+        }
+
+        .series-winner-card .winner-trophy {
+            font-size: 5em;
+        }
+
+        .series-winner-card .winner-name {
+            font-size: 2.5em;
+        }
+
+        .no-series-winner {
+            text-align: center;
+            padding: 60px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 2px dashed var(--primary-orange);
+        }
+
+        .no-series-winner-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-series-winner-text {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+        }
+
         .modal-header {
             display: flex;
             align-items: flex-start;
@@ -1205,6 +1424,7 @@
         <div class="nav-container">
             <div class="nav-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
             <div class="nav-item active" onclick="showTab('events')">📅 Event Results</div>
+            <div class="nav-item" onclick="showTab('winners')">🏅 AADS Winners</div>
             <div class="nav-item" onclick="showTab('players')">👥 Player Profiles</div>
             <div class="nav-item" onclick="window.open('simulator.html', '_blank')" style="background: linear-gradient(135deg, var(--primary-orange), #d63031); font-weight: 600;">🎮 Match Simulator</div>
         </div>
@@ -1452,6 +1672,30 @@
 
             <div id="playersGrid" class="players-grid">
                 <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Winners Section -->
+        <div id="section-winners" class="section">
+            <div class="hall-of-fame-header">
+                <h1>🏆 AADS Hall of Fame 🏆</h1>
+                <p>Celebrating Excellence in the Atlantic Amateur Darts Series</p>
+            </div>
+
+            <!-- Event Winners -->
+            <div class="winners-section">
+                <h2 class="winners-section-title">Event Champions</h2>
+                <div class="winner-cards-grid" id="eventWinnersGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Series Winners -->
+            <div class="winners-section">
+                <h2 class="winners-section-title">Series Champions</h2>
+                <div class="winner-cards-grid" id="seriesWinnersGrid">
+                    <!-- Populated by JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -2278,6 +2522,13 @@
             return name;
         }
 
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
         // Convert display name back to JSON format (FirstName LastName -> LastName, FirstName)
         function formatNameForJSON(displayName) {
             const parts = displayName.trim().split(' ');
@@ -2305,8 +2556,10 @@
                 navItems[0].classList.add('active');
             } else if (tabName === 'events') {
                 navItems[1].classList.add('active');
-            } else if (tabName === 'players') {
+            } else if (tabName === 'winners') {
                 navItems[2].classList.add('active');
+            } else if (tabName === 'players') {
+                navItems[3].classList.add('active');
             }
 
             // Update sections
@@ -2319,6 +2572,8 @@
                 renderLeaderboard();
             } else if (tabName === 'players') {
                 renderPlayerCards();
+            } else if (tabName === 'winners') {
+                renderWinners();
             }
         }
 
@@ -2984,6 +3239,122 @@
                 const name = card.textContent.toLowerCase();
                 card.style.display = name.includes(search) ? '' : 'none';
             });
+        }
+
+        // Render Winners Hall of Fame
+        function renderWinners() {
+            const eventWinnersGrid = document.getElementById('eventWinnersGrid');
+            const seriesWinnersGrid = document.getElementById('seriesWinnersGrid');
+
+            // Render Event Winners
+            const eventWinners = eventFiles
+                .filter(event => event.metadata.champion)
+                .sort((a, b) => a.metadata.event_id - b.metadata.event_id)
+                .map(event => {
+                    const championName = formatNameForDisplay(event.metadata.champion);
+                    const championStats = event.player_event_stats.find(p => 
+                        formatNameForDisplay(p.name) === championName
+                    );
+                    const profile = playerProfiles.find(p => p.name === championName);
+
+                    let photoHtml;
+                    const imgSrc = getImageSrc(profile?.imageBase64);
+                    if (imgSrc) {
+                        photoHtml = `<img src="${imgSrc}" class="winner-photo" loading="lazy">`;
+                    } else {
+                        photoHtml = `<div class="winner-photo-placeholder">👤</div>`;
+                    }
+
+                    return `
+                        <div class="winner-card">
+                            <div class="winner-card-header">
+                                <span class="winner-trophy">🏆</span>
+                                <div class="winner-event-name">${event.metadata.event_name}</div>
+                                <div class="winner-date">${formatDate(event.metadata.date)}</div>
+                            </div>
+                            <div class="winner-photo-container">
+                                ${photoHtml}
+                            </div>
+                            <div class="winner-name">${championName}</div>
+                            <div class="winner-stats">
+                                <div class="winner-stat">
+                                    <div class="winner-stat-value">${championStats?.final_event_3da.toFixed(2) || 'N/A'}</div>
+                                    <div class="winner-stat-label">Event Avg</div>
+                                </div>
+                                <div class="winner-stat">
+                                    <div class="winner-stat-value">${championStats?.co_pct.toFixed(1) || 'N/A'}%</div>
+                                    <div class="winner-stat-label">CO%</div>
+                                </div>
+                                <div class="winner-stat">
+                                    <div class="winner-stat-value">${championStats?.wins || 0}-${championStats?.losses || 0}</div>
+                                    <div class="winner-stat-label">W-L</div>
+                                </div>
+                                <div class="winner-stat">
+                                    <div class="winner-stat-value">${championStats?.high_finish || 'N/A'}</div>
+                                    <div class="winner-stat-label">High Finish</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            eventWinnersGrid.innerHTML = eventWinners || '<div class="no-series-winner"><div class="no-series-winner-icon">🎯</div><div class="no-series-winner-text">No event champions yet</div></div>';
+
+            // Check for series winner (Event 7 - TOC)
+            const tocEvent = eventFiles.find(e => e.metadata.event_id === 7);
+            
+            if (tocEvent && tocEvent.metadata.champion) {
+                const seriesChampionName = formatNameForDisplay(tocEvent.metadata.champion);
+                const seriesChampionStats = careerStats[seriesChampionName];
+                const profile = playerProfiles.find(p => p.name === seriesChampionName);
+
+                let photoHtml;
+                const imgSrc = getImageSrc(profile?.imageBase64);
+                if (imgSrc) {
+                    photoHtml = `<img src="${imgSrc}" class="winner-photo" loading="lazy">`;
+                } else {
+                    photoHtml = `<div class="winner-photo-placeholder">👤</div>`;
+                }
+
+                seriesWinnersGrid.innerHTML = `
+                    <div class="winner-card series-winner-card">
+                        <div class="winner-card-header">
+                            <span class="winner-trophy">👑</span>
+                            <div class="winner-event-name">Series 1 Champion</div>
+                            <div class="winner-date">Tournament of Champions Winner</div>
+                        </div>
+                        <div class="winner-photo-container">
+                            ${photoHtml}
+                        </div>
+                        <div class="winner-name">${seriesChampionName}</div>
+                        <div class="winner-stats">
+                            <div class="winner-stat">
+                                <div class="winner-stat-value">${seriesChampionStats?.career3DA.toFixed(2) || 'N/A'}</div>
+                                <div class="winner-stat-label">Career Avg</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value">${seriesChampionStats?.coRate.toFixed(1) || 'N/A'}%</div>
+                                <div class="winner-stat-label">CO%</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value">${seriesChampionStats?.totalWins || 0}</div>
+                                <div class="winner-stat-label">Career Wins</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value">${seriesChampionStats?.total180s || 0}</div>
+                                <div class="winner-stat-label">Total 180s</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                seriesWinnersGrid.innerHTML = `
+                    <div class="no-series-winner">
+                        <div class="no-series-winner-icon">👑</div>
+                        <div class="no-series-winner-text">Series Champion will be crowned at the Tournament of Champions (Event 7)</div>
+                    </div>
+                `;
+            }
         }
 
         // Show player details
