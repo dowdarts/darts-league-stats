@@ -1622,6 +1622,7 @@
             // Helper to simulate a "Set Play" match
             simulateSetMatch(playerA, playerB, legsPerSet, setsToWin) {
                 let setsA = 0, setsB = 0;
+                let totalLegsA = 0, totalLegsB = 0;
                 const legProbA = 1 / (1 + Math.pow(10, (playerB.p4pScore - playerA.p4pScore) / 40));
 
                 while (setsA < setsToWin && setsB < setsToWin) {
@@ -1630,9 +1631,17 @@
                     while (legsA < targetLegs && legsB < targetLegs) {
                         Math.random() < legProbA ? legsA++ : legsB++;
                     }
+                    totalLegsA += legsA;
+                    totalLegsB += legsB;
                     legsA === targetLegs ? setsA++ : setsB++;
                 }
-                return setsA === setsToWin ? playerA : playerB;
+                
+                const winner = setsA === setsToWin ? playerA : playerB;
+                return {
+                    winner,
+                    legsA: totalLegsA,
+                    legsB: totalLegsB
+                };
             }
 
             runFullTournament() {
@@ -1647,14 +1656,36 @@
 
                 // 2. Round Robin (Best of 5 legs, single set)
                 const getStandings = (group) => {
-                    let points = group.map(p => ({ ...p, wins: 0 }));
+                    let points = group.map(p => ({ ...p, wins: 0, legsFor: 0, legsAgainst: 0, legDiff: 0 }));
                     for (let i = 0; i < 5; i++) {
                         for (let j = i + 1; j < 5; j++) {
-                            const winner = this.simulateSetMatch(points[i], points[j], 5, 1);
-                            winner.name === points[i].name ? points[i].wins++ : points[j].wins++;
+                            const result = this.simulateSetMatch(points[i], points[j], 5, 1);
+                            
+                            // Update wins
+                            if (result.winner.name === points[i].name) {
+                                points[i].wins++;
+                            } else {
+                                points[j].wins++;
+                            }
+                            
+                            // Update leg counts for +/-
+                            points[i].legsFor += result.legsA;
+                            points[i].legsAgainst += result.legsB;
+                            points[j].legsFor += result.legsB;
+                            points[j].legsAgainst += result.legsA;
+                            
+                            // Calculate leg difference (+/-)
+                            points[i].legDiff = points[i].legsFor - points[i].legsAgainst;
+                            points[j].legDiff = points[j].legsFor - points[j].legsAgainst;
                         }
                     }
-                    return points.sort((a, b) => b.wins - a.wins);
+                    // Sort by wins first, then by leg difference for tie-breaking
+                    return points.sort((a, b) => {
+                        if (b.wins !== a.wins) {
+                            return b.wins - a.wins; // Primary: Most wins
+                        }
+                        return b.legDiff - a.legDiff; // Tie-breaker: Best +/-
+                    });
                 };
 
                 const standA = getStandings(groupA);
@@ -1670,23 +1701,23 @@
                 });
 
                 // 3. Quarter Finals (Best of 5 Sets, 3 legs per set)
-                const qf1 = this.simulateSetMatch(standA[0], standB[3], 3, 3); // A1 v B4
-                const qf2 = this.simulateSetMatch(standA[2], standB[1], 3, 3); // A3 v B2
-                const qf3 = this.simulateSetMatch(standA[1], standB[2], 3, 3); // A2 v B3
-                const qf4 = this.simulateSetMatch(standA[3], standB[0], 3, 3); // A4 v B1
+                const qf1 = this.simulateSetMatch(standA[0], standB[3], 3, 3).winner; // A1 v B4
+                const qf2 = this.simulateSetMatch(standA[2], standB[1], 3, 3).winner; // A3 v B2
+                const qf3 = this.simulateSetMatch(standA[1], standB[2], 3, 3).winner; // A2 v B3
+                const qf4 = this.simulateSetMatch(standA[3], standB[0], 3, 3).winner; // A4 v B1
 
                 // Track SF reaches
                 [qf1, qf2, qf3, qf4].forEach(p => this.sfReaches[p.name]++);
 
                 // 4. Semi Finals (Best of 5 Sets, 5 legs per set)
-                const sf1 = this.simulateSetMatch(qf1, qf2, 5, 3);
-                const sf2 = this.simulateSetMatch(qf3, qf4, 5, 3);
+                const sf1 = this.simulateSetMatch(qf1, qf2, 5, 3).winner;
+                const sf2 = this.simulateSetMatch(qf3, qf4, 5, 3).winner;
 
                 // Track Final reaches
                 [sf1, sf2].forEach(p => this.finalReaches[p.name]++);
 
                 // 5. Final (Best of 7 Sets, 5 legs per set)
-                const champion = this.simulateSetMatch(sf1, sf2, 5, 4);
+                const champion = this.simulateSetMatch(sf1, sf2, 5, 4).winner;
                 this.eventWins[champion.name]++;
             }
 
