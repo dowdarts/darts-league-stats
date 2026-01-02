@@ -1563,10 +1563,10 @@
                 const eventName = event.metadata.event_name;
 
                 // Process Round Robin matches
-                if (event.matches) {
+                if (event.round_robin && event.round_robin.matches) {
                     ['groupA', 'groupB'].forEach(group => {
-                        if (event.matches[group]) {
-                            event.matches[group].forEach(match => {
+                        if (event.round_robin.matches[group]) {
+                            event.round_robin.matches[group].forEach(match => {
                                 const sortKey = `${eventDate}T${match.start_time || '00:00'}`;
                                 const hasPlayerA = match.player1 === playerAName || match.player2 === playerAName;
                                 const hasPlayerB = playerBName ? (match.player1 === playerBName || match.player2 === playerBName) : true;
