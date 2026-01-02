@@ -409,6 +409,213 @@
             color: var(--primary-orange);
         }
 
+        /* Betting Odds Display */
+        .odds-board {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary-orange);
+        }
+
+        .odds-header {
+            text-align: center;
+            font-size: 1.3em;
+            color: var(--primary-orange);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .odds-display {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .odds-player {
+            text-align: center;
+        }
+
+        .odds-player-name {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .odds-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-orange);
+            margin-bottom: 5px;
+        }
+
+        .odds-prob {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .odds-vs {
+            font-size: 2em;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .correct-scores {
+            margin-top: 20px;
+        }
+
+        .correct-scores-title {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .correct-scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .correct-score-item {
+            background: var(--dark-bg);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255,107,53,0.3);
+        }
+
+        .correct-score-item.likely {
+            border-color: var(--accent-green);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .correct-score-label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .correct-score-prob {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+
+        .correct-score-odds {
+            font-size: 0.9em;
+            color: var(--primary-orange);
+            font-weight: 600;
+        }
+
+        .nine-dart-odds {
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid var(--primary-orange);
+        }
+
+        .nine-dart-title {
+            font-size: 1em;
+            color: var(--primary-orange);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .nine-dart-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nine-dart-option {
+            text-align: center;
+        }
+
+        .nine-dart-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .nine-dart-value {
+            font-size: 1.3em;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Momentum Meter */
+        .momentum-meter {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .momentum-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .momentum-bar-container {
+            position: relative;
+            height: 40px;
+            background: var(--dark-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .momentum-zone-left {
+            flex: 1;
+            background: linear-gradient(to right, var(--accent-blue), var(--dark-bg));
+        }
+
+        .momentum-zone-right {
+            flex: 1;
+            background: linear-gradient(to left, var(--accent-red), var(--dark-bg));
+        }
+
+        .momentum-needle {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: white;
+            box-shadow: 0 0 10px white;
+            transition: left 0.5s ease-out;
+            z-index: 10;
+        }
+
+        .momentum-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .momentum-label {
+            font-size: 0.9em;
+        }
+
+        .momentum-label.hot {
+            color: var(--primary-orange);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
         @media (max-width: 768px) {
             .setup-section {
                 grid-template-columns: 1fr;
@@ -421,6 +628,15 @@
 
             .vs-divider {
                 order: 2;
+            }
+
+            .odds-display {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .odds-vs {
+                display: none;
             }
         }
     </style>
@@ -545,6 +761,51 @@
 
         <!-- Results Section -->
         <div class="results-section" id="resultsSection">
+            <!-- Betting Odds Board -->
+            <div id="oddsBoard" style="display: none;">
+                <div class="odds-board">
+                    <div class="odds-header">📊 Pre-Match Betting Odds</div>
+                    <div class="odds-display">
+                        <div class="odds-player">
+                            <div class="odds-player-name" id="oddsP1Name">Player 1</div>
+                            <div class="odds-value" id="oddsP1Value">2.00</div>
+                            <div class="odds-prob" id="oddsP1Prob">50.0% Implied</div>
+                        </div>
+                        <div class="odds-vs">VS</div>
+                        <div class="odds-player">
+                            <div class="odds-player-name" id="oddsP2Name">Player 2</div>
+                            <div class="odds-value" id="oddsP2Value">2.00</div>
+                            <div class="odds-prob" id="oddsP2Prob">50.0% Implied</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Correct Score Probabilities -->
+                    <div class="correct-scores">
+                        <div class="correct-scores-title">Most Likely Correct Scores</div>
+                        <div class="correct-scores-grid" id="correctScoresGrid"></div>
+                    </div>
+
+                    <!-- 9-Dart Finish Odds -->
+                    <div class="nine-dart-odds">
+                        <div class="nine-dart-title">⚡ 9-Dart Finish Market</div>
+                        <div class="nine-dart-display">
+                            <div class="nine-dart-option">
+                                <div class="nine-dart-label">YES</div>
+                                <div class="nine-dart-value" id="nineDartYes">--</div>
+                            </div>
+                            <div class="nine-dart-option">
+                                <div class="nine-dart-label">Probability</div>
+                                <div class="nine-dart-value" id="nineDartProb" style="font-size: 0.9em;">--</div>
+                            </div>
+                            <div class="nine-dart-option">
+                                <div class="nine-dart-label">NO</div>
+                                <div class="nine-dart-value" id="nineDartNo">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="singleMatchResults" style="display: none;">
                 <h2 style="margin-bottom: 20px; color: var(--primary-orange);">Match Result</h2>
                 <div class="match-scoreboard">
@@ -749,6 +1010,136 @@
                 this.format = format;
                 this.options = options;
                 this.log = [];
+                this.margin = 1.05; // 5% Bookie Vig
+            }
+
+            // Calculate P4P-based win probability (Elo-style)
+            calculateWinProbability() {
+                const p1P4P = this.calculateP4PScore(this.p1);
+                const p2P4P = this.calculateP4PScore(this.p2);
+                return 1 / (1 + Math.pow(10, (p2P4P - p1P4P) / 40));
+            }
+
+            // Calculate P4P score for a player
+            calculateP4PScore(player) {
+                const mwr = (player.matchWinRate || 50) / 100;
+                const lwr = 0.5; // Estimate if not available
+                const ce = (player.checkoutPct || 35) / 100;
+                return ((0.20 * mwr) + (0.25 * lwr) + (0.40 * ce)) * 100;
+            }
+
+            // Get decimal odds with vig
+            getDecimalOdds() {
+                const probA = this.calculateWinProbability();
+                const probB = 1 - probA;
+                return {
+                    playerA: (1 / (probA * this.margin)).toFixed(2),
+                    playerB: (1 / (probB * this.margin)).toFixed(2),
+                    impliedProbA: (probA * 100).toFixed(1),
+                    impliedProbB: (probB * 100).toFixed(1)
+                };
+            }
+
+            // Calculate 9-dart odds
+            calculateNineDartOdds(player, legsInMatch) {
+                const p4pScore = this.calculateP4PScore(player);
+                const probPerLeg = (p4pScore / 100) * 0.0008;
+                const probInMatch = 1 - Math.pow((1 - probPerLeg), legsInMatch);
+                return {
+                    yes: (1 / (probInMatch * 1.10)).toFixed(2),
+                    no: (1 / ((1 - probInMatch) * 1.05)).toFixed(2),
+                    probability: (probInMatch * 100).toFixed(3)
+                };
+            }
+
+            // Calculate correct score probabilities (Monte Carlo)
+            calculateCorrectScoreProbs(sims = 5000) {
+                const scoreCounts = {};
+                const [type, target] = this.format.split(':');
+                const winTarget = type === 'legs' ? Math.ceil(parseInt(target) / 2) : Math.ceil(parseInt(target) / 2);
+                const probA = this.calculateWinProbability();
+
+                for (let i = 0; i < sims; i++) {
+                    let scoreA = 0, scoreB = 0;
+                    
+                    if (type === 'legs') {
+                        while (scoreA < winTarget && scoreB < winTarget) {
+                            Math.random() < probA ? scoreA++ : scoreB++;
+                        }
+                    } else {
+                        // Sets format
+                        while (scoreA < winTarget && scoreB < winTarget) {
+                            let setScoreA = 0, setScoreB = 0;
+                            while (setScoreA < 3 && setScoreB < 3) {
+                                Math.random() < probA ? setScoreA++ : setScoreB++;
+                            }
+                            setScoreA > setScoreB ? scoreA++ : scoreB++;
+                        }
+                    }
+                    
+                    const finalScore = `${scoreA}-${scoreB}`;
+                    scoreCounts[finalScore] = (scoreCounts[finalScore] || 0) + 1;
+                }
+
+                return Object.entries(scoreCounts).map(([score, count]) => {
+                    const probability = count / sims;
+                    return {
+                        score,
+                        probability: (probability * 100).toFixed(1),
+                        odds: (1 / (probability * this.margin)).toFixed(2),
+                        count
+                    };
+                }).sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
+            }
+
+            // Calculate live odds based on current match state
+            calculateLiveOdds(state) {
+                const [type, target] = this.format.split(':');
+                const winTarget = type === 'legs' ? Math.ceil(parseInt(target) / 2) : Math.ceil(parseInt(target) / 2);
+                const sims = 5000;
+                let winsA = 0;
+                
+                const baseProbA = this.calculateWinProbability();
+                const throwBias = 0.08; // First dart advantage
+                
+                for (let i = 0; i < sims; i++) {
+                    let scoreA = state.scoreA;
+                    let scoreB = state.scoreB;
+                    let aThrowsNext = state.playerAOnThrow;
+                    
+                    if (type === 'legs') {
+                        while (scoreA < winTarget && scoreB < winTarget) {
+                            let currentProb = aThrowsNext ? 
+                                Math.min(baseProbA + throwBias, 0.95) : 
+                                Math.max(baseProbA - throwBias, 0.05);
+                            Math.random() < currentProb ? scoreA++ : scoreB++;
+                            aThrowsNext = !aThrowsNext;
+                        }
+                    } else {
+                        // Sets format with throw bias
+                        while (scoreA < winTarget && scoreB < winTarget) {
+                            let setScoreA = 0, setScoreB = 0;
+                            while (setScoreA < 3 && setScoreB < 3) {
+                                let currentProb = aThrowsNext ? 
+                                    Math.min(baseProbA + throwBias, 0.95) : 
+                                    Math.max(baseProbA - throwBias, 0.05);
+                                Math.random() < currentProb ? setScoreA++ : setScoreB++;
+                                aThrowsNext = !aThrowsNext;
+                            }
+                            setScoreA > setScoreB ? scoreA++ : scoreB++;
+                        }
+                    }
+                    
+                    if (scoreA === winTarget) winsA++;
+                }
+                
+                const liveProbA = winsA / sims;
+                return {
+                    playerA: (1 / (liveProbA * this.margin)).toFixed(2),
+                    playerB: (1 / ((1 - liveProbA) * this.margin)).toFixed(2),
+                    winChanceA: (liveProbA * 100).toFixed(1),
+                    winChanceB: ((1 - liveProbA) * 100).toFixed(1)
+                };
             }
 
             // Generate a realistic visit score based on average
@@ -928,6 +1319,43 @@
             }
         }
 
+        // Show odds board with betting information
+        function showOddsBoard(sim, format) {
+            const oddsBoard = document.getElementById('oddsBoard');
+            oddsBoard.style.display = 'block';
+            
+            // Get match winner odds
+            const odds = sim.getDecimalOdds();
+            document.getElementById('oddsP1Name').textContent = player1.name;
+            document.getElementById('oddsP2Name').textContent = player2.name;
+            document.getElementById('oddsP1Value').textContent = odds.playerA;
+            document.getElementById('oddsP2Value').textContent = odds.playerB;
+            document.getElementById('oddsP1Prob').textContent = `${odds.impliedProbA}% Implied`;
+            document.getElementById('oddsP2Prob').textContent = `${odds.impliedProbB}% Implied`;
+            
+            // Calculate correct score probabilities
+            const correctScores = sim.calculateCorrectScoreProbs();
+            const correctScoresHTML = correctScores.slice(0, 8).map((item, index) => {
+                const isLikely = index < 3;
+                return `
+                    <div class="correct-score-item ${isLikely ? 'likely' : ''}">
+                        <div class="correct-score-label">${item.score}</div>
+                        <div class="correct-score-prob">${item.probability}%</div>
+                        <div class="correct-score-odds">${item.odds}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('correctScoresGrid').innerHTML = correctScoresHTML;
+            
+            // Calculate 9-dart odds
+            const [type, target] = format.split(':');
+            const totalLegs = type === 'legs' ? parseInt(target) : parseInt(target) * 5; // Estimate for sets
+            const nineDartOdds = sim.calculateNineDartOdds(player1, totalLegs / 2);
+            document.getElementById('nineDartYes').textContent = nineDartOdds.yes;
+            document.getElementById('nineDartNo').textContent = nineDartOdds.no;
+            document.getElementById('nineDartProb').textContent = `${nineDartOdds.probability}%`;
+        }
+
         // UI Functions
         function simulateSingleMatch() {
             if (!player1 || !player2) {
@@ -939,6 +1367,11 @@
             const crowdPressure = document.getElementById('crowdPressure').checked;
             
             const sim = new DartsSimulator(player1, player2, format, { crowdPressure });
+            
+            // Calculate and display pre-match odds
+            showOddsBoard(sim, format);
+            
+            // Run the match simulation
             const result = sim.simulateMatch(true);
             
             // Display results
@@ -1134,6 +1567,7 @@
             document.getElementById('p2Card').classList.remove('active');
             
             document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('oddsBoard').style.display = 'none';
             
             player1 = null;
             player2 = null;
