@@ -186,7 +186,7 @@
                         id="downloadProfiles" 
                         class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-sm"
                     >
-                        💾 Download Player Profiles (ZIP)
+                        💾 Download Player Profiles (JSON)
                     </button>
                 </div>
 
@@ -557,47 +557,23 @@
         };
 
         // Download profiles
-        document.getElementById('downloadProfiles').addEventListener('click', async function() {
+        document.getElementById('downloadProfiles').addEventListener('click', function() {
             if (profiles.length === 0) {
                 alert('No profiles to download! Add at least one player first.');
                 return;
             }
 
-            // Create a new ZIP file
-            const zip = new JSZip();
-            
-            // Process profiles to extract images
-            const processedProfiles = [];
-            const imagesFolder = zip.folder("images").folder("players");
-            
-            for (const profile of profiles) {
-                const processedProfile = { ...profile };
-                
-                // If profile has base64 image, extract it
-                if (profile.imageBase64 && profile.imageBase64.startsWith('data:')) {
-                    // Create filename from player name
-                    const filename = profile.name.toLowerCase()
-                        .replace(/[^a-z0-9\s]/g, '')
-                        .replace(/\s+/g, '-') + '.png';
-                    
-                    // Extract base64 data
-                    const base64Data = profile.imageBase64.replace(/^data:image\/[^;]+;base64,/, '');
-                    
-                    // Add image to ZIP
-                    imagesFolder.file(filename, base64Data, { base64: true });
-                    
-                    // Update profile to reference filename instead of base64
-                    processedProfile.imageBase64 = filename;
-                }
-                
-                processedProfiles.push(processedProfile);
-            }
-            
-            // Add JSON to ZIP
-            zip.file("player_profiles.json", JSON.stringify(processedProfiles, null, 2));
-            
-            // Generate ZIP and download
-            const blob = await zip.generateAsync({ type: 'blob' });
+            // Download as simple JSON file
+            const blob = new Blob([JSON.stringify(profiles, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'player_profiles.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
