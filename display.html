@@ -1354,6 +1354,14 @@
             <div class="data-table">
                 <div class="table-header">
                     <h2>Career Rankings</h2>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: var(--text-secondary); font-size: 0.9em;">Sort by:</span>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <span style="color: var(--text-secondary); font-size: 0.9em;">Career 3DA</span>
+                            <input type="checkbox" id="p4pToggle" onchange="toggleRankingMode()" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="color: var(--primary-orange); font-size: 0.9em; font-weight: 600;">P4P Score</span>
+                        </label>
+                    </div>
                 </div>
                 <div style="overflow-x: auto; overflow-y: auto; max-height: 600px; width: 100%; padding: 20px;">
                     <table style="width: 100%; min-width: 1800px;">
@@ -1362,7 +1370,7 @@
                                 <th class="center">Rank</th>
                                 <th>Player</th>
                                 <th class="center">Events</th>
-                                <th class="center">Career 3DA</th>
+                                <th class="center" id="primaryStatHeader">Career 3DA</th>
                                 <th class="center">100+</th>
                                 <th class="center">140+</th>
                                 <th class="center">180s</th>
@@ -2313,9 +2321,39 @@
             }
         }
 
+        // Toggle between Career 3DA and P4P ranking modes
+        let rankingMode = 'career3DA'; // Default mode
+
+        function toggleRankingMode() {
+            const toggle = document.getElementById('p4pToggle');
+            rankingMode = toggle.checked ? 'p4p' : 'career3DA';
+            renderLeaderboard();
+        }
+
+        // Calculate P4P (Pound-for-Pound) score
+        function calculateP4PScore(player) {
+            // Extract win rates (as decimals 0-1)
+            const matchWinRate = player.totalMatches > 0 ? player.totalWins / player.totalMatches : 0;
+            const setWinRate = player.totalSets > 0 ? player.totalSetsWon / player.totalSets : 0;
+            const legWinRate = player.totalLegs > 0 ? player.totalLegsWon / player.totalLegs : 0;
+            const checkoutEfficiency = player.coRate / 100; // Convert percentage to decimal
+
+            // P4P Formula: D = (0.20 × MWR) + (0.15 × SWR) + (0.25 × LWR) + (0.40 × CE)
+            const p4pScore = (0.20 * matchWinRate) + (0.15 * setWinRate) + (0.25 * legWinRate) + (0.40 * checkoutEfficiency);
+            
+            return p4pScore * 100; // Return as percentage (0-100 scale)
+        }
+
         // Render leaderboard
         function renderLeaderboard() {
-            const sortedPlayers = Object.values(careerStats).sort((a, b) => b.career3DA - a.career3DA);
+            // Sort based on selected ranking mode
+            const sortedPlayers = Object.values(careerStats).sort((a, b) => {
+                if (rankingMode === 'p4p') {
+                    return calculateP4PScore(b) - calculateP4PScore(a);
+                } else {
+                    return b.career3DA - a.career3DA;
+                }
+            });
 
             // Champion showcase - Look for Event 7 (TOC) winner
             const event7 = eventFiles.find(e => e.metadata.event_id === 7);
@@ -2348,6 +2386,15 @@
 
             // Rankings table
             const tbody = document.getElementById('leaderboardTable');
+            const headerEl = document.getElementById('primaryStatHeader');
+            
+            // Update header text based on ranking mode
+            if (rankingMode === 'p4p') {
+                headerEl.textContent = 'P4P Score';
+            } else {
+                headerEl.textContent = 'Career 3DA';
+            }
+            
             tbody.innerHTML = sortedPlayers.map((player, index) => {
                 const profile = playerProfiles.find(p => p.name === player.name);
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
@@ -2366,6 +2413,11 @@
                 const lwPct = player.totalLegs > 0 ? ((player.totalLegsWon / player.totalLegs) * 100).toFixed(1) : '0.0';
                 const coPct = player.coRate.toFixed(1);
 
+                // Display primary stat based on mode
+                const primaryStat = rankingMode === 'p4p' 
+                    ? calculateP4PScore(player).toFixed(1) 
+                    : player.career3DA.toFixed(2);
+
                 return `
                     <tr onclick="highlightRow(this)" style="cursor: pointer; transition: background 0.2s;">
                         <td class="center rank-cell ${rankClass}">${index + 1}</td>
@@ -2376,7 +2428,7 @@
                             </div>
                         </td>
                         <td class="center">${player.events.length}</td>
-                        <td class="center highlight-stat">${player.career3DA.toFixed(2)}</td>
+                        <td class="center highlight-stat">${primaryStat}</td>
                         <td class="center">${player.total100s}</td>
                         <td class="center">${player.total140s}</td>
                         <td class="center">${player.total180s}</td>
