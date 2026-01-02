@@ -24,7 +24,7 @@
         <!-- METADATA SECTION -->
         <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-purple-500">
             <h2 class="text-2xl font-bold mb-4 text-purple-300">Event Metadata</h2>
-            <div class="grid md:grid-cols-2 gap-4">
+            <div class="grid md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-300">Series Number</label>
                     <select 
@@ -57,6 +57,14 @@
                         <option value="6">Event 6</option>
                         <option value="7">Event 7 - Tournament of Champions</option>
                     </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Event Date</label>
+                    <input 
+                        type="date" 
+                        id="eventDate" 
+                        class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
                 </div>
             </div>
         </div>
@@ -524,10 +532,12 @@
                     // Convert uploaded data to appData format
                     appData.metadata.seriesNumber = uploadedData.metadata.series_id;
                     appData.metadata.eventNumber = uploadedData.metadata.event_id;
+                    appData.metadata.eventDate = uploadedData.metadata.event_date || '';
                     
                     // Update metadata dropdowns
                     document.getElementById('seriesNumber').value = uploadedData.metadata.series_id;
                     document.getElementById('eventNumber').value = uploadedData.metadata.event_id;
+                    document.getElementById('eventDate').value = uploadedData.metadata.event_date || '';
                     
                     // Extract players from standings
                     const groupAPlayers = uploadedData.standings.groupA.map(s => s.name);
@@ -656,7 +666,8 @@
                 if (!appData.metadata) {
                     appData.metadata = {
                         seriesNumber: parseInt(document.getElementById('seriesNumber').value) || 1,
-                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1
+                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1,
+                        eventDate: document.getElementById('eventDate').value || ''
                     };
                 }
             } else {
@@ -664,7 +675,8 @@
                 appData = {
                     metadata: {
                         seriesNumber: parseInt(document.getElementById('seriesNumber').value) || 1,
-                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1
+                        eventNumber: parseInt(document.getElementById('eventNumber').value) || 1,
+                        eventDate: document.getElementById('eventDate').value || ''
                     },
                     groupA: {
                         players: [],
@@ -695,6 +707,7 @@
             const storageKey = getStorageKey();
             appData.metadata.seriesNumber = parseInt(document.getElementById('seriesNumber').value) || 1;
             appData.metadata.eventNumber = parseInt(document.getElementById('eventNumber').value) || 1;
+            appData.metadata.eventDate = document.getElementById('eventDate').value || '';
             localStorage.setItem(storageKey, JSON.stringify(appData));
         }
 
@@ -1149,13 +1162,13 @@
             if (!appData.metadata) {
                 appData.metadata = {
                     seriesNumber: 1,
-                    eventNumber: 1
+                    eventNumber: 1,
+                    eventDate: ''
                 };
             }
             
-            // Get current date
-            const today = new Date();
-            const dateStr = today.toISOString().split('T')[0];
+            // Get event date from form or use current date
+            const eventDate = document.getElementById('eventDate').value || new Date().toISOString().split('T')[0];
             
             // Generate event name
             const eventId = appData.metadata.eventNumber || 1;
@@ -1168,7 +1181,7 @@
                     series_id: seriesId,
                     event_id: eventId,
                     event_name: eventName,
-                    date: dateStr
+                    event_date: eventDate
                 },
                 standings: {
                     groupA: buildStandingsArray('A', appData.groupA),

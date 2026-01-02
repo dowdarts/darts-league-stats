@@ -158,7 +158,7 @@
                     }
 
                     // Show success
-                    document.getElementById('rrInfo').textContent = `${rrData.metadata.event_name} - ${rrData.metadata.date}`;
+                    document.getElementById('rrInfo').textContent = `${rrData.metadata.event_name} - ${rrData.metadata.event_date || rrData.metadata.date}`;
                     document.getElementById('rrGroupACount').textContent = rrData.matches.groupA?.length || 0;
                     document.getElementById('rrGroupBCount').textContent = rrData.matches.groupB?.length || 0;
                     document.getElementById('rrStatus').classList.remove('hidden');
@@ -353,7 +353,7 @@
                     series_id: rr.metadata.series_id,
                     event_id: rr.metadata.event_id,
                     event_name: rr.metadata.event_name,
-                    date: rr.metadata.date,
+                    event_date: rr.metadata.event_date || rr.metadata.date,
                     champion: ko.knockout.champion || 'TBD'
                 },
                 player_event_stats: players,

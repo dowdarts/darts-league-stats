@@ -1596,7 +1596,7 @@
             }
 
             eventFiles.forEach(event => {
-                const eventDate = event.metadata.date;
+                const eventDate = event.metadata.event_date || event.metadata.date || '1900-01-01';
                 const eventName = event.metadata.event_name;
 
                 // Process Round Robin matches
