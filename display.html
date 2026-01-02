@@ -2087,6 +2087,8 @@
                 }
             }
             console.log('All events loaded');
+            // Re-populate player selectors now that all players are loaded
+            populatePlayerSelectors();
         }
 
         // Setup lazy loading for partners section
@@ -2111,6 +2113,10 @@
             const playerNames = Object.keys(careerStats).sort();
             const playerASelect = document.getElementById('playerASelect');
             const playerBSelect = document.getElementById('playerBSelect');
+
+            // Clear existing options
+            playerASelect.innerHTML = '';
+            playerBSelect.innerHTML = '';
 
             playerNames.forEach(name => {
                 const optionA = document.createElement('option');
