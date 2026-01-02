@@ -414,6 +414,17 @@
                         return;
                     }
 
+                    // Manual tiebreaker adjustment: Tyler Cyr finished ahead of Kyle Gray 
+                    // due to one more match win (organizer ruling)
+                    const grayIndex = standingsB.findIndex(p => p.name === 'Gray, Kyle');
+                    const cyrIndex = standingsB.findIndex(p => p.name === 'Cyr, Tyler');
+                    if (grayIndex !== -1 && cyrIndex !== -1 && grayIndex < cyrIndex) {
+                        // Swap Gray and Cyr in the standings
+                        [standingsB[grayIndex], standingsB[cyrIndex]] = [standingsB[cyrIndex], standingsB[grayIndex]];
+                        console.log('Applied manual tiebreaker: Swapped Cyr and Gray');
+                        console.log('Updated Group B Standings:', standingsB.map((p, i) => `${i}: ${p.name} (Rank ${p.rank})`));
+                    }
+
                     // Create Quarter Finals with seeding: A1vB4, A2vB3, A3vB2, A4vB1
                     // standingsA[0] = A1 (1st place), standingsB[3] = B4 (4th place), etc.
                     appData.knockout.quarterFinals = [
