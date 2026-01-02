@@ -1440,8 +1440,9 @@
                 document.getElementById('championWins').textContent = champion?.totalWins || 0;
 
                 const photoEl = document.getElementById('championPhoto');
-                if (profile?.imageBase64) {
-                    photoEl.src = profile.imageBase64;
+                const imgSrc = getImageSrc(profile?.imageBase64);
+                if (imgSrc) {
+                    photoEl.src = imgSrc;
                     photoEl.style.display = 'block';
                 } else {
                     photoEl.style.display = 'none';
@@ -1458,8 +1459,9 @@
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
 
                 let photoHtml;
-                if (profile?.imageBase64) {
-                    photoHtml = `<img src="${profile.imageBase64}" class="player-photo">`;
+                const imgSrc = getImageSrc(profile?.imageBase64);
+                if (imgSrc) {
+                    photoHtml = `<img src="${imgSrc}" class="player-photo">`;
                 } else {
                     photoHtml = `<div class="player-photo-placeholder">👤</div>`;
                 }
@@ -1981,8 +1983,9 @@
                 const profile = playerProfiles.find(p => p.name === player.name);
 
                 let photoHtml;
-                if (profile?.imageBase64) {
-                    photoHtml = `<img src="${profile.imageBase64}" class="player-card-photo">`;
+                const imgSrc = getImageSrc(profile?.imageBase64);
+                if (imgSrc) {
+                    photoHtml = `<img src="${imgSrc}" class="player-card-photo">`;
                 } else {
                     photoHtml = `<div class="player-card-placeholder">👤</div>`;
                 }
@@ -2147,8 +2150,9 @@
             document.getElementById('modalPlayerName').textContent = playerName;
             
             const photoContainer = document.getElementById('modalPhotoContainer');
-            if (profile?.imageBase64) {
-                photoContainer.innerHTML = `<img src="${profile.imageBase64}" class="modal-photo">`;
+            const imgSrc = getImageSrc(profile?.imageBase64);
+            if (imgSrc) {
+                photoContainer.innerHTML = `<img src="${imgSrc}" class="modal-photo">`;
             } else {
                 photoContainer.innerHTML = `<div class="modal-photo-placeholder">👤</div>`;
             }
