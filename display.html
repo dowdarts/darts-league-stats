@@ -1879,9 +1879,10 @@
             if (h2hMatches.length === 0) {
                 matchesList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">No previous matches found between these players</div>';
             } else {
-                matchesList.innerHTML = h2hMatches.map(match => {
+                matchesList.innerHTML = h2hMatches.map((match, index) => {
+                    const matchId = `h2h-match-${index}`;
                     const score = match.type === 'RR' 
-                        ? `${match.player1_legs} - ${match.player2_legs}`
+                        ? `${match.player1_legs} - ${match.player2_legs} Legs`
                         : `${match.player1_sets} - ${match.player2_sets} Sets`;
                     
                     let winner = '';
@@ -1893,8 +1894,15 @@
 
                     const winnerClass = winner === playerANameJSON ? 'color: #22c55e' : 'color: #ef4444';
 
+                    // Get match details
+                    const p1Details = match.player1_details || {};
+                    const p2Details = match.player2_details || {};
+
                     return `
-                        <div style="background: #1a1a1a; border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 15px;">
+                        <div style="background: #1a1a1a; border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s;" 
+                             onclick="toggleMatchDetails('${matchId}')"
+                             onmouseover="this.style.background='rgba(255, 107, 0, 0.1)'" 
+                             onmouseout="this.style.background='#1a1a1a'">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <div style="color: var(--text-secondary); font-size: 0.9em;">${match.eventName} - ${match.type}</div>
@@ -1905,6 +1913,65 @@
                                     <div style="margin-top: 5px; ${winnerClass}; font-weight: bold;">Winner: ${winner}</div>
                                 </div>
                             </div>
+                        </div>
+                        <div id="${matchId}" class="match-details-row" style="display: none; margin-bottom: 15px; background: rgba(255, 107, 0, 0.05); padding: 20px; border-left: 4px solid var(--primary-orange); border-radius: 4px;">
+                            <h4 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Match Details</h4>
+                            <table style="width: 100%; max-width: 600px; margin: 0 auto; font-size: 0.95em; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: rgba(0, 0, 0, 0.2);">
+                                        <th style="padding: 10px; text-align: left;">Stat</th>
+                                        <th style="padding: 10px; text-align: center;">${match.player1}</th>
+                                        <th style="padding: 10px; text-align: center;">${match.player2}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>${match.type === 'RR' ? 'Legs' : 'Sets'}</strong></td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${match.type === 'RR' ? match.player1_legs : match.player1_sets}</td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${match.type === 'RR' ? match.player2_legs : match.player2_sets}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>3-Dart Average</strong></td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${(p1Details.three_dart_avg || p1Details.threeDartAvg || 0).toFixed(2)}</td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${(p2Details.three_dart_avg || p2Details.threeDartAvg || 0).toFixed(2)}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>CO Opportunities</strong></td>
+                                        <td style="padding: 8px; text-align: center;">${p1Details.co_opportunities || p1Details.coOpportunities || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${p2Details.co_opportunities || p2Details.coOpportunities || 0}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>CO Completed</strong></td>
+                                        <td style="padding: 8px; text-align: center;">${p1Details.co_completed || p1Details.coCompleted || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${p2Details.co_completed || p2Details.coCompleted || 0}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>Checkout %</strong></td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p1Details.co_pct || p1Details.coPct || 0).toFixed(1)}%</td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p2Details.co_pct || p2Details.coPct || 0).toFixed(1)}%</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>180s</strong></td>
+                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_180 || p1Details.scores180 || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_180 || p2Details.scores180 || 0}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>140+ Scores</strong></td>
+                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_140plus || p1Details.scores140plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_140plus || p2Details.scores140plus || 0}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 8px;"><strong>100+ Scores</strong></td>
+                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_100plus || p1Details.scores100plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_100plus || p2Details.scores100plus || 0}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px;"><strong>High Finish</strong></td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${p1Details.high_checkout || p1Details.highCheckout || 0}</td>
+                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${p2Details.high_checkout || p2Details.highCheckout || 0}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     `;
                 }).join('');
@@ -2629,7 +2696,11 @@
         function toggleMatchDetails(matchId) {
             const detailsRow = document.getElementById(matchId);
             if (detailsRow) {
-                detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+                if (detailsRow.style.display === 'none' || detailsRow.style.display === '') {
+                    detailsRow.style.display = detailsRow.tagName === 'TR' ? 'table-row' : 'block';
+                } else {
+                    detailsRow.style.display = 'none';
+                }
             }
         }
         
