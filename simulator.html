@@ -1902,6 +1902,14 @@
                             eventDataCache[eventNum] = JSON.parse(storedEvent);
                         }
                     }
+                    
+                    // Check if we have any data at all
+                    const hasData = Object.keys(eventDataCache).length > 0;
+                    console.log(`LocalStorage check: ${hasData ? 'Found' : 'No'} event data. Events loaded:`, Object.keys(eventDataCache));
+                    
+                    if (!hasData) {
+                        throw new Error('No data available in localStorage. Please sync data first from index.html');
+                    }
                 }
                 
                 // Calculate career stats for each player
@@ -1909,7 +1917,10 @@
                 
                 for (const eventNum of manifest.available_events) {
                     const eventData = eventDataCache[eventNum];
-                    if (!eventData) continue;
+                    if (!eventData) {
+                        console.warn(`Event ${eventNum} data missing`);
+                        continue;
+                    }
                     
                     // Process each player in this event
                     if (!eventData.player_event_stats) continue;
@@ -1966,6 +1977,8 @@
                 
                 careerStats = statsMap;
                 playerData = Object.values(statsMap).sort((a, b) => b.avg3DA - a.avg3DA);
+                
+                console.log(`✅ Loaded ${playerData.length} players successfully`);
                 
                 // Populate player selects
                 const p1Select = document.getElementById('p1Select');
