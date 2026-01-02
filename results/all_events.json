@@ -2182,9 +2182,9 @@
                                                       "scores_100plus":  5,
                                                       "scores_140plus":  0,
                                                       "scores_180":  0,
-                                                      "co_opportunities":  8,
-                                                      "co_completed":  7,
-                                                      "co_pct":  87.5,
+                                                      "co_opportunities":  11,
+                                                      "co_completed":  1,
+                                                      "co_pct":  9.09,
                                                       "high_finish":  0
                                                   }
                                               ],
@@ -2622,7 +2622,7 @@
                                                                               "player1_details":  {
                                                                                                       "three_dart_avg":  49.91,
                                                                                                       "co_opportunities":  2,
-                                                                                                      "co_completed":  3,
+                                                                                                      "co_completed":  0,
                                                                                                       "co_pct":  0,
                                                                                                       "scores_100plus":  1,
                                                                                                       "scores_140plus":  0,
@@ -2648,8 +2648,8 @@
                                                                               "start_time":  "09:11",
                                                                               "player1_details":  {
                                                                                                       "three_dart_avg":  49.1,
-                                                                                                      "co_opportunities":  0,
-                                                                                                      "co_completed":  3,
+                                                                                                      "co_opportunities":  3,
+                                                                                                      "co_completed":  0,
                                                                                                       "co_pct":  0,
                                                                                                       "scores_100plus":  1,
                                                                                                       "scores_140plus":  0,
