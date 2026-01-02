@@ -1436,6 +1436,7 @@
                     avg: playerStats.avg3DA,
                     checkoutPct: playerStats.coRate,
                     matchWinRate: playerStats.matchWinRate,
+                    p4pScore: playerStats.p4pScore,
                     formBonus: 0
                 };
                 document.getElementById('p1Card').classList.add('active');
@@ -1445,6 +1446,7 @@
                     avg: playerStats.avg3DA,
                     checkoutPct: playerStats.coRate,
                     matchWinRate: playerStats.matchWinRate,
+                    p4pScore: playerStats.p4pScore,
                     formBonus: 0
                 };
                 document.getElementById('p2Card').classList.add('active');
@@ -2121,15 +2123,15 @@
                     <div class="recap-grid">
                         <div class="recap-item">
                             <span class="recap-label">${player1.name} P4P Score</span>
-                            <span class="recap-value">${player1.final_event_3da.toFixed(1)}</span>
+                            <span class="recap-value">${player1.p4pScore.toFixed(1)}</span>
                         </div>
                         <div class="recap-item">
                             <span class="recap-label">${player2.name} P4P Score</span>
-                            <span class="recap-value">${player2.final_event_3da.toFixed(1)}</span>
+                            <span class="recap-value">${player2.p4pScore.toFixed(1)}</span>
                         </div>
                         <div class="recap-item">
                             <span class="recap-label">P4P Differential</span>
-                            <span class="recap-value">${Math.abs(player1.final_event_3da - player2.final_event_3da).toFixed(1)}</span>
+                            <span class="recap-value">${Math.abs(player1.p4pScore - player2.p4pScore).toFixed(1)}</span>
                         </div>
                         <div class="recap-item">
                             <span class="recap-label">Predicted Win Probability</span>
@@ -2320,7 +2322,6 @@
                 `;
                 
                 document.getElementById('bulkResults').innerHTML = resultsHTML;
-                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
             }, 100);
         }
 
