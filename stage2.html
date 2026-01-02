@@ -343,12 +343,13 @@
                         qfs[3] = origQF2; // QF4 gets old QF2
                         console.log('QF matchups rearranged');
                         
-                        // Also swap SF1 and SF2 for Event 2
+                        // Swap specific players between SF1 and SF2 for Event 2
                         const sfs = appData.knockout.semiFinals;
-                        const origSF1 = sfs[0];
-                        sfs[0] = sfs[1]; // SF1 gets old SF2
-                        sfs[1] = origSF1; // SF2 gets old SF1
-                        console.log('SF matchups swapped');
+                        // Swap SF1.player2 with SF2.player1
+                        const temp = sfs[0].player2;
+                        sfs[0].player2 = sfs[1].player1;
+                        sfs[1].player1 = temp;
+                        console.log('SF players swapped: SF1.player2 ↔ SF2.player1');
                     }
                     
                     console.log('Restored appData:', appData);
