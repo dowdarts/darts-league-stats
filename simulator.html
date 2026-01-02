@@ -1854,19 +1854,19 @@
         // Load player data on page load
         async function loadPlayerData() {
             try {
-                // Load career stats from display.html's localStorage or fetch fresh
-                const response = await fetch(`results/player_profiles.json?t=${Date.now()}`);
+                // Load career stats from offline_results folder for simulator
+                const response = await fetch(`offline_results/player_profiles.json?t=${Date.now()}`);
                 const profiles = await response.json();
                 
                 // Load event data to calculate stats
-                const manifestResponse = await fetch(`results/manifest.json?t=${Date.now()}`);
+                const manifestResponse = await fetch(`offline_results/manifest.json?t=${Date.now()}`);
                 const manifest = await manifestResponse.json();
                 
                 // Calculate career stats for each player
                 const statsMap = {};
                 
                 for (const eventNum of manifest.available_events) {
-                    const eventResponse = await fetch(`results/Final_Series1_Event${eventNum}.json?t=${Date.now()}`);
+                    const eventResponse = await fetch(`offline_results/Final_Series1_Event${eventNum}.json?t=${Date.now()}`);
                     const eventData = await eventResponse.json();
                     
                     // Process each player in this event
