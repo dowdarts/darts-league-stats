@@ -1851,23 +1851,52 @@
             document.getElementById('groupStage').style.display = 'none';
         }
 
+        // Embedded data for offline use (fallback if fetch fails)
+        const EMBEDDED_MANIFEST = {"available_events": [1, 2, 3], "series_name": "Atlantic Amateur Darts Series", "series_id": 1, "current_event": 3, "last_updated": "2026-01-02"};
+        
         // Load player data on page load
         async function loadPlayerData() {
             try {
-                // Load career stats from offline_results folder for simulator
-                const response = await fetch(`offline_results/player_profiles.json?t=${Date.now()}`);
-                const profiles = await response.json();
+                let profiles, manifest, eventDataCache = {};
                 
-                // Load event data to calculate stats
-                const manifestResponse = await fetch(`offline_results/manifest.json?t=${Date.now()}`);
-                const manifest = await manifestResponse.json();
+                // Try to fetch from offline_results folder first
+                try {
+                    const response = await fetch(`offline_results/player_profiles.json?t=${Date.now()}`);
+                    profiles = await response.json();
+                    
+                    const manifestResponse = await fetch(`offline_results/manifest.json?t=${Date.now()}`);
+                    manifest = await manifestResponse.json();
+                    
+                    // Fetch all event files
+                    for (const eventNum of manifest.available_events) {
+                        const eventResponse = await fetch(`offline_results/Final_Series1_Event${eventNum}.json?t=${Date.now()}`);
+                        eventDataCache[eventNum] = await eventResponse.json();
+                    }
+                } catch (fetchError) {
+                    console.log('Fetch failed, using embedded/localStorage data:', fetchError);
+                    
+                    // Use embedded manifest
+                    manifest = EMBEDDED_MANIFEST;
+                    
+                    // Try to load from localStorage as fallback
+                    const storedProfiles = localStorage.getItem('player_profiles');
+                    profiles = storedProfiles ? JSON.parse(storedProfiles) : [];
+                    
+                    // Load event data from localStorage
+                    for (const eventNum of manifest.available_events) {
+                        const storedEvent = localStorage.getItem(`Final_Series1_Event${eventNum}`);
+                        if (storedEvent) {
+                            eventDataCache[eventNum] = JSON.parse(storedEvent);
+                        }
+                    }
+                }
                 
                 // Calculate career stats for each player
                 const statsMap = {};
                 
                 for (const eventNum of manifest.available_events) {
-                    const eventResponse = await fetch(`offline_results/Final_Series1_Event${eventNum}.json?t=${Date.now()}`);
-                    const eventData = await eventResponse.json();
+                    const eventData = eventDataCache[eventNum];
+                    if (!eventData) continue;
                     
                     // Process each player in this event
                     if (!eventData.player_event_stats) continue;
