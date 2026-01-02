@@ -2247,9 +2247,8 @@
         function promptAdminCode() {
             const code = prompt('Enter admin code to access Match Simulator:');
             if (code === ADMIN_CODE) {
-                sessionStorage.setItem('aads_admin_access', 'true');
                 showSimulatorLink();
-                alert('✓ Admin access granted! Match Simulator is now available.');
+                alert('✓ Admin access granted! Match Simulator is now available until page refresh.');
             } else if (code !== null) {
                 alert('✗ Incorrect code. Access denied.');
             }
@@ -2268,22 +2267,11 @@
                 simulatorLink.style.display = 'none';
             }
         }
-        
-        function checkAdminAccess() {
-            if (sessionStorage.getItem('aads_admin_access') === 'true') {
-                showSimulatorLink();
-            } else {
-                hideSimulatorLink();
-            }
-        }
 
         // Initialize
         async function init() {
-            // Clear any old localStorage admin access (migration from old system)
-            localStorage.removeItem('aads_admin_access');
-            
-            // Check admin access on page load (uses sessionStorage)
-            checkAdminAccess();
+            // Simulator link is hidden by default - no persistence
+            hideSimulatorLink();
             
             try {
                 // Try to load from cache first for instant display
