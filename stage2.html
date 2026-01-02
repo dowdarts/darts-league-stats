@@ -410,12 +410,12 @@
                         return;
                     }
 
-                    // Create Quarter Finals with seeding: A1vB4, A2vB3, B1vA4, B2vA3
+                    // Create Quarter Finals with seeding: A1vB4, A2vB3, A3vB2, A4vB1
                     appData.knockout.quarterFinals = [
                         createKnockoutMatch(standingsA[0].name, standingsB[3].name, 'QF1'),
                         createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF2'),
-                        createKnockoutMatch(standingsB[0].name, standingsA[3].name, 'QF3'),
-                        createKnockoutMatch(standingsB[1].name, standingsA[2].name, 'QF4')
+                        createKnockoutMatch(standingsA[2].name, standingsB[1].name, 'QF3'),
+                        createKnockoutMatch(standingsA[3].name, standingsB[0].name, 'QF4')
                     ];
 
                     // Create empty Semi Finals
