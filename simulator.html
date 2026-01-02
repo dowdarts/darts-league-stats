@@ -1403,13 +1403,24 @@
             }
             
             // Display match stats
+            const [formatType] = format.split(':');
+            const scoreLabel = formatType === 'sets' ? 'Sets' : 'Legs';
+            
             const statsHTML = `
                 <div class="stat-box">
-                    <div class="stat-box-title">${player1.name} Legs</div>
+                    <div class="stat-box-title">${player1.name} ${scoreLabel}</div>
+                    <div class="stat-box-value">${result.score[0]}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player2.name} ${scoreLabel}</div>
+                    <div class="stat-box-value">${result.score[1]}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player1.name} Total Legs</div>
                     <div class="stat-box-value">${result.legs[0]}</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-box-title">${player2.name} Legs</div>
+                    <div class="stat-box-title">${player2.name} Total Legs</div>
                     <div class="stat-box-value">${result.legs[1]}</div>
                 </div>
                 <div class="stat-box">
