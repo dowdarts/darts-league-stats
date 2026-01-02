@@ -1809,7 +1809,8 @@
         // Helper function to fetch with suppressed 404 logging
         async function fetchEventFile(eventNumber) {
             try {
-                const response = await fetch(`results/Final_Series1_Event${eventNumber}.json`);
+                // Add cache-busting parameter to always get fresh data
+                const response = await fetch(`results/Final_Series1_Event${eventNumber}.json?t=${Date.now()}`);
                 if (!response.ok) return null;
                 return await response.json();
             } catch (error) {
