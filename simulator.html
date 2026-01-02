@@ -605,6 +605,56 @@
             margin-top: 5px;
         }
 
+        /* Prop Markets */
+        .prop-market {
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+        }
+
+        .prop-market-title {
+            font-size: 1.05em;
+            color: var(--primary-orange);
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .prop-market-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prop-market-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .prop-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .prop-odds {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.95em;
+            color: var(--text-primary);
+        }
+
+        .prop-odds strong {
+            color: var(--primary-orange);
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
         /* Momentum Meter */
         .momentum-meter {
             background: var(--card-bg);
@@ -845,6 +895,69 @@
                         <div class="format-title">📋 Match Format</div>
                         <div class="format-info" id="formatInfo">--</div>
                     </div>
+
+                    <!-- 180s Markets -->
+                    <div class="prop-market">
+                        <div class="prop-market-title">🎯 180s Markets</div>
+                        <div class="prop-market-grid">
+                            <div class="prop-market-item">
+                                <div class="prop-label">Total 180s</div>
+                                <div class="prop-odds">
+                                    <span>O <span id="total180Line">--</span>: <strong id="total180Over">--</strong></span>
+                                    <span>U <span id="total180LineU">--</span>: <strong id="total180Under">--</strong></span>
+                                </div>
+                            </div>
+                            <div class="prop-market-item">
+                                <div class="prop-label">Most 180s</div>
+                                <div class="prop-odds">
+                                    <span><span id="most180P1Name">P1</span>: <strong id="most180P1">--</strong></span>
+                                    <span><span id="most180P2Name">P2</span>: <strong id="most180P2">--</strong></span>
+                                    <span>Tie: <strong id="most180Tie">--</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Markets -->
+                    <div class="prop-market">
+                        <div class="prop-market-title">🏁 Checkout Markets</div>
+                        <div class="prop-market-grid">
+                            <div class="prop-market-item">
+                                <div class="prop-label">Highest Checkout</div>
+                                <div class="prop-odds">
+                                    <span><span id="highestP1Name">P1</span>: <strong id="highestP1">--</strong></span>
+                                    <span><span id="highestP2Name">P2</span>: <strong id="highestP2">--</strong></span>
+                                </div>
+                            </div>
+                            <div class="prop-market-item">
+                                <div class="prop-label">Highest Over 130.5</div>
+                                <div class="prop-odds">
+                                    <span>Over: <strong id="over130">--</strong></span>
+                                    <span>Under: <strong id="under130">--</strong></span>
+                                </div>
+                            </div>
+                            <div class="prop-market-item">
+                                <div class="prop-label">170 Checkout</div>
+                                <div class="prop-odds">
+                                    <span>Yes: <strong id="yes170">--</strong></span>
+                                    <span>No: <strong id="no170">--</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Treble -->
+                    <div class="prop-market">
+                        <div class="prop-market-title">👑 Match Treble (Win + Most 180s + Highest CO)</div>
+                        <div class="prop-market-grid">
+                            <div class="prop-market-item">
+                                <div class="prop-odds" style="justify-content: center; gap: 30px;">
+                                    <span><span id="trebleP1Name">P1</span> Treble: <strong id="trebleP1">--</strong></span>
+                                    <span><span id="trebleP2Name">P2</span> Treble: <strong id="trebleP2">--</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1046,6 +1159,21 @@
             }
         }
 
+        // Mathematical utility functions for betting markets
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function poisson(k, lambda) {
+            const e = Math.E;
+            return (Math.pow(lambda, k) * Math.pow(e, -lambda)) / factorial(k);
+        }
+
         // Darts Simulator Class
         class DartsSimulator {
             constructor(p1, p2, format, options = {}) {
@@ -1232,6 +1360,106 @@
                 return Math.random() * 100 < effectivePct;
             }
 
+            // ============ PROP MARKETS ============
+            
+            // 180s Markets
+            calculate180sMarkets(estimatedLegs) {
+                const p1Stats = careerStats[this.p1.name];
+                const p2Stats = careerStats[this.p2.name];
+                
+                const p1Freq = (p1Stats?.avg180PerLeg || 0.15);
+                const p2Freq = (p2Stats?.avg180PerLeg || 0.15);
+                const combinedFreq = p1Freq + p2Freq;
+                const lambda = estimatedLegs * combinedFreq;
+                
+                // Total 180s Over/Under
+                const line = Math.floor(lambda) + 0.5;
+                let probUnder = 0;
+                for (let i = 0; i <= Math.floor(line); i++) {
+                    probUnder += poisson(i, lambda);
+                }
+                
+                // Most 180s (3-way)
+                const p1Expected = estimatedLegs * p1Freq;
+                const p2Expected = estimatedLegs * p2Freq;
+                const probP1Most = p1Expected / (p1Expected + p2Expected + 0.5);
+                const probP2Most = p2Expected / (p1Expected + p2Expected + 0.5);
+                const probTie = 0.5 / (p1Expected + p2Expected + 0.5);
+                
+                return {
+                    totalLine: line,
+                    overOdds: (1 / ((1 - probUnder) * this.margin)).toFixed(2),
+                    underOdds: (1 / (probUnder * this.margin)).toFixed(2),
+                    most180sP1: (1 / (probP1Most * this.margin)).toFixed(2),
+                    most180sP2: (1 / (probP2Most * this.margin)).toFixed(2),
+                    most180sTie: (1 / (probTie * this.margin)).toFixed(2),
+                    p1PlayerLine: (p1Expected - 0.5).toFixed(1),
+                    p2PlayerLine: (p2Expected - 0.5).toFixed(1)
+                };
+            }
+
+            // Checkout Markets
+            calculateCheckoutMarkets() {
+                const p1Stats = careerStats[this.p1.name];
+                const p2Stats = careerStats[this.p2.name];
+                
+                const p1Peak = p1Stats?.peakFinish || 120;
+                const p2Peak = p2Stats?.peakFinish || 120;
+                const p1HighTonProb = (p1Stats?.highFinishRate || 0.10);
+                const p2HighTonProb = (p2Stats?.highFinishRate || 0.10);
+                
+                // Highest Checkout market
+                const probP1Highest = p1Peak / (p1Peak + p2Peak);
+                const probP2Highest = 1 - probP1Highest;
+                
+                // Highest Checkout O/U 130.5
+                const maxPeak = Math.max(p1Peak, p2Peak);
+                const probOver130 = maxPeak > 130 ? 0.65 : 0.35;
+                
+                // 170 Checkout (Yes/No)
+                const prob170 = Math.max(p1HighTonProb, p2HighTonProb) * 0.05;
+                
+                return {
+                    highestP1: (1 / (probP1Highest * this.margin)).toFixed(2),
+                    highestP2: (1 / (probP2Highest * this.margin)).toFixed(2),
+                    over130: (1 / (probOver130 * this.margin)).toFixed(2),
+                    under130: (1 / ((1 - probOver130) * this.margin)).toFixed(2),
+                    yes170: (1 / (prob170 * 1.10)).toFixed(2),
+                    no170: (1 / ((1 - prob170) * 1.05)).toFixed(2)
+                };
+            }
+
+            // Handicap Market
+            calculateHandicapMarket(handicap) {
+                const probA = this.calculateWinProbability();
+                const [type, target] = this.format.split(':');
+                const totalLegs = type === 'legs' ? parseInt(target) : parseInt(target) * 3;
+                
+                // Adjust win probability based on handicap
+                const adjustedProb = probA + (handicap * 0.05);
+                const clampedProb = Math.max(0.05, Math.min(0.95, adjustedProb));
+                
+                return {
+                    playerAHandicap: (1 / (clampedProb * this.margin)).toFixed(2),
+                    playerBHandicap: (1 / ((1 - clampedProb) * this.margin)).toFixed(2)
+                };
+            }
+
+            // Match Treble (Win + Most 180s + Highest Checkout)
+            calculateMatchTreble(estimatedLegs) {
+                const winProb = this.calculateWinProbability();
+                const markets180 = this.calculate180sMarkets(estimatedLegs);
+                const checkoutMarkets = this.calculateCheckoutMarkets();
+                
+                const probP1Treble = winProb * (1 / parseFloat(markets180.most180sP1)) * (1 / parseFloat(checkoutMarkets.highestP1));
+                const probP2Treble = (1 - winProb) * (1 / parseFloat(markets180.most180sP2)) * (1 / parseFloat(checkoutMarkets.highestP2));
+                
+                return {
+                    p1Treble: (1 / (probP1Treble * this.margin)).toFixed(2),
+                    p2Treble: (1 / (probP2Treble * this.margin)).toFixed(2)
+                };
+            }
+
             // Simulate a single leg (501 game)
             simulateLeg(starter, logEnabled = false) {
                 let scores = [501, 501];
@@ -1391,8 +1619,9 @@
             }).join('');
             document.getElementById('correctScoresGrid').innerHTML = correctScoresHTML;
             
-            // Display match format
+            // Display match format and estimate legs
             const [type, target] = format.split(':');
+            const estimatedLegs = type === 'legs' ? parseInt(target) * 0.85 : parseInt(target) * 4;
             let formatText = '';
             if (type === 'legs') {
                 formatText = `Best of ${target} Legs (First to ${Math.ceil(parseInt(target) / 2)})`;
@@ -1400,6 +1629,36 @@
                 formatText = `Best of ${target} Sets (First to ${Math.ceil(parseInt(target) / 2)})<br><small>Each set: Best of 5 legs (First to 3)</small>`;
             }
             document.getElementById('formatInfo').innerHTML = formatText;
+
+            // Calculate and display 180s markets
+            const markets180 = sim.calculate180sMarkets(estimatedLegs);
+            document.getElementById('total180Line').textContent = markets180.totalLine;
+            document.getElementById('total180LineU').textContent = markets180.totalLine;
+            document.getElementById('total180Over').textContent = markets180.overOdds;
+            document.getElementById('total180Under').textContent = markets180.underOdds;
+            document.getElementById('most180P1Name').textContent = player1.name;
+            document.getElementById('most180P2Name').textContent = player2.name;
+            document.getElementById('most180P1').textContent = markets180.most180sP1;
+            document.getElementById('most180P2').textContent = markets180.most180sP2;
+            document.getElementById('most180Tie').textContent = markets180.most180sTie;
+
+            // Calculate and display checkout markets
+            const checkoutMarkets = sim.calculateCheckoutMarkets();
+            document.getElementById('highestP1Name').textContent = player1.name;
+            document.getElementById('highestP2Name').textContent = player2.name;
+            document.getElementById('highestP1').textContent = checkoutMarkets.highestP1;
+            document.getElementById('highestP2').textContent = checkoutMarkets.highestP2;
+            document.getElementById('over130').textContent = checkoutMarkets.over130;
+            document.getElementById('under130').textContent = checkoutMarkets.under130;
+            document.getElementById('yes170').textContent = checkoutMarkets.yes170;
+            document.getElementById('no170').textContent = checkoutMarkets.no170;
+
+            // Calculate and display match treble
+            const trebleMarkets = sim.calculateMatchTreble(estimatedLegs);
+            document.getElementById('trebleP1Name').textContent = player1.name;
+            document.getElementById('trebleP2Name').textContent = player2.name;
+            document.getElementById('trebleP1').textContent = trebleMarkets.p1Treble;
+            document.getElementById('trebleP2').textContent = trebleMarkets.p2Treble;
         }
 
         // UI Functions
