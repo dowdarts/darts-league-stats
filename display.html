@@ -2247,7 +2247,7 @@
         function promptAdminCode() {
             const code = prompt('Enter admin code to access Match Simulator:');
             if (code === ADMIN_CODE) {
-                localStorage.setItem('aads_admin_access', 'true');
+                sessionStorage.setItem('aads_admin_access', 'true');
                 showSimulatorLink();
                 alert('✓ Admin access granted! Match Simulator is now available.');
             } else if (code !== null) {
@@ -2270,7 +2270,7 @@
         }
         
         function checkAdminAccess() {
-            if (localStorage.getItem('aads_admin_access') === 'true') {
+            if (sessionStorage.getItem('aads_admin_access') === 'true') {
                 showSimulatorLink();
             } else {
                 hideSimulatorLink();
