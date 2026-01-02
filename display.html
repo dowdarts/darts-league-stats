@@ -2279,7 +2279,10 @@
 
         // Initialize
         async function init() {
-            // Check admin access on page load
+            // Clear any old localStorage admin access (migration from old system)
+            localStorage.removeItem('aads_admin_access');
+            
+            // Check admin access on page load (uses sessionStorage)
             checkAdminAccess();
             
             try {
