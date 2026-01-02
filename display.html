@@ -1188,7 +1188,6 @@
         <div class="nav-container">
             <div class="nav-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
             <div class="nav-item active" onclick="showTab('events')">📅 Event Results</div>
-            <div class="nav-item" onclick="showTab('bracket')">🎯 Tournament Bracket</div>
             <div class="nav-item" onclick="showTab('players')">👥 Player Profiles</div>
         </div>
     </div>
@@ -1403,25 +1402,6 @@
                         <h2>Knockout Results</h2>
                     </div>
                     <div id="koBracket" style="padding: 30px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tournament Bracket Section -->
-        <div id="section-bracket" class="section">
-            <div class="event-selector">
-                <label>Select Event for Bracket View:</label>
-                <select id="bracketEventSelector" onchange="showTournamentBracket()">
-                    <option value="">Choose an event...</option>
-                </select>
-            </div>
-
-            <div id="bracketDisplay" style="display: none;">
-                <div class="data-table">
-                    <div class="table-header">
-                        <h2 id="bracketTitle"></h2>
-                    </div>
-                    <div id="bracketContainer" class="bracket-grid"></div>
                 </div>
             </div>
         </div>
@@ -1849,94 +1829,6 @@
             document.getElementById('comparisonResults').style.display = 'block';
         }
 
-        // Tournament Bracket Functions
-        function showTournamentBracket() {
-            const selector = document.getElementById('bracketEventSelector');
-            const eventIndex = parseInt(selector.value);
-            
-            if (isNaN(eventIndex)) {
-                document.getElementById('bracketDisplay').style.display = 'none';
-                return;
-            }
-
-            const event = eventFiles[eventIndex];
-            if (!event) return;
-
-            document.getElementById('bracketTitle').textContent = `🏆 ${event.metadata.series_name} - Event ${event.metadata.event_number} - Road to the Final`;
-            
-            const bracketContainer = document.getElementById('bracketContainer');
-            bracketContainer.innerHTML = '';
-
-            // Group matches by round
-            const rounds = {
-                'Quarter-Finals': [],
-                'Semi-Finals': [],
-                'Final': []
-            };
-
-            // Process knockout matches
-            if (event.knockoutMatches) {
-                event.knockoutMatches.quarterFinals?.forEach((match, idx) => {
-                    rounds['Quarter-Finals'].push({ ...match, round: 'QF', index: idx + 1 });
-                });
-                
-                event.knockoutMatches.semiFinals?.forEach((match, idx) => {
-                    rounds['Semi-Finals'].push({ ...match, round: 'SF', index: idx + 1 });
-                });
-                
-                if (event.knockoutMatches.final) {
-                    rounds['Final'].push({ ...event.knockoutMatches.final, round: 'F', index: 1 });
-                }
-            }
-
-            // Create bracket columns for each round
-            Object.entries(rounds).forEach(([roundName, matches]) => {
-                if (matches.length === 0) return;
-
-                // Sort matches by start time if available
-                matches.sort((a, b) => {
-                    const timeA = a.start_time || '00:00';
-                    const timeB = b.start_time || '00:00';
-                    return timeA.localeCompare(timeB);
-                });
-
-                const roundDiv = document.createElement('div');
-                roundDiv.className = 'bracket-round';
-                
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'bracket-round-title';
-                titleDiv.textContent = roundName;
-                roundDiv.appendChild(titleDiv);
-
-                matches.forEach(match => {
-                    const matchDiv = document.createElement('div');
-                    matchDiv.className = 'bracket-match';
-                    
-                    const player1Wins = match.player1_sets > match.player2_sets;
-                    const player2Wins = match.player2_sets > match.player1_sets;
-
-                    matchDiv.innerHTML = `
-                        <div class="match-player">
-                            <span class="${player1Wins ? 'winner-text' : ''}">${match.player1}</span>
-                            <span class="score-box">${match.player1_sets}</span>
-                            ${player1Wins ? '<span class="winner-icon">✓</span>' : ''}
-                        </div>
-                        <div class="match-player">
-                            <span class="${player2Wins ? 'winner-text' : ''}">${match.player2}</span>
-                            <span class="score-box">${match.player2_sets}</span>
-                            ${player2Wins ? '<span class="winner-icon">✓</span>' : ''}
-                        </div>
-                    `;
-                    
-                    roundDiv.appendChild(matchDiv);
-                });
-
-                bracketContainer.appendChild(roundDiv);
-            });
-
-            document.getElementById('bracketDisplay').style.display = 'block';
-        }
-
         // Initialize
         async function init() {
             try {
@@ -2268,19 +2160,12 @@
         // Populate event selector
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
-            const bracketSelector = document.getElementById('bracketEventSelector');
             
             eventFiles.forEach((event, index) => {
                 const option = document.createElement('option');
                 option.value = index;
                 option.textContent = event.metadata.event_name;
                 selector.appendChild(option);
-                
-                // Also populate bracket selector
-                const bracketOption = document.createElement('option');
-                bracketOption.value = index;
-                bracketOption.textContent = event.metadata.event_name;
-                bracketSelector.appendChild(bracketOption);
             });
         }
 
