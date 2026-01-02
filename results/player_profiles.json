@@ -78,5 +78,37 @@
         "dartsSetup":  "Stephen Bunting 18g",
         "bio":  "",
         "imageBase64":  "royce-milliea.png"
+    },
+    {
+        "name":  "Tyler Cyr",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  "tyler cyr.png"
+    },
+    {
+        "name":  "Kyle Gray",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  "kylegray.png"
+    },
+    {
+        "name":  "Corey O'Brien",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  "coreyobrien.png"
+    },
+    {
+        "name":  "Fernand Pellerin",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  "fernand pellerin.png"
     }
 ]
