@@ -7,7 +7,6 @@
     <meta name="description" content="Official statistics and standings for the Atlantic Amateur Darts Series">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎯</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preload" href="Logos/AADS OFFIAL LOGO - Copy.png" as="image">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     
     <style>
@@ -105,6 +104,14 @@
 
         .partners-section {
             margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .partners-section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .partners-title {
@@ -1836,18 +1843,15 @@
         // Initialize
         async function init() {
             try {
-                // Quick check for which events exist (just metadata, no full data)
-                const checkPromises = [];
-                for (let i = 1; i <= MAX_EVENTS; i++) {
-                    checkPromises.push(
-                        fetch(`results/Final_Series1_Event${i}.json`)
-                            .then(res => res.ok ? i : null)
-                            .catch(() => null)
-                    );
+                // Load manifest to see which events exist (tiny file, no 404s)
+                const manifestRes = await fetch('results/manifest.json');
+                if (manifestRes.ok) {
+                    const manifest = await manifestRes.json();
+                    availableEvents = manifest.available_events || [1];
+                } else {
+                    // Fallback: just try Event 1
+                    availableEvents = [1];
                 }
-
-                const checks = await Promise.all(checkPromises);
-                availableEvents = checks.filter(n => n !== null);
                 
                 console.log('Available events:', availableEvents);
 
@@ -1878,6 +1882,9 @@
 
                 // Load remaining events in background
                 loadRemainingEvents();
+
+                // Setup lazy loading for partners section
+                setupPartnersLazyLoad();
 
             } catch (error) {
                 console.error('Error:', error);
@@ -1912,6 +1919,23 @@
                 }
             }
             console.log('All events loaded');
+        }
+
+        // Setup lazy loading for partners section
+        function setupPartnersLazyLoad() {
+            const partnersSection = document.querySelector('.partners-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '100px' });
+            
+            if (partnersSection) {
+                observer.observe(partnersSection);
+            }
         }
 
         // Populate H2H player selectors
