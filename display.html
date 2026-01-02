@@ -1707,10 +1707,17 @@
                 return;
             }
 
-            // Get all matches for both players
-            const playerAMatches = getSortedMatches(playerAName);
-            const playerBMatches = getSortedMatches(playerBName);
-            const h2hMatches = getSortedMatches(playerAName, playerBName);
+            // Convert display names to JSON format for matching
+            const playerANameJSON = formatNameForJSON(playerAName);
+            const playerBNameJSON = formatNameForJSON(playerBName);
+
+            console.log('Display names:', playerAName, playerBName);
+            console.log('JSON names:', playerANameJSON, playerBNameJSON);
+
+            // Get all matches for both players using JSON format names
+            const playerAMatches = getSortedMatches(playerANameJSON);
+            const playerBMatches = getSortedMatches(playerBNameJSON);
+            const h2hMatches = getSortedMatches(playerANameJSON, playerBNameJSON);
 
             console.log('Player A Matches:', playerAMatches.length);
             console.log('Player B Matches:', playerBMatches.length);
@@ -1721,9 +1728,9 @@
             const playerALast10 = playerAMatches.slice(0, 10);
             const playerBLast10 = playerBMatches.slice(0, 10);
 
-            // Calculate stats
-            const playerAStats = calculatePlayerH2HStats(playerAName, playerALast10);
-            const playerBStats = calculatePlayerH2HStats(playerBName, playerBLast10);
+            // Calculate stats using JSON format names
+            const playerAStats = calculatePlayerH2HStats(playerANameJSON, playerALast10);
+            const playerBStats = calculatePlayerH2HStats(playerBNameJSON, playerBLast10);
 
             console.log('Player A Stats:', playerAStats);
             console.log('Player B Stats:', playerBStats);
@@ -1734,13 +1741,13 @@
 
             h2hMatches.forEach(match => {
                 if (match.type === 'RR') {
-                    if (match.player1 === playerAName && match.player1_legs >= 3) playerAH2HWins++;
-                    if (match.player2 === playerAName && match.player2_legs >= 3) playerAH2HWins++;
-                    if (match.player1 === playerBName && match.player1_legs >= 3) playerBH2HWins++;
-                    if (match.player2 === playerBName && match.player2_legs >= 3) playerBH2HWins++;
+                    if (match.player1 === playerANameJSON && match.player1_legs >= 3) playerAH2HWins++;
+                    if (match.player2 === playerANameJSON && match.player2_legs >= 3) playerAH2HWins++;
+                    if (match.player1 === playerBNameJSON && match.player1_legs >= 3) playerBH2HWins++;
+                    if (match.player2 === playerBNameJSON && match.player2_legs >= 3) playerBH2HWins++;
                 } else {
-                    if (match.winner === playerAName) playerAH2HWins++;
-                    if (match.winner === playerBName) playerBH2HWins++;
+                    if (match.winner === playerANameJSON) playerAH2HWins++;
+                    if (match.winner === playerBNameJSON) playerBH2HWins++;
                 }
             });
 
@@ -1760,8 +1767,8 @@
             document.getElementById('playerANickname').textContent = profileA?.nickname ? `"${profileA.nickname}"` : '';
             document.getElementById('playerBNickname').textContent = profileB?.nickname ? `"${profileB.nickname}"` : '';
 
-            document.getElementById('playerAForm').innerHTML = getFormBadges(playerAName, playerALast10);
-            document.getElementById('playerBForm').innerHTML = getFormBadges(playerBName, playerBLast10);
+            document.getElementById('playerAForm').innerHTML = getFormBadges(playerANameJSON, playerALast10);
+            document.getElementById('playerBForm').innerHTML = getFormBadges(playerBNameJSON, playerBLast10);
 
             document.getElementById('playerAH2HWins').textContent = playerAH2HWins;
             document.getElementById('playerBH2HWins').textContent = playerBH2HWins;
@@ -1820,7 +1827,7 @@
                         winner = match.winner;
                     }
 
-                    const winnerClass = winner === playerAName ? 'color: #22c55e' : 'color: #ef4444';
+                    const winnerClass = winner === playerANameJSON ? 'color: #22c55e' : 'color: #ef4444';
 
                     return `
                         <div style="background: #1a1a1a; border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 15px;">
@@ -2126,6 +2133,17 @@
                 return `${parts[1]} ${parts[0]}`;
             }
             return name;
+        }
+
+        // Convert display name back to JSON format (FirstName LastName -> LastName, FirstName)
+        function formatNameForJSON(displayName) {
+            const parts = displayName.trim().split(' ');
+            if (parts.length >= 2) {
+                const firstName = parts.slice(0, -1).join(' ');
+                const lastName = parts[parts.length - 1];
+                return `${lastName}, ${firstName}`;
+            }
+            return displayName;
         }
 
         // Show tab
