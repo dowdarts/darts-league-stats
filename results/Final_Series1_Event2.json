@@ -36,7 +36,7 @@
       "high_finish": 124
     },
     {
-      "name": "Cormier, Dee",
+      "name": "Cormier, Darrell",
       "total_matches": 6,
       "wins": 4,
       "losses": 2,
@@ -153,7 +153,7 @@
       "groupA": [
         {
           "rank": 1,
-          "name": "Cormier, Dee",
+          "name": "Cormier, Darrell",
           "matches_played": 4,
           "matches_won": 3,
           "matches_lost": 1,
@@ -248,7 +248,7 @@
     "matches": {
       "groupA": [
         {
-          "player1": "Cormier, Dee",
+          "player1": "Cormier, Darrell",
           "player2": "Holden, Tom",
           "player1_legs": 3,
           "player2_legs": 1,
@@ -275,7 +275,7 @@
           }
         },
         {
-          "player1": "Cormier, Dee",
+          "player1": "Cormier, Darrell",
           "player2": "Leblanc, Denis",
           "player1_legs": 2,
           "player2_legs": 3,
@@ -302,7 +302,7 @@
           }
         },
         {
-          "player1": "Cormier, Dee",
+          "player1": "Cormier, Darrell",
           "player2": "Leger, Michel",
           "player1_legs": 3,
           "player2_legs": 0,
@@ -329,7 +329,7 @@
           }
         },
         {
-          "player1": "Cormier, Dee",
+          "player1": "Cormier, Darrell",
           "player2": "Rushton, Steve",
           "player1_legs": 3,
           "player2_legs": 0,
@@ -796,13 +796,13 @@
     "quarterFinals": [
       {
         "match_id": "QF1",
-        "player1": "Cormier, Dee",
+        "player1": "Cormier, Darrell",
         "player2": "Pellerin, Fernand",
         "player1_sets": 3,
         "player2_sets": 0,
         "player1_total_legs": 6,
         "player2_total_legs": 1,
-        "winner": "Cormier, Dee",
+        "winner": "Cormier, Darrell",
         "start_time": "00:29",
         "player1_details": {
           "three_dart_avg": 81.43,
@@ -922,7 +922,7 @@
     "semiFinals": [
       {
         "match_id": "SF1",
-        "player1": "Cormier, Dee",
+        "player1": "Cormier, Darrell",
         "player2": "Gray, Kyle",
         "player1_sets": 1,
         "player2_sets": 3,
