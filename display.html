@@ -1189,6 +1189,7 @@
                     <p>Atlantic Amateur Darts Series</p>
                 </div>
             </div>
+            <button onclick="clearCacheAndReload()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255, 107, 0, 0.2); border: 1px solid var(--primary-orange); color: var(--primary-orange); border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Clear cache and reload fresh data">🔄 Refresh Data</button>
         </div>
     </div>
 
@@ -1512,6 +1513,15 @@
     </div>
 
     <script>
+        // Register Service Worker for caching
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered for caching'))
+                    .catch(err => console.warn('Service Worker registration failed:', err));
+            });
+        }
+
         let eventFiles = [];
         let eventFilesCache = {}; // Cache for loaded event data
         let availableEvents = []; // List of event numbers that exist
@@ -1519,6 +1529,7 @@
         let careerStats = {};
         let currentChart = null;
         const MAX_EVENTS = 20; // Maximum number of events to check for
+        const CACHE_VERSION = 'v1'; // Increment this when data structure changes
 
         // Helper function to get image source (supports both base64 and filenames)
         function getImageSrc(imageBase64) {
@@ -1536,6 +1547,34 @@
             } catch (error) {
                 // Silently handle errors (expected for non-existent event files)
                 return null;
+            }
+        }
+
+        // LocalStorage caching functions
+        function getCachedData(key) {
+            try {
+                const cached = localStorage.getItem(key);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (data.version === CACHE_VERSION) {
+                        return data.value;
+                    }
+                }
+            } catch (e) {
+                console.warn('Cache read error:', e);
+            }
+            return null;
+        }
+
+        function setCachedData(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify({
+                    version: CACHE_VERSION,
+                    value: value,
+                    timestamp: Date.now()
+                }));
+            } catch (e) {
+                console.warn('Cache write error:', e);
             }
         }
 
@@ -1843,12 +1882,27 @@
         // Initialize
         async function init() {
             try {
+                // Try to load from cache first for instant display
+                const cachedProfiles = getCachedData('player_profiles');
+                const cachedManifest = getCachedData('manifest');
+                
+                if (cachedProfiles) {
+                    playerProfiles = cachedProfiles;
+                    console.log('Loaded player profiles from cache');
+                }
+                
+                if (cachedManifest) {
+                    availableEvents = cachedManifest.available_events || [1];
+                    console.log('Loaded manifest from cache');
+                }
+
                 // Load manifest to see which events exist (tiny file, no 404s)
                 const manifestRes = await fetch('results/manifest.json');
                 if (manifestRes.ok) {
                     const manifest = await manifestRes.json();
                     availableEvents = manifest.available_events || [1];
-                } else {
+                    setCachedData('manifest', manifest);
+                } else if (!cachedManifest) {
                     // Fallback: just try Event 1
                     availableEvents = [1];
                 }
@@ -1863,6 +1917,7 @@
                 const profileRes = await fetch('results/player_profiles.json');
                 if (profileRes.ok) {
                     playerProfiles = await profileRes.json();
+                    setCachedData('player_profiles', playerProfiles);
                 }
 
                 // Load only the first event for initial display
@@ -1900,9 +1955,21 @@
                 return eventFilesCache[eventNum];
             }
 
+            // Check cache first
+            const cachedEvent = getCachedData(`event_${eventNum}`);
+            if (cachedEvent) {
+                eventFilesCache[eventNum] = cachedEvent;
+                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                calculateCareerStats();
+                console.log(`Loaded Event ${eventNum} from cache`);
+                return cachedEvent;
+            }
+
+            // Fetch from network
             const event = await fetchEventFile(eventNum);
             if (event) {
                 eventFilesCache[eventNum] = event;
+                setCachedData(`event_${eventNum}`, event);
                 eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
                 calculateCareerStats();
             }
@@ -2961,6 +3028,22 @@
                 if (currentChart) {
                     currentChart.destroy();
                     currentChart = null;
+                }
+            }
+        }
+
+        // Clear cache and reload
+        function clearCacheAndReload() {
+            if (confirm('This will clear all cached data and reload fresh from the server. Continue?')) {
+                localStorage.clear();
+                if ('serviceWorker' in navigator && 'caches' in window) {
+                    caches.keys().then(keys => {
+                        return Promise.all(keys.map(key => caches.delete(key)));
+                    }).then(() => {
+                        location.reload(true);
+                    });
+                } else {
+                    location.reload(true);
                 }
             }
         }
