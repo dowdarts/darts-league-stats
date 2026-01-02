@@ -359,7 +359,7 @@
             letter-spacing: 1px;
         }
 
-        /* Head-to-Head Comparison */
+        /* Head-to-Head Comparison - Tale of the Tape Style */
         .h2h-section {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
@@ -405,81 +405,156 @@
             box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
         }
 
-        .comparison-card {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 40px;
-            background: #2a2a2a;
-            padding: 40px;
-            border-radius: 15px;
-            border: 2px solid var(--border-color);
+        /* Tale of the Tape Container */
+        .h2h-wrapper {
+            background: linear-gradient(180deg, #111827 0%, #000000 100%);
+            border: 1px solid #374151;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .h2h-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3rem 2rem;
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .player-side {
+            width: 33%;
+        }
+
+        .player-side.left {
+            text-align: left;
+        }
+
+        .player-side.right {
+            text-align: right;
+        }
+
+        .vs-divider {
             text-align: center;
+            font-style: italic;
+            font-weight: 900;
+            font-size: 4rem;
+            color: #374151;
+            width: 33%;
         }
 
         .player-photo-compare {
-            width: 120px;
-            height: 120px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             object-fit: cover;
-            margin: 0 auto 15px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-side.left .player-photo-compare {
+            border: 4px solid #22c55e;
+        }
+
+        .player-side.right .player-photo-compare {
+            border: 4px solid #6b7280;
+            margin-left: auto;
             display: block;
-            box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
         }
 
         .player-name-compare {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--primary-orange);
+            font-size: 1.25rem;
+            font-weight: 900;
+            font-style: italic;
+            color: #f9fafb;
+            text-transform: uppercase;
         }
 
+        .player-nickname {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Stat Rows */
+        .stats-container {
+            padding: 1rem;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 1fr 120px 1fr;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #f9fafb;
+        }
+
+        .stat-value.left {
+            text-align: right;
+        }
+
+        .stat-value.right {
+            text-align: left;
+        }
+
+        .stat-value.highlight {
+            color: #22c55e;
+        }
+
+        /* Win/Loss Badges */
         .form-badges {
             display: flex;
-            justify-content: center;
-            gap: 6px;
+            gap: 4px;
             margin-top: 15px;
             flex-wrap: wrap;
         }
 
+        .player-side.left .form-badges {
+            justify-content: flex-start;
+        }
+
+        .player-side.right .form-badges {
+            justify-content: flex-end;
+        }
+
         .form-badge {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 13px;
+            font-size: 0.7rem;
+            font-weight: 900;
             color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .bg-win {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+            background-color: #059669;
+            box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
         }
 
         .bg-loss {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .comparison-stats {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 25px;
-            min-width: 200px;
-        }
-
-        .stat-row {
-            text-align: center;
-            font-size: 0.95em;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+            background-color: #dc2626;
         }
 
         .player-stat-value {
@@ -1113,6 +1188,7 @@
         <div class="nav-container">
             <div class="nav-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
             <div class="nav-item active" onclick="showTab('events')">📅 Event Results</div>
+            <div class="nav-item" onclick="showTab('bracket')">🎯 Tournament Bracket</div>
             <div class="nav-item" onclick="showTab('players')">👥 Player Profiles</div>
         </div>
     </div>
@@ -1163,7 +1239,7 @@
                 </div>
             </div>
 
-            <!-- Head-to-Head Comparison -->
+            <!-- Head-to-Head Comparison - Tale of the Tape -->
             <div class="h2h-section">
                 <div class="table-header">
                     <h2>🥊 Head-to-Head Comparison</h2>
@@ -1180,81 +1256,67 @@
                 </div>
 
                 <div id="comparisonResults" style="display: none;">
-                    <div class="comparison-card">
-                        <!-- Player A Side -->
-                        <div class="player-side">
-                            <img id="playerAPhoto" class="player-photo-compare" src="" alt="Player A">
-                            <div id="playerAName" class="player-name-compare"></div>
-                            <div id="playerANickname" style="color: var(--text-secondary); font-style: italic; margin-bottom: 10px;"></div>
-                            <div class="form-badges" id="playerAForm"></div>
-                            <div style="margin-top: 20px;">
-                                <div class="player-stat-value" id="playerAH2HWins">0</div>
-                                <div style="color: var(--text-secondary); font-size: 0.9em;">H2H Wins</div>
+                    <div class="h2h-wrapper">
+                        <!-- Player Headers -->
+                        <div class="h2h-header">
+                            <div class="player-side left">
+                                <img id="playerAPhoto" class="player-photo-compare" src="" alt="Player A">
+                                <h2 id="playerAName" class="player-name-compare"></h2>
+                                <div id="playerANickname" class="player-nickname"></div>
+                            </div>
+                            
+                            <div class="vs-divider">VS</div>
+                            
+                            <div class="player-side right">
+                                <img id="playerBPhoto" class="player-photo-compare" src="" alt="Player B">
+                                <h2 id="playerBName" class="player-name-compare"></h2>
+                                <div id="playerBNickname" class="player-nickname"></div>
                             </div>
                         </div>
 
-                        <!-- Stats in the Middle -->
-                        <div class="comparison-stats">
-                            <div class="stat-row">Last 10 Avg</div>
-                            <div class="stat-row">Total 180s</div>
-                            <div class="stat-row">High Finish</div>
-                            <div class="stat-row">CO%</div>
-                            <div class="stat-row">Head-to-Head</div>
-                        </div>
-
-                        <!-- Player B Side -->
-                        <div class="player-side">
-                            <img id="playerBPhoto" class="player-photo-compare" src="" alt="Player B">
-                            <div id="playerBName" class="player-name-compare"></div>
-                            <div id="playerBNickname" style="color: var(--text-secondary); font-style: italic; margin-bottom: 10px;"></div>
-                            <div class="form-badges" id="playerBForm"></div>
-                            <div style="margin-top: 20px;">
-                                <div class="player-stat-value" id="playerBH2HWins">0</div>
-                                <div style="color: var(--text-secondary); font-size: 0.9em;">H2H Wins</div>
+                        <!-- Stats Comparison -->
+                        <div class="stats-container">
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerACareerAvg">0.0</div>
+                                <div class="stat-label">Career 3DA</div>
+                                <div class="stat-value right" id="playerBCareerAvg">0.0</div>
                             </div>
-                        </div>
-                    </div>
+                            
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerALast10Avg">0.0</div>
+                                <div class="stat-label">Last 10 Avg</div>
+                                <div class="stat-value right" id="playerBLast10Avg">0.0</div>
+                            </div>
 
-                    <!-- Stats Values -->
-                    <div class="comparison-card" style="margin-top: 20px;">
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerALast10Avg">0</div>
-                        </div>
-                        <div class="comparison-stats">
-                            <!-- Empty middle column for alignment -->
-                        </div>
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerBLast10Avg">0</div>
-                        </div>
-                    </div>
+                            <div class="stat-row">
+                                <div class="form-badges" id="playerAForm"></div>
+                                <div class="stat-label">Current Form</div>
+                                <div class="form-badges" id="playerBForm"></div>
+                            </div>
 
-                    <div class="comparison-card" style="margin-top: 10px;">
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerA180s">0</div>
-                        </div>
-                        <div class="comparison-stats"></div>
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerB180s">0</div>
-                        </div>
-                    </div>
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerA180s">0</div>
+                                <div class="stat-label">Total 180s</div>
+                                <div class="stat-value right" id="playerB180s">0</div>
+                            </div>
 
-                    <div class="comparison-card" style="margin-top: 10px;">
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerAHighFinish">0</div>
-                        </div>
-                        <div class="comparison-stats"></div>
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerBHighFinish">0</div>
-                        </div>
-                    </div>
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerAHighFinish">0</div>
+                                <div class="stat-label">High Finish</div>
+                                <div class="stat-value right" id="playerBHighFinish">0</div>
+                            </div>
 
-                    <div class="comparison-card" style="margin-top: 10px;">
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerACO">0%</div>
-                        </div>
-                        <div class="comparison-stats"></div>
-                        <div class="player-side">
-                            <div class="player-stat-value" id="playerBCO">0%</div>
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerACO">0%</div>
+                                <div class="stat-label">Checkout %</div>
+                                <div class="stat-value right" id="playerBCO">0%</div>
+                            </div>
+
+                            <div class="stat-row">
+                                <div class="stat-value left" id="playerAH2HWins">0</div>
+                                <div class="stat-label">Head-to-Head</div>
+                                <div class="stat-value right" id="playerBH2HWins">0</div>
+                            </div>
                         </div>
                     </div>
 
@@ -1341,6 +1403,25 @@
                         <h2>Knockout Results</h2>
                     </div>
                     <div id="koBracket" style="padding: 30px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Bracket Section -->
+        <div id="section-bracket" class="section">
+            <div class="event-selector">
+                <label>Select Event for Bracket View:</label>
+                <select id="bracketEventSelector" onchange="showTournamentBracket()">
+                    <option value="">Choose an event...</option>
+                </select>
+            </div>
+
+            <div id="bracketDisplay" style="display: none;">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h2 id="bracketTitle"></h2>
+                    </div>
+                    <div id="bracketContainer" class="bracket-grid"></div>
                 </div>
             </div>
         </div>
@@ -1657,8 +1738,33 @@
             document.getElementById('playerAH2HWins').textContent = playerAH2HWins;
             document.getElementById('playerBH2HWins').textContent = playerBH2HWins;
 
-            document.getElementById('playerALast10Avg').textContent = playerAStats.avg3DA;
-            document.getElementById('playerBLast10Avg').textContent = playerBStats.avg3DA;
+            // Career averages
+            const careerAStats = careerStats[playerAName];
+            const careerBStats = careerStats[playerBName];
+            
+            document.getElementById('playerACareerAvg').textContent = careerAStats?.avg3DA || '0.0';
+            document.getElementById('playerBCareerAvg').textContent = careerBStats?.avg3DA || '0.0';
+            
+            // Last 10 averages with highlighting
+            const aLast10Elem = document.getElementById('playerALast10Avg');
+            const bLast10Elem = document.getElementById('playerBLast10Avg');
+            
+            aLast10Elem.textContent = playerAStats.avg3DA;
+            bLast10Elem.textContent = playerBStats.avg3DA;
+            
+            const aLast10Val = parseFloat(playerAStats.avg3DA);
+            const bLast10Val = parseFloat(playerBStats.avg3DA);
+            
+            if (aLast10Val > bLast10Val) {
+                aLast10Elem.classList.add('highlight');
+                bLast10Elem.classList.remove('highlight');
+            } else if (bLast10Val > aLast10Val) {
+                bLast10Elem.classList.add('highlight');
+                aLast10Elem.classList.remove('highlight');
+            } else {
+                aLast10Elem.classList.remove('highlight');
+                bLast10Elem.classList.remove('highlight');
+            }
 
             document.getElementById('playerA180s').textContent = playerAStats.total180s;
             document.getElementById('playerB180s').textContent = playerBStats.total180s;
@@ -1706,6 +1812,94 @@
             }
 
             document.getElementById('comparisonResults').style.display = 'block';
+        }
+
+        // Tournament Bracket Functions
+        function showTournamentBracket() {
+            const selector = document.getElementById('bracketEventSelector');
+            const eventIndex = parseInt(selector.value);
+            
+            if (isNaN(eventIndex)) {
+                document.getElementById('bracketDisplay').style.display = 'none';
+                return;
+            }
+
+            const event = eventFiles[eventIndex];
+            if (!event) return;
+
+            document.getElementById('bracketTitle').textContent = `🏆 ${event.metadata.series_name} - Event ${event.metadata.event_number} - Road to the Final`;
+            
+            const bracketContainer = document.getElementById('bracketContainer');
+            bracketContainer.innerHTML = '';
+
+            // Group matches by round
+            const rounds = {
+                'Quarter-Finals': [],
+                'Semi-Finals': [],
+                'Final': []
+            };
+
+            // Process knockout matches
+            if (event.knockoutMatches) {
+                event.knockoutMatches.quarterFinals?.forEach((match, idx) => {
+                    rounds['Quarter-Finals'].push({ ...match, round: 'QF', index: idx + 1 });
+                });
+                
+                event.knockoutMatches.semiFinals?.forEach((match, idx) => {
+                    rounds['Semi-Finals'].push({ ...match, round: 'SF', index: idx + 1 });
+                });
+                
+                if (event.knockoutMatches.final) {
+                    rounds['Final'].push({ ...event.knockoutMatches.final, round: 'F', index: 1 });
+                }
+            }
+
+            // Create bracket columns for each round
+            Object.entries(rounds).forEach(([roundName, matches]) => {
+                if (matches.length === 0) return;
+
+                // Sort matches by start time if available
+                matches.sort((a, b) => {
+                    const timeA = a.start_time || '00:00';
+                    const timeB = b.start_time || '00:00';
+                    return timeA.localeCompare(timeB);
+                });
+
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'bracket-round';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'bracket-round-title';
+                titleDiv.textContent = roundName;
+                roundDiv.appendChild(titleDiv);
+
+                matches.forEach(match => {
+                    const matchDiv = document.createElement('div');
+                    matchDiv.className = 'bracket-match';
+                    
+                    const player1Wins = match.player1_sets > match.player2_sets;
+                    const player2Wins = match.player2_sets > match.player1_sets;
+
+                    matchDiv.innerHTML = `
+                        <div class="match-player">
+                            <span class="${player1Wins ? 'winner-text' : ''}">${match.player1}</span>
+                            <span class="score-box">${match.player1_sets}</span>
+                            ${player1Wins ? '<span class="winner-icon">✓</span>' : ''}
+                        </div>
+                        <div class="match-player">
+                            <span class="${player2Wins ? 'winner-text' : ''}">${match.player2}</span>
+                            <span class="score-box">${match.player2_sets}</span>
+                            ${player2Wins ? '<span class="winner-icon">✓</span>' : ''}
+                        </div>
+                    `;
+                    
+                    roundDiv.appendChild(matchDiv);
+                });
+
+                bracketContainer.appendChild(roundDiv);
+            });
+
+            document.getElementById('bracketDisplay').style.display = 'block';
         }
 
         // Initialize
@@ -2024,11 +2218,19 @@
         // Populate event selector
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
+            const bracketSelector = document.getElementById('bracketEventSelector');
+            
             eventFiles.forEach((event, index) => {
                 const option = document.createElement('option');
                 option.value = index;
                 option.textContent = event.metadata.event_name;
                 selector.appendChild(option);
+                
+                // Also populate bracket selector
+                const bracketOption = document.createElement('option');
+                bracketOption.value = index;
+                bracketOption.textContent = event.metadata.event_name;
+                bracketSelector.appendChild(bracketOption);
             });
         }
 
