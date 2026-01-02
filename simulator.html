@@ -575,7 +575,7 @@
             font-weight: 600;
         }
 
-        .nine-dart-odds {
+        .format-display {
             background: var(--dark-bg);
             padding: 15px;
             border-radius: 8px;
@@ -583,33 +583,26 @@
             border: 1px solid var(--primary-orange);
         }
 
-        .nine-dart-title {
+        .format-title {
             font-size: 1em;
             color: var(--primary-orange);
             margin-bottom: 10px;
             text-align: center;
-        }
-
-        .nine-dart-display {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .nine-dart-option {
-            text-align: center;
-        }
-
-        .nine-dart-label {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .nine-dart-value {
-            font-size: 1.3em;
-            color: var(--accent-green);
             font-weight: 600;
+        }
+
+        .format-info {
+            font-size: 1.1em;
+            color: var(--text-primary);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .format-info small {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-top: 5px;
         }
 
         /* Momentum Meter */
@@ -847,23 +840,10 @@
                         <div class="correct-scores-grid" id="correctScoresGrid"></div>
                     </div>
 
-                    <!-- 9-Dart Finish Odds -->
-                    <div class="nine-dart-odds">
-                        <div class="nine-dart-title">⚡ 9-Dart Finish Market</div>
-                        <div class="nine-dart-display">
-                            <div class="nine-dart-option">
-                                <div class="nine-dart-label">YES</div>
-                                <div class="nine-dart-value" id="nineDartYes">--</div>
-                            </div>
-                            <div class="nine-dart-option">
-                                <div class="nine-dart-label">Probability</div>
-                                <div class="nine-dart-value" id="nineDartProb" style="font-size: 0.9em;">--</div>
-                            </div>
-                            <div class="nine-dart-option">
-                                <div class="nine-dart-label">NO</div>
-                                <div class="nine-dart-value" id="nineDartNo">--</div>
-                            </div>
-                        </div>
+                    <!-- Match Format Display -->
+                    <div class="format-display">
+                        <div class="format-title">📋 Match Format</div>
+                        <div class="format-info" id="formatInfo">--</div>
                     </div>
                 </div>
             </div>
@@ -1411,13 +1391,15 @@
             }).join('');
             document.getElementById('correctScoresGrid').innerHTML = correctScoresHTML;
             
-            // Calculate 9-dart odds
+            // Display match format
             const [type, target] = format.split(':');
-            const totalLegs = type === 'legs' ? parseInt(target) : parseInt(target) * 5; // Estimate for sets
-            const nineDartOdds = sim.calculateNineDartOdds(player1, totalLegs / 2);
-            document.getElementById('nineDartYes').textContent = nineDartOdds.yes;
-            document.getElementById('nineDartNo').textContent = nineDartOdds.no;
-            document.getElementById('nineDartProb').textContent = `${nineDartOdds.probability}%`;
+            let formatText = '';
+            if (type === 'legs') {
+                formatText = `Best of ${target} Legs (First to ${Math.ceil(parseInt(target) / 2)})`;
+            } else {
+                formatText = `Best of ${target} Sets (First to ${Math.ceil(parseInt(target) / 2)})<br><small>Each set: Best of 5 legs (First to 3)</small>`;
+            }
+            document.getElementById('formatInfo').innerHTML = formatText;
         }
 
         // UI Functions
@@ -1435,9 +1417,6 @@
             // Calculate all pre-match data
             const odds = sim.getDecimalOdds();
             const correctScores = sim.calculateCorrectScoreProbs();
-            const [type, target] = format.split(':');
-            const totalLegs = type === 'legs' ? parseInt(target) : parseInt(target) * 5;
-            const nineDartOdds = sim.calculateNineDartOdds(player1, totalLegs / 2);
             
             // Display pre-match odds board
             showOddsBoard(sim, format);
@@ -1469,11 +1448,10 @@
             }
             
             // Build comprehensive match recap
-            const [formatType] = format.split(':');
+            const [formatType, target] = format.split(':');
             const scoreLabel = formatType === 'sets' ? 'Sets' : 'Legs';
             const finalScore = `${result.score[0]}-${result.score[1]}`;
             const actualCorrectScore = correctScores.find(s => s.score === finalScore);
-            const nineDartHappened = result.log.some(entry => entry.includes('9-DART'));
             
             const recapHTML = `
                 <!-- P4P Stats Section -->
@@ -1516,12 +1494,8 @@
                             <span class="recap-value">${finalScore}: ${actualCorrectScore ? actualCorrectScore.probability : 'N/A'}% (@${actualCorrectScore ? actualCorrectScore.odds : 'N/A'})</span>
                         </div>
                         <div class="recap-item">
-                            <span class="recap-label">9-Dart Finish Market</span>
-                            <span class="recap-value">YES @${nineDartOdds.yes} (${nineDartOdds.probability}%) | NO @${nineDartOdds.no}</span>
-                        </div>
-                        <div class="recap-item">
-                            <span class="recap-label">9-Dart Result</span>
-                            <span class="recap-value ${nineDartHappened ? 'highlight-win' : ''}">${nineDartHappened ? '✅ YES - 9-Dart Achieved!' : '❌ NO - No 9-Darter'}</span>
+                            <span class="recap-label">Match Format</span>
+                            <span class="recap-value">${formatType === 'sets' ? `Best of ${target} Sets (Each set: Best of 5 legs)` : `Best of ${target} Legs`}</span>
                         </div>
                     </div>
                 </div>
