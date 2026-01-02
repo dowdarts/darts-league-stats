@@ -2139,10 +2139,13 @@
         function formatNameForJSON(displayName) {
             const parts = displayName.trim().split(' ');
             if (parts.length >= 2) {
-                const firstName = parts.slice(0, -1).join(' ');
                 const lastName = parts[parts.length - 1];
-                return `${lastName}, ${firstName}`;
+                const firstName = parts.slice(0, -1).join(' ');
+                const result = `${lastName}, ${firstName}`;
+                console.log('formatNameForJSON:', displayName, '->', result);
+                return result;
             }
+            console.log('formatNameForJSON: no conversion needed for', displayName);
             return displayName;
         }
 
