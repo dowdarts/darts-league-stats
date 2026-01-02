@@ -426,13 +426,13 @@
                         console.log('Updated Group B Standings:', standingsB.map((p, i) => `${i}: ${p.name} (Rank ${p.rank})`));
                     }
 
-                    // Create Quarter Finals with seeding: A1vB4, A2vB3, A3vB2, A4vB1
-                    // standingsA[0] = A1 (1st place), standingsB[3] = B4 (4th place), etc.
+                    // Create Quarter Finals with standard bracket seeding
+                    // QF1 vs QF2 → SF1, QF3 vs QF4 → SF2
                     appData.knockout.quarterFinals = [
                         createKnockoutMatch(standingsA[0].name, standingsB[3].name, 'QF1'),  // A1 vs B4
-                        createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF2'),  // A2 vs B3
-                        createKnockoutMatch(standingsA[2].name, standingsB[1].name, 'QF3'),  // A3 vs B2
-                        createKnockoutMatch(standingsA[3].name, standingsB[0].name, 'QF4')   // A4 vs B1
+                        createKnockoutMatch(standingsA[3].name, standingsB[0].name, 'QF2'),  // A4 vs B1
+                        createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF3'),  // A2 vs B3
+                        createKnockoutMatch(standingsA[2].name, standingsB[1].name, 'QF4')   // A3 vs B2
                     ];
 
                     // Create empty Semi Finals
@@ -709,14 +709,14 @@
             // Progress winner to next round
             if (match.winner) {
                 if (round === 'quarterFinals') {
-                    // QF1 winner -> SF1 player1, QF3 winner -> SF1 player2
-                    // QF2 winner -> SF2 player1, QF4 winner -> SF2 player2
+                    // QF1 winner -> SF1 player1, QF2 winner -> SF1 player2
+                    // QF3 winner -> SF2 player1, QF4 winner -> SF2 player2
                     if (matchIndex === 0) {
                         appData.knockout.semiFinals[0].player1 = match.winner;
                     } else if (matchIndex === 1) {
-                        appData.knockout.semiFinals[1].player1 = match.winner;
-                    } else if (matchIndex === 2) {
                         appData.knockout.semiFinals[0].player2 = match.winner;
+                    } else if (matchIndex === 2) {
+                        appData.knockout.semiFinals[1].player1 = match.winner;
                     } else if (matchIndex === 3) {
                         appData.knockout.semiFinals[1].player2 = match.winner;
                     }
