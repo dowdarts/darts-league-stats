@@ -1415,7 +1415,10 @@
                     <p>Atlantic Amateur Darts Series</p>
                 </div>
             </div>
-            <button onclick="clearCacheAndReload()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255, 107, 0, 0.2); border: 1px solid var(--primary-orange); color: var(--primary-orange); border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Clear cache and reload fresh data">🔄 Refresh Data</button>
+            <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 10px;">
+                <button onclick="promptAdminCode()" style="padding: 8px 16px; background: rgba(255, 107, 0, 0.1); border: 1px solid var(--primary-orange); color: var(--primary-orange); border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Admin Access">🔐 Admin</button>
+                <button onclick="clearCacheAndReload()" style="padding: 8px 16px; background: rgba(255, 107, 0, 0.2); border: 1px solid var(--primary-orange); color: var(--primary-orange); border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Clear cache and reload fresh data">🔄 Refresh Data</button>
+            </div>
         </div>
     </div>
 
@@ -1426,7 +1429,7 @@
             <div class="nav-item active" onclick="showTab('events')">📅 Event Results</div>
             <div class="nav-item" onclick="showTab('winners')">🏅 AADS Winners</div>
             <div class="nav-item" onclick="showTab('players')">👥 Player Profiles</div>
-            <div class="nav-item" onclick="window.open('simulator.html', '_blank')" style="background: linear-gradient(135deg, var(--primary-orange), #d63031); font-weight: 600;">🎮 Match Simulator</div>
+            <div id="simulatorNavItem" class="nav-item" onclick="window.open('simulator.html', '_blank')" style="background: linear-gradient(135deg, var(--primary-orange), #d63031); font-weight: 600; display: none;">🎮 Match Simulator</div>
         </div>
     </div>
 
@@ -2239,8 +2242,38 @@
             document.getElementById('comparisonResults').style.display = 'block';
         }
 
+        // Admin authentication
+        const ADMIN_CODE = '40783';
+        
+        function promptAdminCode() {
+            const code = prompt('Enter admin code to access Match Simulator:');
+            if (code === ADMIN_CODE) {
+                localStorage.setItem('aads_admin_access', 'true');
+                showSimulatorLink();
+                alert('✓ Admin access granted! Match Simulator is now available.');
+            } else if (code !== null) {
+                alert('✗ Incorrect code. Access denied.');
+            }
+        }
+        
+        function showSimulatorLink() {
+            const simulatorLink = document.getElementById('simulatorNavItem');
+            if (simulatorLink) {
+                simulatorLink.style.display = '';
+            }
+        }
+        
+        function checkAdminAccess() {
+            if (localStorage.getItem('aads_admin_access') === 'true') {
+                showSimulatorLink();
+            }
+        }
+
         // Initialize
         async function init() {
+            // Check admin access on page load
+            checkAdminAccess();
+            
             try {
                 // Try to load from cache first for instant display
                 const cachedProfiles = getCachedData('player_profiles');
