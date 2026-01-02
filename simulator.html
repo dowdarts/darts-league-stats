@@ -410,6 +410,11 @@
         }
 
         /* Betting Odds Display */
+        #oddsBoard {
+            margin: 30px auto;
+            max-width: 1000px;
+        }
+
         .odds-board {
             background: var(--card-bg);
             padding: 25px;
@@ -759,10 +764,8 @@
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div class="results-section" id="resultsSection">
-            <!-- Betting Odds Board -->
-            <div id="oddsBoard" style="display: none;">
+        <!-- Betting Odds Board -->
+        <div id="oddsBoard" style="display: none;">
                 <div class="odds-board">
                     <div class="odds-header">📊 Pre-Match Betting Odds</div>
                     <div class="odds-display">
@@ -806,6 +809,8 @@
                 </div>
             </div>
 
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
             <div id="singleMatchResults" style="display: none;">
                 <h2 style="margin-bottom: 20px; color: var(--primary-orange);">Match Result</h2>
                 <div class="match-scoreboard">
