@@ -2393,13 +2393,12 @@
             const selector = document.getElementById('eventSelector');
             
             availableEvents.forEach((eventNum) => {
+                const option = document.createElement('option');
+                option.value = eventNum;
+                // Use cached event name if available, otherwise use placeholder
                 const event = eventFilesCache[eventNum];
-                if (event) {
-                    const option = document.createElement('option');
-                    option.value = eventNum;
-                    option.textContent = event.metadata.event_name;
-                    selector.appendChild(option);
-                }
+                option.textContent = event ? event.metadata.event_name : `Series 1 - Event ${eventNum}`;
+                selector.appendChild(option);
             });
         }
 
