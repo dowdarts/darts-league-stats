@@ -2289,7 +2289,8 @@
                 }
 
                 // Load manifest to see which events exist (tiny file, no 404s)
-                const manifestRes = await fetch('results/manifest.json');
+                // Add cache-busting parameter to always get fresh data
+                const manifestRes = await fetch(`results/manifest.json?t=${Date.now()}`);
                 if (manifestRes.ok) {
                     const manifest = await manifestRes.json();
                     availableEvents = manifest.available_events || [1];
