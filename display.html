@@ -2219,13 +2219,13 @@
                                     </tr>
                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         <td style="padding: 8px;"><strong>140+ Scores</strong></td>
-                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_140plus || p1Details.scores140plus || 0}</td>
-                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_140plus || p2Details.scores140plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores_140plus || p1Details.scores140plus || 0) + (p1Details.scores_180 || p1Details.scores180 || 0)}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores_140plus || p2Details.scores140plus || 0) + (p2Details.scores_180 || p2Details.scores180 || 0)}</td>
                                     </tr>
                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         <td style="padding: 8px;"><strong>100+ Scores</strong></td>
-                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_100plus || p1Details.scores100plus || 0}</td>
-                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_100plus || p2Details.scores100plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores_100plus || p1Details.scores100plus || 0) + (p1Details.scores_140plus || p1Details.scores140plus || 0) + (p1Details.scores_180 || p1Details.scores180 || 0)}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores_100plus || p2Details.scores100plus || 0) + (p2Details.scores_140plus || p2Details.scores140plus || 0) + (p2Details.scores_180 || p2Details.scores180 || 0)}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px;"><strong>High Finish</strong></td>
@@ -2741,8 +2741,8 @@
                         </td>
                         <td class="center">${player.events.length}</td>
                         <td class="center highlight-stat">${primaryStat}</td>
-                        <td class="center">${player.total100s}</td>
-                        <td class="center">${player.total140s}</td>
+                        <td class="center">${player.total100s + player.total140s + player.total180s}</td>
+                        <td class="center">${player.total140s + player.total180s}</td>
                         <td class="center">${player.total180s}</td>
                         <td class="center">${player.totalMatches}</td>
                         <td class="center">${player.totalWins}</td>
@@ -2909,13 +2909,13 @@
                                                                     </tr>
                                                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                                                         <td style="padding: 8px;"><strong>140+ Scores</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_140plus || p1Details.scores140plus || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_140plus || p2Details.scores140plus || 0}</td>
+                                                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores_140plus || p1Details.scores140plus || 0) + (p1Details.scores_180 || p1Details.scores180 || 0)}</td>
+                                                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores_140plus || p2Details.scores140plus || 0) + (p2Details.scores_180 || p2Details.scores180 || 0)}</td>
                                                                     </tr>
                                                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                                                         <td style="padding: 8px;"><strong>100+ Scores</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_100plus || p1Details.scores100plus || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_100plus || p2Details.scores100plus || 0}</td>
+                                                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores_100plus || p1Details.scores100plus || 0) + (p1Details.scores_140plus || p1Details.scores140plus || 0) + (p1Details.scores_180 || p1Details.scores180 || 0)}</td>
+                                                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores_100plus || p2Details.scores100plus || 0) + (p2Details.scores_140plus || p2Details.scores140plus || 0) + (p2Details.scores_180 || p2Details.scores180 || 0)}</td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td style="padding: 8px;"><strong>High Finish</strong></td>
@@ -3197,13 +3197,13 @@
                                     </tr>
                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         <td style="padding: 8px;"><strong>140+ Scores</strong></td>
-                                        <td style="padding: 8px; text-align: center;">${p1Details.scores140plus || p1Details.scores_140plus || 0}</td>
-                                        <td style="padding: 8px; text-align: center;">${p2Details.scores140plus || p2Details.scores_140plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores140plus || p1Details.scores_140plus || 0) + (p1Details.scores180 || p1Details.scores_180 || 0)}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores140plus || p2Details.scores_140plus || 0) + (p2Details.scores180 || p2Details.scores_180 || 0)}</td>
                                     </tr>
                                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         <td style="padding: 8px;"><strong>100+ Scores</strong></td>
-                                        <td style="padding: 8px; text-align: center;">${p1Details.scores100plus || p1Details.scores_100plus || 0}</td>
-                                        <td style="padding: 8px; text-align: center;">${p2Details.scores100plus || p2Details.scores_100plus || 0}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p1Details.scores100plus || p1Details.scores_100plus || 0) + (p1Details.scores140plus || p1Details.scores_140plus || 0) + (p1Details.scores180 || p1Details.scores_180 || 0)}</td>
+                                        <td style="padding: 8px; text-align: center;">${(p2Details.scores100plus || p2Details.scores_100plus || 0) + (p2Details.scores140plus || p2Details.scores_140plus || 0) + (p2Details.scores180 || p2Details.scores_180 || 0)}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px;"><strong>High Finish</strong></td>
