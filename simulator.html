@@ -1679,10 +1679,10 @@
                             points[j].legDiff = points[j].legsFor - points[j].legsAgainst;
                         }
                     }
-                    // Sort by wins first, then by leg difference for tie-breaking
+                    // Sort by leg wins first, then by leg difference (+/-) for tie-breaking
                     return points.sort((a, b) => {
-                        if (b.wins !== a.wins) {
-                            return b.wins - a.wins; // Primary: Most wins
+                        if (b.legsFor !== a.legsFor) {
+                            return b.legsFor - a.legsFor; // Primary: Most leg wins
                         }
                         return b.legDiff - a.legDiff; // Tie-breaker: Best +/-
                     });
