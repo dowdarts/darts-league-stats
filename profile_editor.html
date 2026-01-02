@@ -180,13 +180,27 @@
 
             <!-- Right: Players List -->
             <div class="bg-gray-800 rounded-lg shadow-xl p-6 border-2 border-green-500">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold text-green-300">Player Profiles</h2>
                     <button 
                         id="downloadProfiles" 
                         class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-sm"
                     >
                         💾 Download Player Profiles (JSON)
+                    </button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <label class="flex items-center gap-2 text-sm text-gray-300">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4">
+                        Select All
+                    </label>
+                    <button 
+                        id="bulkDelete" 
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-sm"
+                        style="display: none;"
+                    >
+                        🗑️ Delete Selected
                     </button>
                 </div>
 
@@ -422,6 +436,7 @@
 
             container.innerHTML = profiles.map((profile, index) => `
                 <div class="bg-gray-700 p-4 rounded-lg flex items-center gap-4">
+                    <input type="checkbox" class="profile-checkbox w-5 h-5" data-index="${index}">
                     ${profile.imageBase64 ? 
                         `<img src="${profile.imageBase64}" alt="${profile.name}" class="w-16 h-16 object-cover rounded-lg border-2 border-gray-600">` :
                         `<div class="w-16 h-16 bg-gray-600 rounded-lg flex items-center justify-center text-gray-400 text-2xl">👤</div>`
@@ -449,7 +464,60 @@
             `).join('');
             
             updateMergeDropdowns();
+            updateBulkDeleteButton();
+            
+            // Add event listeners to checkboxes
+            document.querySelectorAll('.profile-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkDeleteButton);
+            });
         }
+
+        // Update bulk delete button visibility
+        function updateBulkDeleteButton() {
+            const checkboxes = document.querySelectorAll('.profile-checkbox:checked');
+            const bulkDeleteBtn = document.getElementById('bulkDelete');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            if (checkboxes.length > 0) {
+                bulkDeleteBtn.style.display = 'block';
+                bulkDeleteBtn.textContent = `🗑️ Delete Selected (${checkboxes.length})`;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+            
+            // Update select all checkbox state
+            const allCheckboxes = document.querySelectorAll('.profile-checkbox');
+            if (allCheckboxes.length > 0) {
+                selectAllCheckbox.checked = checkboxes.length === allCheckboxes.length;
+            }
+        }
+
+        // Select all functionality
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.profile-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkDeleteButton();
+        });
+
+        // Bulk delete
+        document.getElementById('bulkDelete').addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('.profile-checkbox:checked');
+            const indices = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index)).sort((a, b) => b - a);
+            
+            if (indices.length === 0) return;
+            
+            if (confirm(`Are you sure you want to delete ${indices.length} profile(s)?`)) {
+                // Delete in reverse order to maintain correct indices
+                indices.forEach(index => {
+                    profiles.splice(index, 1);
+                });
+                
+                renderPlayersList();
+                document.getElementById('selectAll').checked = false;
+            }
+        });
 
         // Update merge dropdowns with current profiles
         function updateMergeDropdowns() {
