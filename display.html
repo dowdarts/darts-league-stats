@@ -1807,8 +1807,8 @@
             const careerAStats = careerStats[playerAName];
             const careerBStats = careerStats[playerBName];
             
-            document.getElementById('playerACareerAvg').textContent = careerAStats?.avg3DA || '0.0';
-            document.getElementById('playerBCareerAvg').textContent = careerBStats?.avg3DA || '0.0';
+            document.getElementById('playerACareerAvg').textContent = careerAStats?.career3DA.toFixed(2) || '0.00';
+            document.getElementById('playerBCareerAvg').textContent = careerBStats?.career3DA.toFixed(2) || '0.00';
             
             // Last 10 averages with highlighting
             const aLast10Elem = document.getElementById('playerALast10Avg');
