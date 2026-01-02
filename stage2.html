@@ -709,14 +709,14 @@
             // Progress winner to next round
             if (match.winner) {
                 if (round === 'quarterFinals') {
-                    // QF1 winner -> SF1 player1, QF2 winner -> SF1 player2
-                    // QF3 winner -> SF2 player1, QF4 winner -> SF2 player2
+                    // QF1 winner -> SF1 player1, QF3 winner -> SF1 player2
+                    // QF2 winner -> SF2 player1, QF4 winner -> SF2 player2
                     if (matchIndex === 0) {
                         appData.knockout.semiFinals[0].player1 = match.winner;
                     } else if (matchIndex === 1) {
-                        appData.knockout.semiFinals[0].player2 = match.winner;
-                    } else if (matchIndex === 2) {
                         appData.knockout.semiFinals[1].player1 = match.winner;
+                    } else if (matchIndex === 2) {
+                        appData.knockout.semiFinals[0].player2 = match.winner;
                     } else if (matchIndex === 3) {
                         appData.knockout.semiFinals[1].player2 = match.winner;
                     }
