@@ -655,6 +655,130 @@
             font-size: 1.1em;
         }
 
+        /* Price Movement Indicators */
+        .odds-value {
+            transition: background-color 0.5s ease;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .flash-shorten {
+            background-color: rgba(239, 68, 68, 0.3);
+            animation: flash 0.5s ease-out;
+        }
+
+        .flash-drift {
+            background-color: rgba(34, 197, 94, 0.3);
+            animation: flash 0.5s ease-out;
+        }
+
+        @keyframes flash {
+            0% { background-color: transparent; }
+            50% { opacity: 1; }
+            100% { background-color: transparent; }
+        }
+
+        .price-arrow {
+            font-size: 0.8em;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .price-down {
+            color: #ef4444;
+        }
+
+        .price-up {
+            color: #22c55e;
+        }
+
+        /* Probability Histogram */
+        .oracle-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+        }
+
+        .oracle-title {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .histogram-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 8px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .histo-bar {
+            flex: 1;
+            background: #3b82f6;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: height 0.6s ease-out, background 0.3s;
+            min-height: 2%;
+        }
+
+        .histo-bar:hover {
+            background: #60a5fa;
+            cursor: pointer;
+        }
+
+        .histo-bar.is-likely {
+            background: var(--accent-green);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .histo-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .bar-tooltip {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .histo-bar:hover .bar-tooltip {
+            opacity: 1;
+        }
+
+        .likely-badge {
+            text-align: center;
+            margin-top: 35px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 8px;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
         /* Momentum Meter */
         .momentum-meter {
             background: var(--card-bg);
@@ -890,6 +1014,13 @@
                         <div class="correct-scores-grid" id="correctScoresGrid"></div>
                     </div>
 
+                    <!-- Probability Histogram (The Oracle) -->
+                    <div class="oracle-container">
+                        <div class="oracle-title">🔮 The Oracle: Score Probability Distribution</div>
+                        <div id="histogram" class="histogram-chart"></div>
+                        <div id="most-likely-label" class="likely-badge">Simulating...</div>
+                    </div>
+
                     <!-- Match Format Display -->
                     <div class="format-display">
                         <div class="format-title">📋 Match Format</div>
@@ -1005,6 +1136,9 @@
         let careerStats = {};
         let player1 = null;
         let player2 = null;
+        
+        // State to track previous odds for price movement arrows
+        let previousOdds = { playerA: null, playerB: null };
 
         // Load player data on page load
         async function loadPlayerData() {
@@ -1591,22 +1725,112 @@
             }
         }
 
+        // Render probability histogram (The Oracle)
+        function renderOracle(scoreData) {
+            const chart = document.getElementById('histogram');
+            chart.innerHTML = '';
+
+            // Sort scores logically
+            const sortedScores = Object.entries(scoreData).sort((a, b) => {
+                const [a1, a2] = a[0].split('-').map(Number);
+                const [b1, b2] = b[0].split('-').map(Number);
+                return (b1 - b2) - (a1 - a2); // Sort by margin
+            });
+            
+            // Find the highest frequency to scale the bars
+            const maxVal = Math.max(...Object.values(scoreData));
+            const likelyScore = Object.keys(scoreData).reduce((a, b) => 
+                scoreData[a] > scoreData[b] ? a : b
+            );
+            const totalSims = Object.values(scoreData).reduce((sum, val) => sum + val, 0);
+
+            sortedScores.forEach(([score, count]) => {
+                const percentage = (count / maxVal) * 100;
+                const realProb = ((count / totalSims) * 100).toFixed(1);
+
+                const bar = document.createElement('div');
+                bar.className = `histo-bar ${score === likelyScore ? 'is-likely' : ''}`;
+                bar.style.height = `${percentage}%`;
+                
+                bar.innerHTML = `
+                    <span class="histo-label">${score}</span>
+                    <div class="bar-tooltip">${realProb}%</div>
+                `;
+
+                chart.appendChild(bar);
+            });
+
+            const likelyProb = ((scoreData[likelyScore] / totalSims) * 100).toFixed(1);
+            document.getElementById('most-likely-label').innerText = 
+                `Most Likely Score: ${likelyScore} (${likelyProb}% probability)`;
+        }
+
+        // Update odds display with price movement arrows
+        function updateOddsWithMovement(newOdds) {
+            const p1ValueEl = document.getElementById('oddsP1Value');
+            const p2ValueEl = document.getElementById('oddsP2Value');
+            
+            // Helper to determine arrow direction and color
+            const getMovement = (current, previous) => {
+                if (!previous) return { icon: '', colorClass: '' };
+                const curr = parseFloat(current);
+                const prev = parseFloat(previous);
+                if (curr < prev) return { icon: '▼', colorClass: 'price-down' }; // Shortening
+                if (curr > prev) return { icon: '▲', colorClass: 'price-up' }; // Drifting
+                return { icon: '', colorClass: '' };
+            };
+
+            const moveA = getMovement(newOdds.playerA, previousOdds.playerA);
+            const moveB = getMovement(newOdds.playerB, previousOdds.playerB);
+
+            // Add flash effect
+            if (moveA.icon) {
+                p1ValueEl.classList.add(moveA.colorClass === 'price-down' ? 'flash-shorten' : 'flash-drift');
+                setTimeout(() => {
+                    p1ValueEl.classList.remove('flash-shorten', 'flash-drift');
+                }, 500);
+            }
+            if (moveB.icon) {
+                p2ValueEl.classList.add(moveB.colorClass === 'price-down' ? 'flash-shorten' : 'flash-drift');
+                setTimeout(() => {
+                    p2ValueEl.classList.remove('flash-shorten', 'flash-drift');
+                }, 500);
+            }
+
+            // Update UI with arrows
+            p1ValueEl.innerHTML = `${newOdds.playerA} ${moveA.icon ? `<span class="price-arrow ${moveA.colorClass}">${moveA.icon}</span>` : ''}`;
+            p2ValueEl.innerHTML = `${newOdds.playerB} ${moveB.icon ? `<span class="price-arrow ${moveB.colorClass}">${moveB.icon}</span>` : ''}`;
+
+            // Save current odds as previous for next update
+            previousOdds = { playerA: newOdds.playerA, playerB: newOdds.playerB };
+        }
+
         // Show odds board with betting information
         function showOddsBoard(sim, format) {
             const oddsBoard = document.getElementById('oddsBoard');
             oddsBoard.style.display = 'block';
             
-            // Get match winner odds
+            // Get match winner odds and apply price movement
             const odds = sim.getDecimalOdds();
             document.getElementById('oddsP1Name').textContent = player1.name;
             document.getElementById('oddsP2Name').textContent = player2.name;
-            document.getElementById('oddsP1Value').textContent = odds.playerA;
-            document.getElementById('oddsP2Value').textContent = odds.playerB;
+            updateOddsWithMovement(odds); // Use the new function with arrows
             document.getElementById('oddsP1Prob').textContent = `${odds.impliedProbA}% Implied`;
             document.getElementById('oddsP2Prob').textContent = `${odds.impliedProbB}% Implied`;
             
-            // Calculate correct score probabilities
-            const correctScores = sim.calculateCorrectScoreProbs();
+            // Calculate correct score probabilities with higher sample for histogram
+            const correctScores = sim.calculateCorrectScoreProbs(10000);
+            
+            // Build score data object for histogram
+            const scoreData = {};
+            correctScores.forEach(item => {
+                scoreData[item.score] = Math.round((parseFloat(item.probability) / 100) * 10000);
+            });
+            
+            // Render the probability histogram
+            renderOracle(scoreData);
+            
+            // Display top 8 scores in the grid
             const correctScoresHTML = correctScores.slice(0, 8).map((item, index) => {
                 const isLikely = index < 3;
                 return `
