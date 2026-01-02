@@ -59,6 +59,35 @@
             </div>
         </div>
 
+        <!-- Merge Profiles -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-yellow-500">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-300">🔀 Merge Duplicate Profiles</h2>
+            <p class="text-gray-400 mb-4 text-sm">Combine two duplicate profiles (e.g., "Darrell Cormier" and "Dee Cormier"). The primary profile will be kept with all its data.</p>
+            <div class="grid md:grid-cols-3 gap-3 items-end">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Primary Profile (Keep)</label>
+                    <select id="mergePrimary" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500">
+                        <option value="">Select profile...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Duplicate Profile (Delete)</label>
+                    <select id="mergeDuplicate" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500">
+                        <option value="">Select profile...</option>
+                    </select>
+                </div>
+                <button id="mergeButton" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded-lg transition whitespace-nowrap">
+                    Merge Profiles
+                </button>
+            </div>
+            <div id="mergeStatus" class="hidden mt-3 p-3 bg-green-900 bg-opacity-30 rounded-lg border border-green-600">
+                <p class="text-green-400 font-bold">✓ Profiles merged successfully!</p>
+            </div>
+            <div id="mergeError" class="hidden mt-3 p-3 bg-red-900 bg-opacity-30 rounded-lg border border-red-600">
+                <p class="text-red-400 font-bold">✗ Please select both profiles to merge.</p>
+            </div>
+        </div>
+
         <div class="grid lg:grid-cols-2 gap-8">
             <!-- Left: Profile Form -->
             <div class="bg-gray-800 rounded-lg shadow-xl p-6 border-2 border-blue-500">
@@ -387,6 +416,7 @@
             
             if (profiles.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-center py-8">No players added yet. Add your first player using the form.</p>';
+                updateMergeDropdowns();
                 return;
             }
 
@@ -417,7 +447,84 @@
                     </div>
                 </div>
             `).join('');
+            
+            updateMergeDropdowns();
         }
+
+        // Update merge dropdowns with current profiles
+        function updateMergeDropdowns() {
+            const primarySelect = document.getElementById('mergePrimary');
+            const duplicateSelect = document.getElementById('mergeDuplicate');
+            
+            // Save current selections
+            const currentPrimary = primarySelect.value;
+            const currentDuplicate = duplicateSelect.value;
+            
+            // Clear and repopulate
+            primarySelect.innerHTML = '<option value="">Select profile...</option>';
+            duplicateSelect.innerHTML = '<option value="">Select profile...</option>';
+            
+            profiles.forEach((profile, index) => {
+                const option1 = document.createElement('option');
+                option1.value = index;
+                option1.textContent = profile.name;
+                primarySelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = index;
+                option2.textContent = profile.name;
+                duplicateSelect.appendChild(option2);
+            });
+            
+            // Restore selections if still valid
+            if (currentPrimary !== '' && parseInt(currentPrimary) < profiles.length) {
+                primarySelect.value = currentPrimary;
+            }
+            if (currentDuplicate !== '' && parseInt(currentDuplicate) < profiles.length) {
+                duplicateSelect.value = currentDuplicate;
+            }
+        }
+
+        // Merge profiles
+        document.getElementById('mergeButton').addEventListener('click', function() {
+            const primaryIndex = parseInt(document.getElementById('mergePrimary').value);
+            const duplicateIndex = parseInt(document.getElementById('mergeDuplicate').value);
+            
+            if (isNaN(primaryIndex) || isNaN(duplicateIndex)) {
+                document.getElementById('mergeError').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('mergeError').classList.add('hidden');
+                }, 3000);
+                return;
+            }
+            
+            if (primaryIndex === duplicateIndex) {
+                alert('Cannot merge a profile with itself!');
+                return;
+            }
+            
+            const primaryProfile = profiles[primaryIndex];
+            const duplicateProfile = profiles[duplicateIndex];
+            
+            if (confirm(`Merge "${duplicateProfile.name}" into "${primaryProfile.name}"?\n\nThe duplicate profile will be deleted.`)) {
+                // Remove the duplicate profile
+                profiles.splice(duplicateIndex, 1);
+                
+                // Re-render
+                renderPlayersList();
+                
+                // Reset dropdowns
+                document.getElementById('mergePrimary').value = '';
+                document.getElementById('mergeDuplicate').value = '';
+                
+                // Show success
+                document.getElementById('mergeStatus').classList.remove('hidden');
+                document.getElementById('mergeError').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('mergeStatus').classList.add('hidden');
+                }, 3000);
+            }
+        });
 
         // Edit profile
         window.editProfile = function(index) {
