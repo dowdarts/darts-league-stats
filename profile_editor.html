@@ -208,16 +208,24 @@
 
                     let importCount = 0;
                     
+                    console.log('Current profiles array:', profiles);
+                    console.log('Profiles count:', profiles.length);
+                    
                     // Import players that don't already have profiles
                     eventData.player_event_stats.forEach(playerStats => {
                         // Format the name from "Last, First" to "First Last"
                         const formattedName = formatNameForDisplay(playerStats.name);
+                        
+                        console.log('Checking player:', formattedName);
                         
                         // Normalize names for comparison (lowercase, trim whitespace)
                         const normalizedNewName = formattedName.toLowerCase().trim();
                         const existingIndex = profiles.findIndex(p => 
                             p.name.toLowerCase().trim() === normalizedNewName
                         );
+                        
+                        console.log('  Normalized:', normalizedNewName);
+                        console.log('  Existing index:', existingIndex);
                         
                         if (existingIndex === -1) {
                             // Create new profile with empty fields
@@ -230,6 +238,9 @@
                                 imageBase64: ''
                             });
                             importCount++;
+                            console.log('  → IMPORTED (new player)');
+                        } else {
+                            console.log('  → SKIPPED (already exists)');
                         }
                     });
 
