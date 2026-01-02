@@ -206,6 +206,13 @@
                     <button id="closeModal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
                 
+                <!-- Match Start Time -->
+                <div class="mb-4 bg-purple-900 bg-opacity-30 p-4 rounded-lg border border-purple-600">
+                    <label class="block text-sm font-medium mb-2 text-purple-300">⏰ Match Start Time (24-hour format)</label>
+                    <input type="time" id="matchStartTime" class="w-full p-2 bg-gray-600 border border-gray-500 rounded focus:ring-2 focus:ring-purple-500" value="00:00" />
+                    <p class="text-xs text-gray-400 mt-1">Enter the time this match started (e.g., 19:30 for 7:30 PM)</p>
+                </div>
+                
                 <div class="space-y-4">
                     <!-- Player 1 Stats -->
                     <div class="bg-gray-700 p-4 rounded-lg">
@@ -1023,6 +1030,9 @@
                 };
             }
             
+            // Load match start time (default to '00:00' if not set)
+            document.getElementById('matchStartTime').value = match.startTime || '00:00';
+            
             // Load player 1 stats
             document.getElementById('p1_3da').value = match.details.player1.threeDartAvg || '';
             document.getElementById('p1_co_opp').value = match.details.player1.coOpportunities || '';
@@ -1086,6 +1096,9 @@
             const { group, matchIndex } = currentMatchEdit;
             const matches = group === 'A' ? appData.groupA.matches : appData.groupB.matches;
             const match = matches[matchIndex];
+            
+            // Save match start time (default to '00:00' if empty)
+            match.startTime = document.getElementById('matchStartTime').value || '00:00';
             
             // Save player 1 stats
             match.details.player1.threeDartAvg = parseFloat(document.getElementById('p1_3da').value) || 0;
@@ -1254,6 +1267,7 @@
                 player2: match.player2,
                 player1_legs: match.player1Legs,
                 player2_legs: match.player2Legs,
+                start_time: match.startTime || '00:00',
                 player1_details: {
                     three_dart_avg: match.details?.player1?.threeDartAvg || 0,
                     co_opportunities: match.details?.player1?.coOpportunities || 0,
