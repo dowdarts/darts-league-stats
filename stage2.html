@@ -219,6 +219,7 @@
     <script>
         let appData = {
             metadata: null,
+            roundRobin: null,  // Store RR data for export
             knockout: {
                 quarterFinals: [],
                 semiFinals: [],
@@ -418,6 +419,12 @@
 
                     // Store metadata
                     appData.metadata = rrData.metadata;
+                    
+                    // Store Round Robin data for export
+                    appData.roundRobin = {
+                        standings: rrData.standings,
+                        matches: rrData.matches
+                    };
 
                     // Get top 4 from each group
                     const standingsA = rrData.standings.groupA;
@@ -1089,6 +1096,7 @@
 
             const exportData = {
                 metadata: appData.metadata,
+                round_robin: appData.roundRobin,  // Include RR data
                 knockout: {
                     quarterFinals: appData.knockout.quarterFinals.map(m => formatKnockoutMatchForExport(m)),
                     semiFinals: appData.knockout.semiFinals.map(m => formatKnockoutMatchForExport(m)),
