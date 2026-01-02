@@ -402,6 +402,65 @@
             color: var(--accent-red);
         }
 
+        /* Match Recap Styles */
+        .recap-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .recap-title {
+            color: var(--primary-orange);
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            border-bottom: 2px solid var(--primary-orange);
+            padding-bottom: 10px;
+        }
+
+        .recap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .recap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-orange);
+        }
+
+        .recap-label {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .recap-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .highlight-win {
+            color: var(--accent-green) !important;
+            font-weight: 700 !important;
+        }
+
+        .highlight-upset {
+            color: var(--accent-red) !important;
+            font-weight: 700 !important;
+        }
+
+        .highlight-fav {
+            color: var(--accent-green) !important;
+            font-weight: 700 !important;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
@@ -1373,7 +1432,14 @@
             
             const sim = new DartsSimulator(player1, player2, format, { crowdPressure });
             
-            // Calculate and display pre-match odds
+            // Calculate all pre-match data
+            const odds = sim.getDecimalOdds();
+            const correctScores = sim.calculateCorrectScoreProbs();
+            const [type, target] = format.split(':');
+            const totalLegs = type === 'legs' ? parseInt(target) : parseInt(target) * 5;
+            const nineDartOdds = sim.calculateNineDartOdds(player1, totalLegs / 2);
+            
+            // Display pre-match odds board
             showOddsBoard(sim, format);
             
             // Run the match simulation
@@ -1385,11 +1451,6 @@
             document.getElementById('bulkResults').style.display = 'none';
             
             // Update scoreboard
-            const p1Name = result.winner === 0 ? player1.name : player2.name;
-            const p2Name = result.winner === 0 ? player2.name : player1.name;
-            const p1Score = result.winner === 0 ? result.score[0] : result.score[1];
-            const p2Score = result.winner === 0 ? result.score[1] : result.score[0];
-            
             document.getElementById('p1ResultName').textContent = player1.name;
             document.getElementById('p2ResultName').textContent = player2.name;
             document.getElementById('p1ResultScore').textContent = result.score[0];
@@ -1407,45 +1468,110 @@
                 p2Card.classList.add('winner');
             }
             
-            // Display match stats
+            // Build comprehensive match recap
             const [formatType] = format.split(':');
             const scoreLabel = formatType === 'sets' ? 'Sets' : 'Legs';
+            const finalScore = `${result.score[0]}-${result.score[1]}`;
+            const actualCorrectScore = correctScores.find(s => s.score === finalScore);
+            const nineDartHappened = result.log.some(entry => entry.includes('9-DART'));
             
-            const statsHTML = `
-                <div class="stat-box">
-                    <div class="stat-box-title">${player1.name} ${scoreLabel}</div>
-                    <div class="stat-box-value">${result.score[0]}</div>
+            const recapHTML = `
+                <!-- P4P Stats Section -->
+                <div class="recap-section">
+                    <h3 class="recap-title">⚖️ Pre-Match P4P Analysis</h3>
+                    <div class="recap-grid">
+                        <div class="recap-item">
+                            <span class="recap-label">${player1.name} P4P Score</span>
+                            <span class="recap-value">${player1.final_event_3da.toFixed(1)}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player2.name} P4P Score</span>
+                            <span class="recap-value">${player2.final_event_3da.toFixed(1)}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">P4P Differential</span>
+                            <span class="recap-value">${Math.abs(player1.final_event_3da - player2.final_event_3da).toFixed(1)}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Predicted Win Probability</span>
+                            <span class="recap-value">${player1.name} ${odds.impliedProbA}% / ${player2.name} ${odds.impliedProbB}%</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player2.name} ${scoreLabel}</div>
-                    <div class="stat-box-value">${result.score[1]}</div>
+
+                <!-- Betting Market Section -->
+                <div class="recap-section">
+                    <h3 class="recap-title">💰 Betting Markets Analysis</h3>
+                    <div class="recap-grid">
+                        <div class="recap-item">
+                            <span class="recap-label">Match Winner Odds</span>
+                            <span class="recap-value">${player1.name} @${odds.playerA} | ${player2.name} @${odds.playerB}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Pre-Match Favorite</span>
+                            <span class="recap-value">${odds.playerA < odds.playerB ? player1.name : player2.name} (${Math.min(odds.playerA, odds.playerB)} odds)</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Correct Score Probability</span>
+                            <span class="recap-value">${finalScore}: ${actualCorrectScore ? actualCorrectScore.probability : 'N/A'}% (@${actualCorrectScore ? actualCorrectScore.odds : 'N/A'})</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">9-Dart Finish Market</span>
+                            <span class="recap-value">YES @${nineDartOdds.yes} (${nineDartOdds.probability}%) | NO @${nineDartOdds.no}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">9-Dart Result</span>
+                            <span class="recap-value ${nineDartHappened ? 'highlight-win' : ''}">${nineDartHappened ? '✅ YES - 9-Dart Achieved!' : '❌ NO - No 9-Darter'}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player1.name} Total Legs</div>
-                    <div class="stat-box-value">${result.legs[0]}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player2.name} Total Legs</div>
-                    <div class="stat-box-value">${result.legs[1]}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player1.name} Avg Visits/Leg</div>
-                    <div class="stat-box-value">${(result.visits[0] / result.legs[0]).toFixed(1)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player2.name} Avg Visits/Leg</div>
-                    <div class="stat-box-value">${(result.visits[1] / result.legs[1]).toFixed(1)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player1.name} CO%</div>
-                    <div class="stat-box-value">${result.checkoutAttempts[0] > 0 ? ((result.legs[0] / result.checkoutAttempts[0]) * 100).toFixed(1) : 0}%</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-title">${player2.name} CO%</div>
-                    <div class="stat-box-value">${result.checkoutAttempts[1] > 0 ? ((result.legs[1] / result.checkoutAttempts[1]) * 100).toFixed(1) : 0}%</div>
+
+                <!-- Match Result Section -->
+                <div class="recap-section">
+                    <h3 class="recap-title">🎯 Match Statistics</h3>
+                    <div class="recap-grid">
+                        <div class="recap-item">
+                            <span class="recap-label">${player1.name} ${scoreLabel}</span>
+                            <span class="recap-value">${result.score[0]}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player2.name} ${scoreLabel}</span>
+                            <span class="recap-value">${result.score[1]}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player1.name} Total Legs</span>
+                            <span class="recap-value">${result.legs[0]}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player2.name} Total Legs</span>
+                            <span class="recap-value">${result.legs[1]}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player1.name} Avg Visits/Leg</span>
+                            <span class="recap-value">${(result.visits[0] / result.legs[0]).toFixed(1)}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player2.name} Avg Visits/Leg</span>
+                            <span class="recap-value">${(result.visits[1] / result.legs[1]).toFixed(1)}</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player1.name} Checkout %</span>
+                            <span class="recap-value">${result.checkoutAttempts[0] > 0 ? ((result.legs[0] / result.checkoutAttempts[0]) * 100).toFixed(1) : 0}%</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">${player2.name} Checkout %</span>
+                            <span class="recap-value">${result.checkoutAttempts[1] > 0 ? ((result.legs[1] / result.checkoutAttempts[1]) * 100).toFixed(1) : 0}%</span>
+                        </div>
+                        <div class="recap-item">
+                            <span class="recap-label">Betting Result</span>
+                            <span class="recap-value ${result.winner === 0 ? (odds.playerA < odds.playerB ? 'highlight-fav' : 'highlight-upset') : (odds.playerB < odds.playerA ? 'highlight-fav' : 'highlight-upset')}">
+                                ${result.winner === 0 ? player1.name : player2.name} Wins ${result.winner === 0 ? (odds.playerA > odds.playerB ? '(UPSET!)' : '(Favorite)') : (odds.playerB > odds.playerA ? '(UPSET!)' : '(Favorite)')}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             `;
-            document.getElementById('matchStats').innerHTML = statsHTML;
+            document.getElementById('matchStats').innerHTML = recapHTML;
             
             // Display match log
             const logHTML = result.log.map(entry => {
