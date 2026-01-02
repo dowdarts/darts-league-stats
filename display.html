@@ -1704,6 +1704,11 @@
             const playerBMatches = getSortedMatches(playerBName);
             const h2hMatches = getSortedMatches(playerAName, playerBName);
 
+            console.log('Player A Matches:', playerAMatches.length);
+            console.log('Player B Matches:', playerBMatches.length);
+            console.log('H2H Matches:', h2hMatches.length);
+            console.log('Sample Player A Match:', playerAMatches[0]);
+
             // Get last 10 matches for each player
             const playerALast10 = playerAMatches.slice(0, 10);
             const playerBLast10 = playerBMatches.slice(0, 10);
@@ -1711,6 +1716,9 @@
             // Calculate stats
             const playerAStats = calculatePlayerH2HStats(playerAName, playerALast10);
             const playerBStats = calculatePlayerH2HStats(playerBName, playerBLast10);
+
+            console.log('Player A Stats:', playerAStats);
+            console.log('Player B Stats:', playerBStats);
 
             // Count H2H wins
             let playerAH2HWins = 0;
