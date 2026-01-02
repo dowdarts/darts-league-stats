@@ -182,6 +182,7 @@
                                         <th class="px-3 py-2 text-center">ML</th>
                                         <th class="px-3 py-2 text-center">Legs Won</th>
                                         <th class="px-3 py-2 text-center">Legs Lost</th>
+                                        <th class="px-3 py-2 text-center">+/-</th>
                                     </tr>
                                 </thead>
                                 <tbody id="groupBStandings" class="divide-y divide-gray-700"></tbody>
@@ -986,17 +987,19 @@
                     return b.legsWon - a.legsWon;
                 }
                 
-                // Secondary: Head-to-Head
+                // Secondary: Leg Difference (+/-)
+                const aDiff = a.legsWon - a.legsLost;
+                const bDiff = b.legsWon - b.legsLost;
+                if (bDiff !== aDiff) {
+                    return bDiff - aDiff;
+                }
+                
+                // Tertiary: Head-to-Head
                 if (a.headToHead[b.name] === 'won') return -1;
                 if (b.headToHead[a.name] === 'won') return 1;
                 
-                // Tertiary: Matches won
-                if (b.won !== a.won) {
-                    return b.won - a.won;
-                }
-                
-                // Quaternary: Legs lost (fewer is better)
-                return a.legsLost - b.legsLost;
+                // Quaternary: Matches won
+                return b.won - a.won;
             });
             
             // Render standings
@@ -1006,6 +1009,7 @@
             sortedStandings.forEach((player, index) => {
                 const row = document.createElement('tr');
                 row.className = index < 4 ? 'bg-green-900 bg-opacity-30' : 'bg-gray-800';
+                const legDiff = player.legsWon - player.legsLost;
                 row.innerHTML = `
                     <td class="px-3 py-2 font-bold">${index + 1}</td>
                     <td class="px-3 py-2">${formatNameForDisplay(player.name)}</td>
@@ -1014,6 +1018,7 @@
                     <td class="px-3 py-2 text-center">${player.lost}</td>
                     <td class="px-3 py-2 text-center font-bold text-green-400">${player.legsWon}</td>
                     <td class="px-3 py-2 text-center text-red-400">${player.legsLost}</td>
+                    <td class="px-3 py-2 text-center font-bold">${legDiff > 0 ? '+' : ''}${legDiff}</td>
                 `;
                 tbody.appendChild(row);
             });

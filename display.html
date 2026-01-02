@@ -2954,9 +2954,19 @@
                 });
 
                         const sortedPlayers = [...players].sort((a, b) => {
-                            const aValue = a.points !== undefined ? a.points : (a.matches_won || 0) * 2;
-                            const bValue = b.points !== undefined ? b.points : (b.matches_won || 0) * 2;
-                            return bValue - aValue;
+                            const aLegsWon = a.legs_won || 0;
+                            const bLegsWon = b.legs_won || 0;
+                            const aLegsLost = a.legs_lost || 0;
+                            const bLegsLost = b.legs_lost || 0;
+                            const aLegDiff = aLegsWon - aLegsLost;
+                            const bLegDiff = bLegsWon - bLegsLost;
+                            
+                            // Primary: Most leg wins
+                            if (bLegsWon !== aLegsWon) {
+                                return bLegsWon - aLegsWon;
+                            }
+                            // Tie-breaker: Best +/- (leg difference)
+                            return bLegDiff - aLegDiff;
                         });
 
                         standingsHTML += `
@@ -2978,6 +2988,7 @@
                                         <th class="center">LP</th>
                                         <th class="center">LW</th>
                                         <th class="center">LL</th>
+                                        <th class="center">+/-</th>
                                         <th class="center">CO%</th>
                                         <th class="center">RR 3DA</th>
                                     </tr>
@@ -3020,6 +3031,7 @@
                                             <td class="center">${legsPlayed}</td>
                                             <td class="center">${legsWon}</td>
                                             <td class="center">${legsLost}</td>
+                                            <td class="center">${legsWon - legsLost}</td>
                                             <td class="center">${coPct}${coPct !== 'N/A' ? '%' : ''}</td>
                                             <td class="center highlight-stat">${avg3DA}</td>
                                         </tr>

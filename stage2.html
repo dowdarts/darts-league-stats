@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage 2: Knockout Bracket</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dragging {
+            opacity: 0.5;
+        }
+        [draggable="true"] {
+            user-select: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white p-6">
     <div class="max-w-7xl mx-auto">
@@ -50,6 +58,15 @@
         <!-- Stage 2: Knockout Bracket -->
         <div id="stage2" class="hidden mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold mb-4 text-yellow-400">Stage 2: Knockout Bracket</h2>
+            
+            <!-- Drag & Drop Instructions -->
+            <div class="mb-6 bg-blue-900 bg-opacity-30 p-4 rounded-lg border border-blue-600">
+                <p class="text-blue-200 text-sm">
+                    <strong>💡 Tip:</strong> You can drag and drop player names to move them between matches! 
+                    Click and hold on any player name, then drag to another match position to swap players.
+                    Use the "⇄ Swap" button to quickly swap players within the same match.
+                </p>
+            </div>
             
             <!-- Quarter Finals -->
             <div class="mb-8">
@@ -531,7 +548,15 @@
                     </h4>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between gap-3">
-                            <div class="flex-1 font-medium ${match.winner === match.player1 ? 'text-green-400' : ''}">${p1Display}</div>
+                            <div 
+                                class="flex-1 font-medium ${match.winner === match.player1 ? 'text-green-400' : ''} ${match.player1 !== 'TBD' ? 'cursor-move hover:bg-gray-600 px-2 py-1 rounded' : ''}" 
+                                draggable="${match.player1 !== 'TBD'}"
+                                ondragstart="handleDragStart(event, '${containerId}', ${index}, 1, '${match.player1}')"
+                                ondragend="handleDragEnd(event)"
+                                ondrop="handleDrop(event, '${containerId}', ${index}, 1)"
+                                ondragover="handleDragOver(event)"
+                                ondragleave="handleDragLeave(event)"
+                            >${p1Display}</div>
                             <div class="flex items-center gap-2">
                                 <div class="text-center">
                                     <label class="text-xs text-gray-400">Sets</label>
@@ -558,7 +583,15 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between gap-3">
-                            <div class="flex-1 font-medium ${match.winner === match.player2 ? 'text-green-400' : ''}">${p2Display}</div>
+                            <div 
+                                class="flex-1 font-medium ${match.winner === match.player2 ? 'text-green-400' : ''} ${match.player2 !== 'TBD' ? 'cursor-move hover:bg-gray-600 px-2 py-1 rounded' : ''}" 
+                                draggable="${match.player2 !== 'TBD'}"
+                                ondragstart="handleDragStart(event, '${containerId}', ${index}, 2, '${match.player2}')"
+                                ondragend="handleDragEnd(event)"
+                                ondrop="handleDrop(event, '${containerId}', ${index}, 2)"
+                                ondragover="handleDragOver(event)"
+                                ondragleave="handleDragLeave(event)"
+                            >${p2Display}</div>
                             <div class="flex items-center gap-2">
                                 <div class="text-center">
                                     <label class="text-xs text-gray-400">Sets</label>
@@ -707,6 +740,95 @@
             
             // Re-render
             renderKnockout();
+        }
+
+        // Drag and drop functionality
+        let dragData = null;
+
+        function handleDragStart(event, round, matchIndex, playerNum, playerName) {
+            event.stopPropagation();
+            dragData = {
+                sourceRound: round,
+                sourceMatchIndex: matchIndex,
+                sourcePlayerNum: playerNum,
+                playerName: playerName
+            };
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/html', event.target.innerHTML);
+            event.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(event) {
+            event.target.style.opacity = '1';
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.dataTransfer.dropEffect = 'move';
+            event.target.classList.add('bg-blue-900');
+            return false;
+        }
+
+        function handleDragLeave(event) {
+            event.stopPropagation();
+            event.target.classList.remove('bg-blue-900');
+        }
+
+        function handleDrop(event, targetRound, targetMatchIndex, targetPlayerNum) {
+            event.stopPropagation();
+            event.preventDefault();
+            event.target.classList.remove('bg-blue-900');
+            
+            if (!dragData) return;
+            
+            // Get source match and player
+            let sourceMatch, targetMatch;
+            
+            if (dragData.sourceRound === 'final') {
+                sourceMatch = appData.knockout.final;
+            } else {
+                sourceMatch = appData.knockout[dragData.sourceRound][dragData.sourceMatchIndex];
+            }
+            
+            if (targetRound === 'final') {
+                targetMatch = appData.knockout.final;
+            } else {
+                targetMatch = appData.knockout[targetRound][targetMatchIndex];
+            }
+            
+            // Get player names and details
+            const sourcePlayerKey = `player${dragData.sourcePlayerNum}`;
+            const targetPlayerKey = `player${targetPlayerNum}`;
+            
+            const sourcePlayerName = sourceMatch[sourcePlayerKey];
+            const targetPlayerName = targetMatch[targetPlayerKey];
+            
+            // Swap player names
+            sourceMatch[sourcePlayerKey] = targetPlayerName;
+            targetMatch[targetPlayerKey] = sourcePlayerName;
+            
+            // Swap player details (stats)
+            const tempDetails = { ...sourceMatch.details[sourcePlayerKey] };
+            sourceMatch.details[sourcePlayerKey] = { ...targetMatch.details[targetPlayerKey] };
+            targetMatch.details[targetPlayerKey] = tempDetails;
+            
+            // Reset scores for both positions
+            sourceMatch[`${sourcePlayerKey}Sets`] = 0;
+            sourceMatch[`${sourcePlayerKey}TotalLegs`] = 0;
+            targetMatch[`${targetPlayerKey}Sets`] = 0;
+            targetMatch[`${targetPlayerKey}TotalLegs`] = 0;
+            
+            // Clear winners if any
+            if (sourceMatch.winner === sourcePlayerName) sourceMatch.winner = null;
+            if (targetMatch.winner === targetPlayerName) targetMatch.winner = null;
+            
+            // Re-render
+            dragData = null;
+            renderKnockout();
+            
+            // Show confirmation
+            alert(`Swapped ${formatNameForDisplay(sourcePlayerName)} with ${formatNameForDisplay(targetPlayerName)}`);
         }
 
         // Update knockout score
