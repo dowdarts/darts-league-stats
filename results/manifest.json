@@ -1,7 +1,7 @@
 {
-  "available_events": [1],
+  "available_events": [1, 2],
   "series_name": "Atlantic Amateur Darts Series",
   "series_id": 1,
-  "current_event": 1,
-  "last_updated": "2026-01-01"
+  "current_event": 2,
+  "last_updated": "2026-01-02"
 }
