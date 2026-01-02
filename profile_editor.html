@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Profile Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body {
             background-color: #1a1a1a;
@@ -43,7 +44,7 @@
         <!-- Upload Existing Profiles -->
         <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border-2 border-orange-500">
             <h2 class="text-2xl font-bold mb-4 text-orange-300">📤 Upload Existing Profiles</h2>
-            <p class="text-gray-400 mb-4 text-sm">Load an existing player_profiles.json file to edit profiles.</p>
+            <p class="text-gray-400 mb-4 text-sm">Load an existing player_profiles.json file (or extract from ZIP) to edit profiles.</p>
             <div class="flex gap-3 items-center mb-3">
                 <input type="file" id="uploadProfilesFile" accept=".json" class="flex-1 block text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700">
                 <button id="uploadProfilesButton" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition whitespace-nowrap">
@@ -156,7 +157,7 @@
                         id="downloadProfiles" 
                         class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-sm"
                     >
-                        💾 Download player_profiles.json
+                        💾 Download Player Profiles (ZIP)
                     </button>
                 </div>
 
@@ -433,23 +434,57 @@
         };
 
         // Download profiles
-        document.getElementById('downloadProfiles').addEventListener('click', function() {
+        document.getElementById('downloadProfiles').addEventListener('click', async function() {
             if (profiles.length === 0) {
                 alert('No profiles to download! Add at least one player first.');
                 return;
             }
 
-            const blob = new Blob([JSON.stringify(profiles, null, 2)], { type: 'application/json' });
+            // Create a new ZIP file
+            const zip = new JSZip();
+            
+            // Process profiles to extract images
+            const processedProfiles = [];
+            const imagesFolder = zip.folder("images").folder("players");
+            
+            for (const profile of profiles) {
+                const processedProfile = { ...profile };
+                
+                // If profile has base64 image, extract it
+                if (profile.imageBase64 && profile.imageBase64.startsWith('data:')) {
+                    // Create filename from player name
+                    const filename = profile.name.toLowerCase()
+                        .replace(/[^a-z0-9\s]/g, '')
+                        .replace(/\s+/g, '-') + '.png';
+                    
+                    // Extract base64 data
+                    const base64Data = profile.imageBase64.replace(/^data:image\/[^;]+;base64,/, '');
+                    
+                    // Add image to ZIP
+                    imagesFolder.file(filename, base64Data, { base64: true });
+                    
+                    // Update profile to reference filename instead of base64
+                    processedProfile.imageBase64 = filename;
+                }
+                
+                processedProfiles.push(processedProfile);
+            }
+            
+            // Add JSON to ZIP
+            zip.file("player_profiles.json", JSON.stringify(processedProfiles, null, 2));
+            
+            // Generate ZIP and download
+            const blob = await zip.generateAsync({ type: 'blob' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'player_profiles.json';
+            a.download = 'player_profiles.zip';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            alert('player_profiles.json downloaded successfully!');
+            alert('player_profiles.zip downloaded! Extract it in your project root folder.');
         });
 
         // Initial render
