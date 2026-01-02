@@ -1259,7 +1259,7 @@
                         <!-- Player Headers -->
                         <div class="h2h-header">
                             <div class="player-side left">
-                                <img id="playerAPhoto" class="player-photo-compare" src="" alt="Player A">
+                                <img id="playerAPhoto" class="player-photo-compare" src="" alt="Player A" loading="lazy">
                                 <h2 id="playerAName" class="player-name-compare"></h2>
                                 <div id="playerANickname" class="player-nickname"></div>
                             </div>
@@ -1267,7 +1267,7 @@
                             <div class="vs-divider">VS</div>
                             
                             <div class="player-side right">
-                                <img id="playerBPhoto" class="player-photo-compare" src="" alt="Player B">
+                                <img id="playerBPhoto" class="player-photo-compare" src="" alt="Player B" loading="lazy">
                                 <h2 id="playerBName" class="player-name-compare"></h2>
                                 <div id="playerBNickname" class="player-nickname"></div>
                             </div>
@@ -1504,6 +1504,8 @@
 
     <script>
         let eventFiles = [];
+        let eventFilesCache = {}; // Cache for loaded event data
+        let availableEvents = []; // List of event numbers that exist
         let playerProfiles = [];
         let careerStats = {};
         let currentChart = null;
@@ -1832,31 +1834,35 @@
         // Initialize
         async function init() {
             try {
-                // Load player profiles
-                const profileRes = await fetch('results/player_profiles.json');
-                if (profileRes.ok) {
-                    playerProfiles = await profileRes.json();
-                    console.log('Player profiles loaded:', playerProfiles.length);
-                } else {
-                    console.log('Failed to load player profiles');
-                }
-
-                // Load event files (check up to MAX_EVENTS)
-                const eventPromises = [];
+                // Quick check for which events exist (just metadata, no full data)
+                const checkPromises = [];
                 for (let i = 1; i <= MAX_EVENTS; i++) {
-                    eventPromises.push(fetchEventFile(i));
+                    checkPromises.push(
+                        fetch(`results/Final_Series1_Event${i}.json`)
+                            .then(res => res.ok ? i : null)
+                            .catch(() => null)
+                    );
                 }
 
-                const events = await Promise.all(eventPromises);
-                eventFiles = events.filter(e => e !== null);
+                const checks = await Promise.all(checkPromises);
+                availableEvents = checks.filter(n => n !== null);
                 
-                console.log('Event files loaded:', eventFiles.length);
+                console.log('Available events:', availableEvents);
 
-                if (eventFiles.length === 0) {
+                if (availableEvents.length === 0) {
                     throw new Error('No event files found in results/ folder');
                 }
 
-                calculateCareerStats();
+                // Load player profiles (small file)
+                const profileRes = await fetch('results/player_profiles.json');
+                if (profileRes.ok) {
+                    playerProfiles = await profileRes.json();
+                }
+
+                // Load only the first event for initial display
+                await loadEvent(availableEvents[0]);
+                
+                // Populate selectors with available events
                 populateEventSelector();
                 populatePlayerSelectors();
 
@@ -1868,12 +1874,42 @@
                 // Setup H2H compare button
                 document.getElementById('compareBtn').addEventListener('click', comparePlayersH2H);
 
+                // Load remaining events in background
+                loadRemainingEvents();
+
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('errorState').style.display = 'block';
                 document.getElementById('errorMessage').textContent = error.message;
             }
+        }
+
+        // Load a specific event file
+        async function loadEvent(eventNum) {
+            if (eventFilesCache[eventNum]) {
+                return eventFilesCache[eventNum];
+            }
+
+            const event = await fetchEventFile(eventNum);
+            if (event) {
+                eventFilesCache[eventNum] = event;
+                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                calculateCareerStats();
+            }
+            return event;
+        }
+
+        // Load remaining events in background
+        async function loadRemainingEvents() {
+            for (let i = 1; i < availableEvents.length; i++) {
+                const eventNum = availableEvents[i];
+                if (!eventFilesCache[eventNum]) {
+                    await loadEvent(eventNum);
+                    console.log(`Background loaded Event ${eventNum}`);
+                }
+            }
+            console.log('All events loaded');
         }
 
         // Populate H2H player selectors
@@ -2094,6 +2130,7 @@
                 const imgSrc = getImageSrc(profile?.imageBase64);
                 if (imgSrc) {
                     photoEl.src = imgSrc;
+                    photoEl.loading = 'lazy';
                     photoEl.style.display = 'block';
                 } else {
                     photoEl.style.display = 'none';
@@ -2161,23 +2198,31 @@
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
             
-            eventFiles.forEach((event, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = event.metadata.event_name;
-                selector.appendChild(option);
+            availableEvents.forEach((eventNum) => {
+                const event = eventFilesCache[eventNum];
+                if (event) {
+                    const option = document.createElement('option');
+                    option.value = eventNum;
+                    option.textContent = event.metadata.event_name;
+                    selector.appendChild(option);
+                }
             });
         }
 
         // Show event details
-        function showEventDetails() {
-            const index = document.getElementById('eventSelector').value;
-            if (!index) {
+        async function showEventDetails() {
+            const eventNum = parseInt(document.getElementById('eventSelector').value);
+            if (isNaN(eventNum) || !availableEvents.includes(eventNum)) {
                 document.getElementById('eventDetails').style.display = 'none';
                 return;
             }
 
-            const event = eventFiles[index];
+            // Load event if not cached
+            if (!eventFilesCache[eventNum]) {
+                await loadEvent(eventNum);
+            }
+
+            const event = eventFilesCache[eventNum];
             document.getElementById('eventDetails').style.display = 'block';
             document.getElementById('eventTitle').textContent = event.metadata.event_name;
             
@@ -2637,7 +2682,7 @@
                 let photoHtml;
                 const imgSrc = getImageSrc(profile?.imageBase64);
                 if (imgSrc) {
-                    photoHtml = `<img src="${imgSrc}" class="player-card-photo">`;
+                    photoHtml = `<img src="${imgSrc}" class="player-card-photo" loading="lazy">`;
                 } else {
                     photoHtml = `<div class="player-card-placeholder">👤</div>`;
                 }
