@@ -212,7 +212,12 @@
                     eventData.player_event_stats.forEach(playerStats => {
                         // Format the name from "Last, First" to "First Last"
                         const formattedName = formatNameForDisplay(playerStats.name);
-                        const existingIndex = profiles.findIndex(p => p.name === formattedName);
+                        
+                        // Normalize names for comparison (lowercase, trim whitespace)
+                        const normalizedNewName = formattedName.toLowerCase().trim();
+                        const existingIndex = profiles.findIndex(p => 
+                            p.name.toLowerCase().trim() === normalizedNewName
+                        );
                         
                         if (existingIndex === -1) {
                             // Create new profile with empty fields
