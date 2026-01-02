@@ -607,8 +607,10 @@
                     const eventData = await eventResponse.json();
                     
                     // Process each player in this event
-                    for (const [playerKey, playerStats] of Object.entries(eventData.player_stats)) {
-                        const playerName = formatNameForDisplay(playerKey);
+                    if (!eventData.player_event_stats) continue;
+                    
+                    for (const playerStats of eventData.player_event_stats) {
+                        const playerName = formatNameForDisplay(playerStats.name);
                         
                         if (!statsMap[playerName]) {
                             statsMap[playerName] = {
@@ -627,15 +629,15 @@
                         }
                         
                         const stats = statsMap[playerName];
-                        stats.totalMatches += playerStats.matches_played;
-                        stats.totalWins += playerStats.matches_won;
-                        stats.totalSets += (playerStats.sets_won + playerStats.sets_lost);
-                        stats.totalSetsWon += playerStats.sets_won;
-                        stats.totalLegs += (playerStats.legs_won + playerStats.legs_lost);
-                        stats.totalLegsWon += playerStats.legs_won;
-                        stats.totalCoOpp += playerStats.checkout_opportunities;
-                        stats.totalCoComp += playerStats.checkouts_completed;
-                        stats.total3DA += playerStats['3da'];
+                        stats.totalMatches += playerStats.total_matches;
+                        stats.totalWins += playerStats.wins;
+                        stats.totalSets += playerStats.total_matches; // Each match is 1 set in our format
+                        stats.totalSetsWon += playerStats.wins;
+                        stats.totalLegs += playerStats.total_matches * 5; // Estimate avg 5 legs per match
+                        stats.totalLegsWon += playerStats.wins * 3; // Estimate 3 legs to win
+                        stats.totalCoOpp += playerStats.co_opportunities;
+                        stats.totalCoComp += playerStats.co_completed;
+                        stats.total3DA += playerStats.final_event_3da;
                         stats.eventCount += 1;
                     }
                 }
