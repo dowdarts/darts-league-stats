@@ -2262,9 +2262,18 @@
             }
         }
         
+        function hideSimulatorLink() {
+            const simulatorLink = document.getElementById('simulatorNavItem');
+            if (simulatorLink) {
+                simulatorLink.style.display = 'none';
+            }
+        }
+        
         function checkAdminAccess() {
             if (localStorage.getItem('aads_admin_access') === 'true') {
                 showSimulatorLink();
+            } else {
+                hideSimulatorLink();
             }
         }
 
