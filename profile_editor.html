@@ -574,17 +574,6 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'player_profiles.zip';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert('player_profiles.zip downloaded! Extract it in your project root folder.');
-        });
 
         // Initial render
         renderPlayersList();
