@@ -1293,6 +1293,12 @@
                             </div>
                             
                             <div class="stat-row">
+                                <div class="stat-value left" id="playerAH2HAvg">0.0</div>
+                                <div class="stat-label">H2H 3DA</div>
+                                <div class="stat-value right" id="playerBH2HAvg">0.0</div>
+                            </div>
+                            
+                            <div class="stat-row">
                                 <div class="stat-value left" id="playerALast10Avg">0.0</div>
                                 <div class="stat-label">Last 10 Avg</div>
                                 <div class="stat-value right" id="playerBLast10Avg">0.0</div>
@@ -1763,8 +1769,14 @@
             const playerAStats = calculatePlayerH2HStats(playerANameJSON, playerALast10);
             const playerBStats = calculatePlayerH2HStats(playerBNameJSON, playerBLast10);
 
+            // Calculate H2H-specific 3DA (average from matches against each other only)
+            const playerAH2HStats = calculatePlayerH2HStats(playerANameJSON, h2hMatches);
+            const playerBH2HStats = calculatePlayerH2HStats(playerBNameJSON, h2hMatches);
+
             console.log('Player A Stats:', playerAStats);
             console.log('Player B Stats:', playerBStats);
+            console.log('Player A H2H Stats:', playerAH2HStats);
+            console.log('Player B H2H Stats:', playerBH2HStats);
 
             // Count H2H wins
             let playerAH2HWins = 0;
@@ -1810,6 +1822,25 @@
             
             document.getElementById('playerACareerAvg').textContent = careerAStats?.career3DA.toFixed(2) || '0.00';
             document.getElementById('playerBCareerAvg').textContent = careerBStats?.career3DA.toFixed(2) || '0.00';
+            
+            // H2H averages with highlighting
+            const aH2HAvgElem = document.getElementById('playerAH2HAvg');
+            const bH2HAvgElem = document.getElementById('playerBH2HAvg');
+            
+            aH2HAvgElem.textContent = playerAH2HStats.avg3DA;
+            bH2HAvgElem.textContent = playerBH2HStats.avg3DA;
+            
+            const aH2HVal = parseFloat(playerAH2HStats.avg3DA);
+            const bH2HVal = parseFloat(playerBH2HStats.avg3DA);
+            
+            aH2HAvgElem.classList.remove('highlight');
+            bH2HAvgElem.classList.remove('highlight');
+            
+            if (aH2HVal > bH2HVal && aH2HVal > 0) {
+                aH2HAvgElem.classList.add('highlight');
+            } else if (bH2HVal > aH2HVal && bH2HVal > 0) {
+                bH2HAvgElem.classList.add('highlight');
+            }
             
             // Last 10 averages with highlighting
             const aLast10Elem = document.getElementById('playerALast10Avg');
