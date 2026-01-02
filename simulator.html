@@ -1164,6 +1164,19 @@
             <p class="subtitle">Run "What If" scenarios • Test your P4P formula • Simulate thousands of matches</p>
         </header>
 
+        <!-- Offline Instructions Banner -->
+        <div style="background: linear-gradient(135deg, #0891b2 0%, #0d9488 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #06b6d4;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 2em;">ℹ️</span>
+                <div>
+                    <strong style="font-size: 1.1em;">Offline Use Instructions:</strong>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9em;">
+                        If player data doesn't load, open <strong>index.html</strong> first and click the <strong>"🔄 Sync Data for Offline Use"</strong> button. This will store all data in your browser for offline access.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Tabbed Navigation -->
         <div class="tab-container">
             <div class="tab-navigation">
@@ -1975,7 +1988,7 @@
                 
             } catch (error) {
                 console.error('Error loading player data:', error);
-                alert('Error loading player data. Make sure results files are available.');
+                alert('⚠️ Unable to load player data.\n\nFor OFFLINE use:\n1. Open index.html in your browser\n2. Click "Sync Data for Offline Use"\n3. Then open simulator.html again\n\nOr use a local web server to access the files.');
             }
         }
 
