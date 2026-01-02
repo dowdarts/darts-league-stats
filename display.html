@@ -2314,8 +2314,29 @@
                     setCachedData('player_profiles', playerProfiles);
                 }
 
-                // Load only the first event for initial display
-                await loadEvent(availableEvents[0]);
+                // Try to load merged all_events.json first
+                const allEventsRes = await fetch(`results/all_events.json?t=${Date.now()}`);
+                if (allEventsRes.ok) {
+                    const allEventsData = await allEventsRes.json();
+                    console.log('Loaded merged all_events.json');
+                    
+                    // Process all events from merged file
+                    if (allEventsData.events && Array.isArray(allEventsData.events)) {
+                        allEventsData.events.forEach(event => {
+                            const eventId = event.metadata?.event_id;
+                            if (eventId) {
+                                eventFilesCache[eventId] = event;
+                                setCachedData(`event_${eventId}`, event);
+                            }
+                        });
+                        eventFiles = allEventsData.events;
+                        calculateCareerStats();
+                    }
+                } else {
+                    // Fallback: Load only the first event individually
+                    console.log('all_events.json not found, loading individual events');
+                    await loadEvent(availableEvents[0]);
+                }
                 
                 // Populate selectors with available events
                 populateEventSelector();
