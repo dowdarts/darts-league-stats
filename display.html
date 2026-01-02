@@ -1527,13 +1527,25 @@
         let playerProfiles = [];
         let careerStats = {};
         let currentChart = null;
-        const MAX_EVENTS = 10;
+        const MAX_EVENTS = 20; // Maximum number of events to check for
 
         // Helper function to get image source (supports both base64 and filenames)
         function getImageSrc(imageBase64) {
             if (!imageBase64 || imageBase64 === '') return null;
             if (imageBase64.startsWith('data:')) return imageBase64;
             return `images/players/${imageBase64}`;
+        }
+
+        // Helper function to fetch with suppressed 404 logging
+        async function fetchEventFile(eventNumber) {
+            try {
+                const response = await fetch(`results/Final_Series1_Event${eventNumber}.json`);
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (error) {
+                // Silently handle errors (expected for non-existent event files)
+                return null;
+            }
         }
 
         // Head-to-Head Comparison Functions
@@ -1911,14 +1923,10 @@
                     playerProfiles = await profileRes.json();
                 }
 
-                // Load event files
+                // Load event files (check up to MAX_EVENTS)
                 const eventPromises = [];
                 for (let i = 1; i <= MAX_EVENTS; i++) {
-                    eventPromises.push(
-                        fetch(`results/Final_Series1_Event${i}.json`)
-                            .then(res => res.ok ? res.json() : null)
-                            .catch(() => null)
-                    );
+                    eventPromises.push(fetchEventFile(i));
                 }
 
                 const events = await Promise.all(eventPromises);
