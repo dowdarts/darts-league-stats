@@ -1551,6 +1551,12 @@
         // Head-to-Head Comparison Functions
         function getSortedMatches(playerAName, playerBName = null) {
             let matchPool = [];
+            
+            console.log('getSortedMatches called for:', playerAName, playerBName);
+            console.log('eventFiles length:', eventFiles.length);
+            if (eventFiles.length > 0) {
+                console.log('First event structure:', eventFiles[0]);
+            }
 
             eventFiles.forEach(event => {
                 const eventDate = event.metadata.date;
@@ -1926,9 +1932,12 @@
         async function init() {
             try {
                 // Load player profiles
-                const profileRes = await fetch('player_profiles.json');
+                const profileRes = await fetch('results/player_profiles.json');
                 if (profileRes.ok) {
                     playerProfiles = await profileRes.json();
+                    console.log('Player profiles loaded:', playerProfiles.length);
+                } else {
+                    console.log('Failed to load player profiles');
                 }
 
                 // Load event files (check up to MAX_EVENTS)
@@ -1939,6 +1948,8 @@
 
                 const events = await Promise.all(eventPromises);
                 eventFiles = events.filter(e => e !== null);
+                
+                console.log('Event files loaded:', eventFiles.length);
 
                 if (eventFiles.length === 0) {
                     throw new Error('No event files found in results/ folder');
