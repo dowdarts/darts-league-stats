@@ -1164,17 +1164,26 @@
             <p class="subtitle">Run "What If" scenarios • Test your P4P formula • Simulate thousands of matches</p>
         </header>
 
-        <!-- Offline Instructions Banner -->
-        <div style="background: linear-gradient(135deg, #0891b2 0%, #0d9488 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #06b6d4;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 2em;">ℹ️</span>
-                <div>
-                    <strong style="font-size: 1.1em;">Offline Use Instructions:</strong>
-                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9em;">
-                        If player data doesn't load, open <strong>index.html</strong> first and click the <strong>"🔄 Sync Data for Offline Use"</strong> button. This will store all data in your browser for offline access.
+        <!-- Manual Data Upload for Offline Use -->
+        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #a78bfa;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                <div style="flex: 1;">
+                    <strong style="font-size: 1.1em; display: block; margin-bottom: 5px;">📁 Manual Data Upload</strong>
+                    <p style="margin: 0; opacity: 0.9; font-size: 0.85em;">
+                        Upload event JSON files directly (all_events.json or individual Final_Series1_EventX.json files)
                     </p>
                 </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="file" id="manualDataUpload" accept=".json" multiple style="display: none;">
+                    <button onclick="document.getElementById('manualDataUpload').click()" style="background: white; color: #7c3aed; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9em;">
+                        Choose Files
+                    </button>
+                    <button id="loadManualDataBtn" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9em;">
+                        Load Data
+                    </button>
+                </div>
             </div>
+            <div id="uploadStatus" style="margin-top: 10px; padding: 8px; border-radius: 5px; display: none;"></div>
         </div>
 
         <!-- Tabbed Navigation -->
@@ -1867,6 +1876,154 @@
         // Embedded data for offline use (fallback if fetch fails)
         const EMBEDDED_MANIFEST = {"available_events": [1, 2, 3], "series_name": "Atlantic Amateur Darts Series", "series_id": 1, "current_event": 3, "last_updated": "2026-01-02"};
         
+        // Manual data upload handler
+        document.getElementById('loadManualDataBtn').addEventListener('click', async function() {
+            const files = document.getElementById('manualDataUpload').files;
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            if (files.length === 0) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#ef4444';
+                statusDiv.style.color = 'white';
+                statusDiv.textContent = '⚠️ Please select JSON files first';
+                return;
+            }
+
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#3b82f6';
+            statusDiv.style.color = 'white';
+            statusDiv.textContent = '⏳ Loading files...';
+
+            try {
+                const eventDataCache = {};
+                let hasAllEvents = false;
+
+                // Process uploaded files
+                for (const file of files) {
+                    const content = await file.text();
+                    const data = JSON.parse(content);
+
+                    // Check if it's all_events.json
+                    if (file.name === 'all_events.json' || (data.events && Array.isArray(data.events))) {
+                        hasAllEvents = true;
+                        // Process all_events format
+                        for (const event of data.events) {
+                            eventDataCache[event.metadata.event_id] = event;
+                        }
+                    } 
+                    // Check if it's individual event file
+                    else if (file.name.startsWith('Final_Series1_Event') || data.metadata) {
+                        const eventId = data.metadata.event_id;
+                        eventDataCache[eventId] = data;
+                    }
+                }
+
+                if (Object.keys(eventDataCache).length === 0) {
+                    throw new Error('No valid event data found in uploaded files');
+                }
+
+                // Process the data and populate player list
+                await processEventData(eventDataCache);
+
+                statusDiv.style.background = '#10b981';
+                statusDiv.textContent = `✅ Successfully loaded ${Object.keys(eventDataCache).length} events with ${playerData.length} players!`;
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Manual upload error:', error);
+                statusDiv.style.background = '#ef4444';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        });
+
+        // Process event data and populate player lists
+        async function processEventData(eventDataCache) {
+            const statsMap = {};
+            
+            for (const eventId in eventDataCache) {
+                const eventData = eventDataCache[eventId];
+                
+                if (!eventData.player_event_stats) continue;
+                
+                for (const playerStats of eventData.player_event_stats) {
+                    const playerName = formatNameForDisplay(playerStats.name);
+                    
+                    if (!statsMap[playerName]) {
+                        statsMap[playerName] = {
+                            name: playerName,
+                            totalMatches: 0,
+                            totalWins: 0,
+                            totalSets: 0,
+                            totalSetsWon: 0,
+                            totalLegs: 0,
+                            totalLegsWon: 0,
+                            totalCoOpp: 0,
+                            totalCoComp: 0,
+                            total3DA: 0,
+                            eventCount: 0
+                        };
+                    }
+                    
+                    const stats = statsMap[playerName];
+                    stats.totalMatches += playerStats.total_matches;
+                    stats.totalWins += playerStats.wins;
+                    stats.totalSets += playerStats.total_matches;
+                    stats.totalSetsWon += playerStats.wins;
+                    stats.totalLegs += playerStats.total_matches * 5;
+                    stats.totalLegsWon += playerStats.wins * 3;
+                    stats.totalCoOpp += playerStats.co_opportunities;
+                    stats.totalCoComp += playerStats.co_completed;
+                    stats.total3DA += playerStats.final_event_3da;
+                    stats.eventCount += 1;
+                }
+            }
+            
+            // Calculate averages and rates
+            for (const playerName in statsMap) {
+                const stats = statsMap[playerName];
+                stats.avg3DA = stats.total3DA / stats.eventCount;
+                stats.coRate = stats.totalCoOpp > 0 ? (stats.totalCoComp / stats.totalCoOpp * 100) : 0;
+                stats.matchWinRate = stats.totalMatches > 0 ? (stats.totalWins / stats.totalMatches * 100) : 0;
+                stats.setWinRate = stats.totalSets > 0 ? (stats.totalSetsWon / stats.totalSets * 100) : 0;
+                stats.legWinRate = stats.totalLegs > 0 ? (stats.totalLegsWon / stats.totalLegs * 100) : 0;
+                
+                const mwr = stats.matchWinRate / 100;
+                const swr = stats.setWinRate / 100;
+                const lwr = stats.legWinRate / 100;
+                const ce = stats.coRate / 100;
+                stats.p4pScore = ((0.20 * mwr) + (0.15 * swr) + (0.25 * lwr) + (0.40 * ce)) * 100;
+            }
+            
+            careerStats = statsMap;
+            playerData = Object.values(statsMap).sort((a, b) => b.avg3DA - a.avg3DA);
+            
+            // Clear and populate player selects
+            const p1Select = document.getElementById('p1Select');
+            const p2Select = document.getElementById('p2Select');
+            
+            // Clear existing options except first
+            p1Select.innerHTML = '<option value="">Select Player...</option>';
+            p2Select.innerHTML = '<option value="">Select Player...</option>';
+            
+            playerData.forEach(player => {
+                const option1 = document.createElement('option');
+                option1.value = player.name;
+                option1.textContent = `${player.name} (${player.avg3DA.toFixed(2)} avg)`;
+                p1Select.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = player.name;
+                option2.textContent = `${player.name} (${player.avg3DA.toFixed(2)} avg)`;
+                p2Select.appendChild(option2);
+            });
+
+            // Populate tournament selector
+            populateTournamentSelector();
+        }
+
         // Load player data on page load
         async function loadPlayerData() {
             try {
