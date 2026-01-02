@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts Match Simulator - What If Scenarios</title>
+    <style>
+        :root {
+            --primary-orange: #ff6b35;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-green: #4caf50;
+            --accent-red: #f44336;
+            --accent-blue: #2196f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, #d63031 100%);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .setup-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .player-card.active {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .player-header h2 {
+            font-size: 1.5em;
+            color: var(--primary-orange);
+        }
+
+        .player-select {
+            width: 100%;
+            padding: 12px;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--primary-orange);
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .stat-group {
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            color: var(--primary-orange);
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, var(--accent-red), var(--primary-orange), var(--accent-green));
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: none;
+        }
+
+        .controls-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--primary-orange);
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            width: 50px;
+            height: 25px;
+            cursor: pointer;
+        }
+
+        .button-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-orange), #d63031);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .match-scoreboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+        }
+
+        .player-score {
+            text-align: center;
+        }
+
+        .player-score.winner {
+            background: linear-gradient(135deg, var(--accent-green), #2e7d32);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .player-name {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+
+        .vs-divider {
+            text-align: center;
+            font-size: 2em;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .match-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box-title {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-box-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--primary-orange);
+        }
+
+        .bulk-results {
+            background: var(--dark-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .bulk-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: var(--primary-orange);
+        }
+
+        .win-probability {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .prob-bar {
+            flex: 1;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            transition: all 0.5s;
+        }
+
+        .prob-bar.p1 {
+            background: linear-gradient(135deg, var(--primary-orange), #d63031);
+        }
+
+        .prob-bar.p2 {
+            background: linear-gradient(135deg, var(--accent-blue), #1565c0);
+        }
+
+        .match-log {
+            max-height: 400px;
+            overflow-y: auto;
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .log-entry.checkout {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .log-entry.bust {
+            color: var(--accent-red);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5em;
+            color: var(--primary-orange);
+        }
+
+        @media (max-width: 768px) {
+            .setup-section {
+                grid-template-columns: 1fr;
+            }
+
+            .match-scoreboard {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .vs-divider {
+                order: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Darts Match Simulator</h1>
+            <p class="subtitle">Run "What If" scenarios • Test your P4P formula • Simulate thousands of matches</p>
+        </header>
+
+        <!-- Player Setup -->
+        <div class="setup-section">
+            <div class="player-card" id="p1Card">
+                <div class="player-header">
+                    <h2>Player 1</h2>
+                    <span class="stat-value" id="p1P4P">P4P: --</span>
+                </div>
+                <select class="player-select" id="p1Select" onchange="loadPlayer(1)">
+                    <option value="">Select Player...</option>
+                </select>
+                <div class="stat-group">
+                    <div class="stat-label">
+                        <span>3-Dart Average</span>
+                        <span class="stat-value" id="p1Avg">0.00</span>
+                    </div>
+                    <div class="stat-label">
+                        <span>Checkout Efficiency</span>
+                        <span class="stat-value" id="p1CO">0%</span>
+                    </div>
+                    <div class="stat-label">
+                        <span>Match Win Rate</span>
+                        <span class="stat-value" id="p1WR">0%</span>
+                    </div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-label">
+                        <span>Form Modifier</span>
+                        <span class="stat-value" id="p1FormValue">0%</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>-5%</span>
+                        <input type="range" id="p1Form" min="-5" max="5" value="0" step="0.5" oninput="updateForm(1)">
+                        <span>+5%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="player-card" id="p2Card">
+                <div class="player-header">
+                    <h2>Player 2</h2>
+                    <span class="stat-value" id="p2P4P">P4P: --</span>
+                </div>
+                <select class="player-select" id="p2Select" onchange="loadPlayer(2)">
+                    <option value="">Select Player...</option>
+                </select>
+                <div class="stat-group">
+                    <div class="stat-label">
+                        <span>3-Dart Average</span>
+                        <span class="stat-value" id="p2Avg">0.00</span>
+                    </div>
+                    <div class="stat-label">
+                        <span>Checkout Efficiency</span>
+                        <span class="stat-value" id="p2CO">0%</span>
+                    </div>
+                    <div class="stat-label">
+                        <span>Match Win Rate</span>
+                        <span class="stat-value" id="p2WR">0%</span>
+                    </div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-label">
+                        <span>Form Modifier</span>
+                        <span class="stat-value" id="p2FormValue">0%</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>-5%</span>
+                        <input type="range" id="p2Form" min="-5" max="5" value="0" step="0.5" oninput="updateForm(2)">
+                        <span>+5%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Controls -->
+        <div class="controls-section">
+            <div class="control-row">
+                <div class="control-group">
+                    <label>Match Format</label>
+                    <select id="formatSelect">
+                        <option value="legs:5">Best of 5 Legs</option>
+                        <option value="legs:7">Best of 7 Legs</option>
+                        <option value="legs:9">Best of 9 Legs</option>
+                        <option value="legs:11" selected>Best of 11 Legs</option>
+                        <option value="sets:3">Best of 3 Sets</option>
+                        <option value="sets:5">Best of 5 Sets</option>
+                        <option value="sets:7">Best of 7 Sets</option>
+                        <option value="sets:11">Best of 11 Sets</option>
+                        <option value="sets:21">Best of 21 Sets</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="crowdPressure">
+                        <span>Crowd Pressure (-10% CO for less experienced)</span>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label>Bulk Simulations</label>
+                    <input type="number" id="bulkCount" min="100" max="10000" value="1000" step="100">
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="btn-primary" onclick="simulateSingleMatch()">▶️ Simulate Single Match</button>
+                <button class="btn-secondary" onclick="simulateBulk()">⚡ Run Bulk Simulation</button>
+                <button class="btn-success" onclick="resetSimulator()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div id="singleMatchResults" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--primary-orange);">Match Result</h2>
+                <div class="match-scoreboard">
+                    <div class="player-score" id="p1ScoreCard">
+                        <div class="player-name" id="p1ResultName">Player 1</div>
+                        <div class="score" id="p1ResultScore">0</div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="player-score" id="p2ScoreCard">
+                        <div class="player-name" id="p2ResultName">Player 2</div>
+                        <div class="score" id="p2ResultScore">0</div>
+                    </div>
+                </div>
+
+                <div class="match-stats" id="matchStats"></div>
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 10px; color: var(--text-secondary);">Match Log</h3>
+                    <div class="match-log" id="matchLog"></div>
+                </div>
+            </div>
+
+            <div id="bulkResults" style="display: none;">
+                <h2 class="bulk-title">Bulk Simulation Results</h2>
+                <div class="win-probability">
+                    <div class="prob-bar p1" id="p1ProbBar">
+                        <span id="p1ProbText">50%</span>
+                    </div>
+                    <div class="prob-bar p2" id="p2ProbBar">
+                        <span id="p2ProbText">50%</span>
+                    </div>
+                </div>
+                <div class="match-stats" id="bulkStats"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let playerData = [];
+        let careerStats = {};
+        let player1 = null;
+        let player2 = null;
+
+        // Load player data on page load
+        async function loadPlayerData() {
+            try {
+                // Load career stats from display.html's localStorage or fetch fresh
+                const response = await fetch('results/player_profiles.json');
+                const profiles = await response.json();
+                
+                // Load event data to calculate stats
+                const manifestResponse = await fetch('results/manifest.json');
+                const manifest = await manifestResponse.json();
+                
+                // Calculate career stats for each player
+                const statsMap = {};
+                
+                for (const eventNum of manifest.available_events) {
+                    const eventResponse = await fetch(`results/Final_Series1_Event${eventNum}.json`);
+                    const eventData = await eventResponse.json();
+                    
+                    // Process each player in this event
+                    for (const [playerKey, playerStats] of Object.entries(eventData.player_stats)) {
+                        const playerName = formatNameForDisplay(playerKey);
+                        
+                        if (!statsMap[playerName]) {
+                            statsMap[playerName] = {
+                                name: playerName,
+                                totalMatches: 0,
+                                totalWins: 0,
+                                totalSets: 0,
+                                totalSetsWon: 0,
+                                totalLegs: 0,
+                                totalLegsWon: 0,
+                                totalCoOpp: 0,
+                                totalCoComp: 0,
+                                total3DA: 0,
+                                eventCount: 0
+                            };
+                        }
+                        
+                        const stats = statsMap[playerName];
+                        stats.totalMatches += playerStats.matches_played;
+                        stats.totalWins += playerStats.matches_won;
+                        stats.totalSets += (playerStats.sets_won + playerStats.sets_lost);
+                        stats.totalSetsWon += playerStats.sets_won;
+                        stats.totalLegs += (playerStats.legs_won + playerStats.legs_lost);
+                        stats.totalLegsWon += playerStats.legs_won;
+                        stats.totalCoOpp += playerStats.checkout_opportunities;
+                        stats.totalCoComp += playerStats.checkouts_completed;
+                        stats.total3DA += playerStats['3da'];
+                        stats.eventCount += 1;
+                    }
+                }
+                
+                // Calculate percentages and averages
+                for (const playerName in statsMap) {
+                    const stats = statsMap[playerName];
+                    stats.avg3DA = stats.total3DA / stats.eventCount;
+                    stats.coRate = stats.totalCoOpp > 0 ? (stats.totalCoComp / stats.totalCoOpp * 100) : 0;
+                    stats.matchWinRate = stats.totalMatches > 0 ? (stats.totalWins / stats.totalMatches * 100) : 0;
+                    stats.setWinRate = stats.totalSets > 0 ? (stats.totalSetsWon / stats.totalSets * 100) : 0;
+                    stats.legWinRate = stats.totalLegs > 0 ? (stats.totalLegsWon / stats.totalLegs * 100) : 0;
+                    
+                    // Calculate P4P score
+                    const mwr = stats.matchWinRate / 100;
+                    const swr = stats.setWinRate / 100;
+                    const lwr = stats.legWinRate / 100;
+                    const ce = stats.coRate / 100;
+                    stats.p4pScore = ((0.20 * mwr) + (0.15 * swr) + (0.25 * lwr) + (0.40 * ce)) * 100;
+                }
+                
+                careerStats = statsMap;
+                playerData = Object.values(statsMap).sort((a, b) => b.avg3DA - a.avg3DA);
+                
+                // Populate player selects
+                const p1Select = document.getElementById('p1Select');
+                const p2Select = document.getElementById('p2Select');
+                
+                playerData.forEach(player => {
+                    const option1 = document.createElement('option');
+                    option1.value = player.name;
+                    option1.textContent = `${player.name} (${player.avg3DA.toFixed(2)} avg)`;
+                    p1Select.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = player.name;
+                    option2.textContent = `${player.name} (${player.avg3DA.toFixed(2)} avg)`;
+                    p2Select.appendChild(option2);
+                });
+                
+            } catch (error) {
+                console.error('Error loading player data:', error);
+                alert('Error loading player data. Make sure results files are available.');
+            }
+        }
+
+        function formatNameForDisplay(name) {
+            if (name.includes(',')) {
+                const [last, first] = name.split(',').map(s => s.trim());
+                return `${first} ${last}`;
+            }
+            return name;
+        }
+
+        function loadPlayer(playerNum) {
+            const selectEl = document.getElementById(`p${playerNum}Select`);
+            const playerName = selectEl.value;
+            
+            if (!playerName) return;
+            
+            const playerStats = careerStats[playerName];
+            if (!playerStats) return;
+            
+            // Update display
+            document.getElementById(`p${playerNum}Avg`).textContent = playerStats.avg3DA.toFixed(2);
+            document.getElementById(`p${playerNum}CO`).textContent = playerStats.coRate.toFixed(1) + '%';
+            document.getElementById(`p${playerNum}WR`).textContent = playerStats.matchWinRate.toFixed(1) + '%';
+            document.getElementById(`p${playerNum}P4P`).textContent = `P4P: ${playerStats.p4pScore.toFixed(1)}`;
+            
+            // Store player data
+            if (playerNum === 1) {
+                player1 = {
+                    name: playerName,
+                    avg: playerStats.avg3DA,
+                    checkoutPct: playerStats.coRate,
+                    matchWinRate: playerStats.matchWinRate,
+                    formBonus: 0
+                };
+                document.getElementById('p1Card').classList.add('active');
+            } else {
+                player2 = {
+                    name: playerName,
+                    avg: playerStats.avg3DA,
+                    checkoutPct: playerStats.coRate,
+                    matchWinRate: playerStats.matchWinRate,
+                    formBonus: 0
+                };
+                document.getElementById('p2Card').classList.add('active');
+            }
+        }
+
+        function updateForm(playerNum) {
+            const formSlider = document.getElementById(`p${playerNum}Form`);
+            const formValue = parseFloat(formSlider.value);
+            document.getElementById(`p${playerNum}FormValue`).textContent = `${formValue > 0 ? '+' : ''}${formValue}%`;
+            
+            if (playerNum === 1 && player1) {
+                player1.formBonus = formValue;
+            } else if (playerNum === 2 && player2) {
+                player2.formBonus = formValue;
+            }
+        }
+
+        // Darts Simulator Class
+        class DartsSimulator {
+            constructor(p1, p2, format, options = {}) {
+                this.p1 = p1;
+                this.p2 = p2;
+                this.format = format;
+                this.options = options;
+                this.log = [];
+            }
+
+            // Generate a realistic visit score based on average
+            generateVisit(avg) {
+                // Base probability distribution based on average
+                // Higher averages = more likely to hit big scores
+                
+                const avgFactor = avg / 180; // Normalize to 0-1 scale
+                const rand = Math.random();
+                
+                // Weighted probability for different score ranges
+                if (rand < avgFactor * 0.15) {
+                    // 180 (15% chance at peak skill)
+                    return 180;
+                } else if (rand < avgFactor * 0.30) {
+                    // 140-179 (15% chance)
+                    return Math.floor(Math.random() * 40) + 140;
+                } else if (rand < avgFactor * 0.55) {
+                    // 100-139 (25% chance)
+                    return Math.floor(Math.random() * 40) + 100;
+                } else if (rand < 0.80) {
+                    // 60-99 (25% chance)
+                    return Math.floor(Math.random() * 40) + 60;
+                } else {
+                    // 26-59 (20% chance for poor visits)
+                    return Math.floor(Math.random() * 34) + 26;
+                }
+            }
+
+            // Try to checkout based on efficiency percentage
+            tryCheckout(checkoutPct) {
+                // Apply crowd pressure modifier if enabled
+                let effectivePct = checkoutPct;
+                if (this.options.crowdPressure) {
+                    // Reduce checkout % by 10% for less experienced player
+                    const p1Experience = this.p1.matchWinRate || 50;
+                    const p2Experience = this.p2.matchWinRate || 50;
+                    
+                    if (p1Experience > p2Experience + 10) {
+                        this.p2.checkoutPct *= 0.9;
+                    } else if (p2Experience > p1Experience + 10) {
+                        this.p1.checkoutPct *= 0.9;
+                    }
+                }
+                
+                return Math.random() * 100 < effectivePct;
+            }
+
+            // Simulate a single leg (501 game)
+            simulateLeg(starter, logEnabled = false) {
+                let scores = [501, 501];
+                let turn = starter; // 0 for p1, 1 for p2
+                let visitCount = [0, 0];
+                let checkoutAttempts = [0, 0];
+                
+                while (scores[0] > 0 && scores[1] > 0) {
+                    const p = (turn === 0) ? this.p1 : this.p2;
+                    const playerName = p.name;
+                    
+                    // Apply form bonus to average
+                    const effectiveAvg = p.avg + (p.avg * (p.formBonus / 100));
+                    
+                    // Generate visit score
+                    let visit = this.generateVisit(effectiveAvg);
+                    visitCount[turn]++;
+                    
+                    // Check if score allows for checkout (2-170)
+                    if (scores[turn] <= 170 && scores[turn] >= 2) {
+                        checkoutAttempts[turn]++;
+                        
+                        if (this.tryCheckout(p.checkoutPct)) {
+                            scores[turn] = 0;
+                            if (logEnabled) {
+                                this.log.push(`🎯 ${playerName} checks out ${scores[turn]} to WIN the leg!`);
+                            }
+                            return {
+                                winner: turn,
+                                visits: visitCount,
+                                checkoutAttempts
+                            };
+                        } else {
+                            if (logEnabled) {
+                                this.log.push(`❌ ${playerName} misses checkout on ${scores[turn]}`);
+                            }
+                        }
+                    }
+                    
+                    // Apply score
+                    const newScore = scores[turn] - visit;
+                    
+                    if (newScore < 2) {
+                        // Bust
+                        if (logEnabled) {
+                            this.log.push(`💥 ${playerName} scores ${visit} - BUST! (${scores[turn]} remaining)`);
+                        }
+                    } else {
+                        scores[turn] = newScore;
+                        if (logEnabled) {
+                            this.log.push(`${playerName} scores ${visit} (${scores[turn]} remaining)`);
+                        }
+                    }
+                    
+                    turn = 1 - turn; // Switch turns
+                }
+            }
+
+            // Simulate a single match
+            simulateMatch(logEnabled = false) {
+                const [type, target] = this.format.split(':');
+                const legsToWin = type === 'legs' ? Math.ceil(parseInt(target) / 2) : null;
+                const setsToWin = type === 'sets' ? Math.ceil(parseInt(target) / 2) : null;
+                
+                let matchScore = [0, 0];
+                let totalLegs = [0, 0];
+                let totalVisits = [0, 0];
+                let totalCheckoutAttempts = [0, 0];
+                let starter = Math.random() < 0.5 ? 0 : 1; // Random starter
+                
+                this.log = [];
+                
+                if (type === 'legs') {
+                    // Best of X legs format
+                    while (matchScore[0] < legsToWin && matchScore[1] < legsToWin) {
+                        const legResult = this.simulateLeg(starter, logEnabled);
+                        matchScore[legResult.winner]++;
+                        totalLegs[legResult.winner]++;
+                        totalVisits[0] += legResult.visits[0];
+                        totalVisits[1] += legResult.visits[1];
+                        totalCheckoutAttempts[0] += legResult.checkoutAttempts[0];
+                        totalCheckoutAttempts[1] += legResult.checkoutAttempts[1];
+                        
+                        if (logEnabled) {
+                            this.log.push(`--- Leg won by ${legResult.winner === 0 ? this.p1.name : this.p2.name} ---`);
+                            this.log.push(`Score: ${this.p1.name} ${matchScore[0]} - ${matchScore[1]} ${this.p2.name}`);
+                            this.log.push('');
+                        }
+                        
+                        starter = 1 - starter; // Alternate starter
+                    }
+                } else {
+                    // Best of X sets format (each set is best of 5 legs)
+                    while (matchScore[0] < setsToWin && matchScore[1] < setsToWin) {
+                        let setScore = [0, 0];
+                        
+                        while (setScore[0] < 3 && setScore[1] < 3) {
+                            const legResult = this.simulateLeg(starter, logEnabled);
+                            setScore[legResult.winner]++;
+                            totalLegs[legResult.winner]++;
+                            totalVisits[0] += legResult.visits[0];
+                            totalVisits[1] += legResult.visits[1];
+                            totalCheckoutAttempts[0] += legResult.checkoutAttempts[0];
+                            totalCheckoutAttempts[1] += legResult.checkoutAttempts[1];
+                            starter = 1 - starter;
+                        }
+                        
+                        const setWinner = setScore[0] > setScore[1] ? 0 : 1;
+                        matchScore[setWinner]++;
+                        
+                        if (logEnabled) {
+                            this.log.push(`--- Set won by ${setWinner === 0 ? this.p1.name : this.p2.name} (${setScore[0]}-${setScore[1]}) ---`);
+                            this.log.push(`Match Score: ${this.p1.name} ${matchScore[0]} - ${matchScore[1]} ${this.p2.name}`);
+                            this.log.push('');
+                        }
+                    }
+                }
+                
+                const winner = matchScore[0] > matchScore[1] ? 0 : 1;
+                
+                return {
+                    winner,
+                    score: matchScore,
+                    legs: totalLegs,
+                    visits: totalVisits,
+                    checkoutAttempts: totalCheckoutAttempts,
+                    log: this.log
+                };
+            }
+        }
+
+        // UI Functions
+        function simulateSingleMatch() {
+            if (!player1 || !player2) {
+                alert('Please select both players first!');
+                return;
+            }
+            
+            const format = document.getElementById('formatSelect').value;
+            const crowdPressure = document.getElementById('crowdPressure').checked;
+            
+            const sim = new DartsSimulator(player1, player2, format, { crowdPressure });
+            const result = sim.simulateMatch(true);
+            
+            // Display results
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('singleMatchResults').style.display = 'block';
+            document.getElementById('bulkResults').style.display = 'none';
+            
+            // Update scoreboard
+            const p1Name = result.winner === 0 ? player1.name : player2.name;
+            const p2Name = result.winner === 0 ? player2.name : player1.name;
+            const p1Score = result.winner === 0 ? result.score[0] : result.score[1];
+            const p2Score = result.winner === 0 ? result.score[1] : result.score[0];
+            
+            document.getElementById('p1ResultName').textContent = player1.name;
+            document.getElementById('p2ResultName').textContent = player2.name;
+            document.getElementById('p1ResultScore').textContent = result.score[0];
+            document.getElementById('p2ResultScore').textContent = result.score[1];
+            
+            // Highlight winner
+            const p1Card = document.getElementById('p1ScoreCard');
+            const p2Card = document.getElementById('p2ScoreCard');
+            p1Card.classList.remove('winner');
+            p2Card.classList.remove('winner');
+            
+            if (result.winner === 0) {
+                p1Card.classList.add('winner');
+            } else {
+                p2Card.classList.add('winner');
+            }
+            
+            // Display match stats
+            const statsHTML = `
+                <div class="stat-box">
+                    <div class="stat-box-title">${player1.name} Legs</div>
+                    <div class="stat-box-value">${result.legs[0]}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player2.name} Legs</div>
+                    <div class="stat-box-value">${result.legs[1]}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player1.name} Avg Visits/Leg</div>
+                    <div class="stat-box-value">${(result.visits[0] / result.legs[0]).toFixed(1)}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player2.name} Avg Visits/Leg</div>
+                    <div class="stat-box-value">${(result.visits[1] / result.legs[1]).toFixed(1)}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player1.name} CO%</div>
+                    <div class="stat-box-value">${result.checkoutAttempts[0] > 0 ? ((result.legs[0] / result.checkoutAttempts[0]) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title">${player2.name} CO%</div>
+                    <div class="stat-box-value">${result.checkoutAttempts[1] > 0 ? ((result.legs[1] / result.checkoutAttempts[1]) * 100).toFixed(1) : 0}%</div>
+                </div>
+            `;
+            document.getElementById('matchStats').innerHTML = statsHTML;
+            
+            // Display match log
+            const logHTML = result.log.map(entry => {
+                let className = 'log-entry';
+                if (entry.includes('WIN')) className += ' checkout';
+                if (entry.includes('BUST')) className += ' bust';
+                return `<div class="${className}">${entry}</div>`;
+            }).join('');
+            document.getElementById('matchLog').innerHTML = logHTML;
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function simulateBulk() {
+            if (!player1 || !player2) {
+                alert('Please select both players first!');
+                return;
+            }
+            
+            const format = document.getElementById('formatSelect').value;
+            const crowdPressure = document.getElementById('crowdPressure').checked;
+            const bulkCount = parseInt(document.getElementById('bulkCount').value);
+            
+            // Show loading
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('singleMatchResults').style.display = 'none';
+            document.getElementById('bulkResults').style.display = 'block';
+            document.getElementById('bulkResults').innerHTML = '<div class="loading">Simulating matches...</div>';
+            
+            // Run simulations asynchronously to not block UI
+            setTimeout(() => {
+                let p1Wins = 0;
+                let p2Wins = 0;
+                let totalP1Legs = 0;
+                let totalP2Legs = 0;
+                let totalP1Score = 0;
+                let totalP2Score = 0;
+                
+                for (let i = 0; i < bulkCount; i++) {
+                    const sim = new DartsSimulator(player1, player2, format, { crowdPressure });
+                    const result = sim.simulateMatch(false);
+                    
+                    if (result.winner === 0) {
+                        p1Wins++;
+                    } else {
+                        p2Wins++;
+                    }
+                    
+                    totalP1Legs += result.legs[0];
+                    totalP2Legs += result.legs[1];
+                    totalP1Score += result.score[0];
+                    totalP2Score += result.score[1];
+                }
+                
+                // Calculate statistics
+                const p1WinPct = (p1Wins / bulkCount * 100).toFixed(1);
+                const p2WinPct = (p2Wins / bulkCount * 100).toFixed(1);
+                const avgP1Legs = (totalP1Legs / bulkCount).toFixed(1);
+                const avgP2Legs = (totalP2Legs / bulkCount).toFixed(1);
+                const avgP1Score = (totalP1Score / bulkCount).toFixed(1);
+                const avgP2Score = (totalP2Score / bulkCount).toFixed(1);
+                
+                // Display results
+                const resultsHTML = `
+                    <h2 class="bulk-title">Bulk Simulation Results (${bulkCount.toLocaleString()} matches)</h2>
+                    <div class="win-probability">
+                        <div class="prob-bar p1" style="flex: ${p1WinPct}">
+                            <span>${player1.name}: ${p1WinPct}%</span>
+                        </div>
+                        <div class="prob-bar p2" style="flex: ${p2WinPct}">
+                            <span>${player2.name}: ${p2WinPct}%</span>
+                        </div>
+                    </div>
+                    <div class="match-stats">
+                        <div class="stat-box">
+                            <div class="stat-box-title">${player1.name} Wins</div>
+                            <div class="stat-box-value">${p1Wins.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">${player2.name} Wins</div>
+                            <div class="stat-box-value">${p2Wins.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">Avg ${player1.name} Legs/Match</div>
+                            <div class="stat-box-value">${avgP1Legs}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">Avg ${player2.name} Legs/Match</div>
+                            <div class="stat-box-value">${avgP2Legs}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">Avg ${player1.name} Score</div>
+                            <div class="stat-box-value">${avgP1Score}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">Avg ${player2.name} Score</div>
+                            <div class="stat-box-value">${avgP2Score}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 20px; background: var(--dark-bg); border-radius: 8px;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 10px;">P4P Validation</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">
+                            Based on ${bulkCount.toLocaleString()} simulations, <strong style="color: var(--text-primary);">${p1WinPct > p2WinPct ? player1.name : player2.name}</strong> 
+                            is the statistical favorite with a <strong style="color: var(--primary-orange);">${Math.max(p1WinPct, p2WinPct)}%</strong> win rate.
+                            ${format.includes('sets') ? 'In set-based formats, consistency and mental fortitude become even more critical.' : 'In leg-based formats, checkout efficiency has a major impact.'}
+                        </p>
+                    </div>
+                `;
+                
+                document.getElementById('bulkResults').innerHTML = resultsHTML;
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function resetSimulator() {
+            document.getElementById('p1Select').value = '';
+            document.getElementById('p2Select').value = '';
+            document.getElementById('p1Form').value = 0;
+            document.getElementById('p2Form').value = 0;
+            document.getElementById('crowdPressure').checked = false;
+            
+            document.getElementById('p1Avg').textContent = '0.00';
+            document.getElementById('p2Avg').textContent = '0.00';
+            document.getElementById('p1CO').textContent = '0%';
+            document.getElementById('p2CO').textContent = '0%';
+            document.getElementById('p1WR').textContent = '0%';
+            document.getElementById('p2WR').textContent = '0%';
+            document.getElementById('p1P4P').textContent = 'P4P: --';
+            document.getElementById('p2P4P').textContent = 'P4P: --';
+            document.getElementById('p1FormValue').textContent = '0%';
+            document.getElementById('p2FormValue').textContent = '0%';
+            
+            document.getElementById('p1Card').classList.remove('active');
+            document.getElementById('p2Card').classList.remove('active');
+            
+            document.getElementById('resultsSection').classList.remove('active');
+            
+            player1 = null;
+            player2 = null;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', loadPlayerData);
+    </script>
+</body>
+</html>
