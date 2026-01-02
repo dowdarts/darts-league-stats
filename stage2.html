@@ -329,29 +329,6 @@
                     // Restore the data
                     appData = migratedData;
                     
-                    // Fix QF matchup order for Event 2 (old bracket structure)
-                    if (appData.metadata.event_id === 2) {
-                        console.log('Detected Event 2 - Rearranging QF matchups to new bracket structure');
-                        const qfs = appData.knockout.quarterFinals;
-                        // Save original matchups
-                        const origQF2 = qfs[1];
-                        const origQF3 = qfs[2];
-                        const origQF4 = qfs[3];
-                        // Rearrange: QF2→QF4, QF3→QF2, QF4→QF3
-                        qfs[1] = origQF3; // QF2 gets old QF3
-                        qfs[2] = origQF4; // QF3 gets old QF4
-                        qfs[3] = origQF2; // QF4 gets old QF2
-                        console.log('QF matchups rearranged');
-                        
-                        // Swap specific players between SF1 and SF2 for Event 2
-                        const sfs = appData.knockout.semiFinals;
-                        // Swap SF1.player2 with SF2.player1
-                        const temp = sfs[0].player2;
-                        sfs[0].player2 = sfs[1].player1;
-                        sfs[1].player1 = temp;
-                        console.log('SF players swapped: SF1.player2 ↔ SF2.player1');
-                    }
-                    
                     console.log('Restored appData:', appData);
                     console.log('Quarter Finals:', appData.knockout.quarterFinals);
                     console.log('Semi Finals:', appData.knockout.semiFinals);
@@ -546,7 +523,12 @@
                 const p2Display = match.player2 === 'TBD' ? 'TBD' : formatNameForDisplay(match.player2);
                 
                 matchDiv.innerHTML = `
-                    <h4 class="text-sm font-bold mb-3 text-gray-400">${match.matchId}</h4>
+                    <h4 class="text-sm font-bold mb-3 text-gray-400 flex items-center justify-between">
+                        <span>${match.matchId}</span>
+                        <button onclick="swapPlayersInMatch('${containerId}', ${index})" class="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded" ${match.player1 === 'TBD' ? 'disabled' : ''}>
+                            ⇄ Swap
+                        </button>
+                    </h4>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between gap-3">
                             <div class="flex-1 font-medium ${match.winner === match.player1 ? 'text-green-400' : ''}">${p1Display}</div>
@@ -693,6 +675,38 @@
                 </div>
             `;
             container.appendChild(matchDiv);
+        }
+
+        // Swap player1 and player2 within a match
+        function swapPlayersInMatch(round, matchIndex) {
+            let match;
+            if (round === 'final') {
+                match = appData.knockout.final;
+            } else {
+                match = appData.knockout[round][matchIndex];
+            }
+            
+            // Swap player names
+            const tempPlayer = match.player1;
+            match.player1 = match.player2;
+            match.player2 = tempPlayer;
+            
+            // Swap scores
+            const tempSets = match.player1Sets;
+            match.player1Sets = match.player2Sets;
+            match.player2Sets = tempSets;
+            
+            const tempLegs = match.player1TotalLegs;
+            match.player1TotalLegs = match.player2TotalLegs;
+            match.player2TotalLegs = tempLegs;
+            
+            // Swap details
+            const tempDetails = match.details.player1;
+            match.details.player1 = match.details.player2;
+            match.details.player2 = tempDetails;
+            
+            // Re-render
+            renderKnockout();
         }
 
         // Update knockout score
