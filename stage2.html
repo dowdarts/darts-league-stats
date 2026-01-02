@@ -430,9 +430,9 @@
                     // QF1 vs QF2 → SF1, QF3 vs QF4 → SF2
                     appData.knockout.quarterFinals = [
                         createKnockoutMatch(standingsA[0].name, standingsB[3].name, 'QF1'),  // A1 vs B4
-                        createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF2'),  // A2 vs B3
+                        createKnockoutMatch(standingsB[1].name, standingsA[2].name, 'QF2'),  // B2 vs A3
                         createKnockoutMatch(standingsA[3].name, standingsB[0].name, 'QF3'),  // A4 vs B1
-                        createKnockoutMatch(standingsA[2].name, standingsB[1].name, 'QF4')   // A3 vs B2
+                        createKnockoutMatch(standingsA[1].name, standingsB[2].name, 'QF4')   // A2 vs B3
                     ];
 
                     // Create empty Semi Finals
