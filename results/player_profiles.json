@@ -112,17 +112,3 @@
         "imageBase64":  "fernand pellerin.png"
     }
 ]
-
-// Check player profiles
-console.log('Player profiles:', playerProfiles.map(p => p.name));
-
-// Check if Corey O'Brien exists
-const corey = playerProfiles.find(p => p.name === "Corey O'Brien");
-console.log('Corey profile:', corey);
-
-// Check career stats
-console.log('Career stats keys:', Object.keys(careerStats));
-const coreyStats = careerStats["Corey O'Brien"];
-console.log('Corey career stats:', coreyStats);
-
-document.querySelector('img[src*="corey"]')?.src
