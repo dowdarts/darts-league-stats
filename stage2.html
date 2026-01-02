@@ -329,6 +329,21 @@
                     // Restore the data
                     appData = migratedData;
                     
+                    // Fix QF matchup order for Event 2 (old bracket structure)
+                    if (appData.metadata.event_id === 2) {
+                        console.log('Detected Event 2 - Rearranging QF matchups to new bracket structure');
+                        const qfs = appData.knockout.quarterFinals;
+                        // Save original matchups
+                        const origQF2 = qfs[1];
+                        const origQF3 = qfs[2];
+                        const origQF4 = qfs[3];
+                        // Rearrange: QF2→QF4, QF3→QF2, QF4→QF3
+                        qfs[1] = origQF3; // QF2 gets old QF3
+                        qfs[2] = origQF4; // QF3 gets old QF4
+                        qfs[3] = origQF2; // QF4 gets old QF2
+                        console.log('QF matchups rearranged');
+                    }
+                    
                     console.log('Restored appData:', appData);
                     console.log('Quarter Finals:', appData.knockout.quarterFinals);
                     console.log('Semi Finals:', appData.knockout.semiFinals);
