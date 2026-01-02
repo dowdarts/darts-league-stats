@@ -1676,7 +1676,7 @@
             const last10 = matches.slice(0, 10);
             let badges = '';
 
-            last10.forEach(match => {
+            last10.forEach((match, index) => {
                 let won = false;
                 if (match.type === 'RR') {
                     if (match.player1 === playerName && match.player1_legs >= 3) won = true;
@@ -1685,7 +1685,9 @@
                     if (match.winner === playerName) won = true;
                 }
 
-                badges += `<div class="form-badge ${won ? 'bg-win' : 'bg-loss'}">${won ? 'W' : 'L'}</div>`;
+                // Add "Latest" label above first badge
+                const label = index === 0 ? '<div style="font-size: 0.7em; color: var(--primary-orange); margin-bottom: 2px; font-weight: 600;">Latest →</div>' : '';
+                badges += `${label}<div class="form-badge ${won ? 'bg-win' : 'bg-loss'}">${won ? 'W' : 'L'}</div>`;
             });
 
             return badges;
