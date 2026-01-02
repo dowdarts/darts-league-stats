@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025 AADS Stats Director</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-6">
     <div class="max-w-4xl w-full">
@@ -139,6 +140,40 @@
             </a>
         </div>
 
+        <!-- Quick Deploy Section -->
+        <div class="mt-8">
+            <div class="bg-gradient-to-r from-red-600 to-orange-600 p-6 rounded-xl shadow-xl border-2 border-red-400">
+                <div class="text-center mb-4">
+                    <div class="text-6xl mb-2">🚀</div>
+                    <h3 class="text-3xl font-bold text-white mb-2">Quick Deploy to Results</h3>
+                    <p class="text-red-100 text-sm">Upload all event files and deploy to results folder automatically</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-white/20 rounded-lg p-4">
+                        <label class="block text-white font-semibold mb-2 text-sm">Round Robin JSON</label>
+                        <input type="file" id="rrFile" accept=".json" class="block w-full text-xs text-gray-200 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700">
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-4">
+                        <label class="block text-white font-semibold mb-2 text-sm">Knockout JSON</label>
+                        <input type="file" id="koFile" accept=".json" class="block w-full text-xs text-gray-200 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700">
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-4">
+                        <label class="block text-white font-semibold mb-2 text-sm">Player Profiles ZIP/JSON</label>
+                        <input type="file" id="profileFile" accept=".zip,.json" class="block w-full text-xs text-gray-200 file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                    </div>
+                </div>
+
+                <button id="deployBtn" class="w-full bg-white text-red-600 font-bold py-4 px-8 rounded-lg text-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-2xl disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed">
+                    🚀 Deploy Complete Event Package
+                </button>
+
+                <div id="deployStatus" class="mt-4 p-4 rounded-lg hidden">
+                    <p id="statusText" class="text-white font-semibold"></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Workflow Guide -->
         <div class="mt-12 bg-gray-800 rounded-xl p-6 border border-gray-700 hidden">
             <h3 class="text-xl font-bold mb-4 text-center text-blue-400">Workflow Guide</h3>
@@ -194,5 +229,98 @@
             <p class="mt-2 text-gray-600 text-xs">Made by MDStudios for AADSDarts.com</p>
         </div>
     </div>
+
+    <script>
+        document.getElementById('deployBtn').addEventListener('click', async function() {
+            const rrFile = document.getElementById('rrFile').files[0];
+            const koFile = document.getElementById('koFile').files[0];
+            const profileFile = document.getElementById('profileFile').files[0];
+            
+            if (!rrFile || !koFile || !profileFile) {
+                alert('Please upload all three files (RR, KO, and Profiles)');
+                return;
+            }
+
+            const statusDiv = document.getElementById('deployStatus');
+            const statusText = document.getElementById('statusText');
+            statusDiv.classList.remove('hidden');
+            statusDiv.className = 'mt-4 p-4 rounded-lg bg-blue-600';
+            statusText.textContent = 'Processing files...';
+
+            try {
+                // Read all files
+                const rrData = JSON.parse(await rrFile.text());
+                const koData = JSON.parse(await koFile.text());
+                
+                let playerProfiles = [];
+                const zip = new JSZip();
+                
+                // Handle player profiles (ZIP or JSON)
+                if (profileFile.name.endsWith('.zip')) {
+                    const zipContent = await JSZip.loadAsync(profileFile);
+                    const profileJson = await zipContent.file('player_profiles.json').async('text');
+                    playerProfiles = JSON.parse(profileJson);
+                    
+                    // Extract images from ZIP
+                    const imagesFolder = zipContent.folder('images/players');
+                    if (imagesFolder) {
+                        const imageFiles = [];
+                        imagesFolder.forEach((relativePath, file) => {
+                            if (!file.dir) {
+                                imageFiles.push({ name: relativePath, file: file });
+                            }
+                        });
+                        
+                        for (const img of imageFiles) {
+                            const imgBlob = await img.file.async('blob');
+                            zip.folder('images').folder('players').file(img.name, imgBlob);
+                        }
+                    }
+                } else {
+                    playerProfiles = JSON.parse(await profileFile.text());
+                }
+
+                // Merge RR + KO into Final event file
+                const finalData = {
+                    metadata: rrData.metadata,
+                    standings: rrData.standings,
+                    matches: rrData.matches,
+                    knockout: koData.knockout
+                };
+
+                const seriesId = rrData.metadata.series_id || 1;
+                const eventId = rrData.metadata.event_id || 1;
+
+                // Add files to ZIP
+                zip.folder('results').file(`Final_Series${seriesId}_Event${eventId}.json`, JSON.stringify(finalData, null, 2));
+                zip.folder('results').file('player_profiles.json', JSON.stringify(playerProfiles, null, 2));
+
+                statusText.textContent = 'Generating deployment package...';
+
+                // Generate and download ZIP
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Deploy_Series${seriesId}_Event${eventId}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                statusDiv.className = 'mt-4 p-4 rounded-lg bg-green-600';
+                statusText.innerHTML = `
+                    ✅ <strong>Deployment package created!</strong><br>
+                    Extract the ZIP in your project root folder, then run:<br>
+                    <code class="bg-black/30 px-2 py-1 rounded">git add results/ images/; git commit -m "Deploy Event ${eventId}"; git push</code>
+                `;
+
+            } catch (error) {
+                statusDiv.className = 'mt-4 p-4 rounded-lg bg-red-700';
+                statusText.textContent = `❌ Error: ${error.message}`;
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
