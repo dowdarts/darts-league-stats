@@ -1,5 +1,5 @@
 // Service Worker for AADS Stats - Aggressive caching for performance
-const CACHE_NAME = 'aads-stats-v5';
+const CACHE_NAME = 'aads-stats-v6';
 const CACHE_URLS = [
     '/darts-league-stats/',
     '/darts-league-stats/display.html',
