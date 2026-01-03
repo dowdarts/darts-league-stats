@@ -419,35 +419,42 @@
             border: 1px solid #374151;
             border-radius: 1rem;
             overflow: hidden;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .h2h-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 3rem 2rem;
+            padding: 2rem 1.5rem;
             background: rgba(0, 0, 0, 0.4);
+            gap: 2rem;
         }
 
         .player-side {
-            width: 33%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .player-side.left {
-            text-align: left;
+            align-items: flex-start;
         }
 
         .player-side.right {
-            text-align: right;
+            align-items: flex-end;
         }
 
         .vs-divider {
             text-align: center;
             font-style: italic;
             font-weight: 900;
-            font-size: 4rem;
+            font-size: 3rem;
             color: #374151;
-            width: 33%;
+            flex-shrink: 0;
+            min-width: 100px;
         }
 
         .player-photo-compare {
@@ -486,15 +493,16 @@
 
         /* Stat Rows */
         .stats-container {
-            padding: 1rem;
+            padding: 1rem 2rem;
         }
 
         .stat-row {
             display: grid;
-            grid-template-columns: 1fr 120px 1fr;
+            grid-template-columns: 1fr 150px 1fr;
             align-items: center;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #1f2937;
+            gap: 1.5rem;
         }
 
         .stat-row:last-child {
