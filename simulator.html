@@ -2948,14 +2948,6 @@
                             <span class="recap-value">${result.legs[1]}</span>
                         </div>
                         <div class="recap-item">
-                            <span class="recap-label">${player1.name} Avg Visits/Leg</span>
-                            <span class="recap-value">${(result.visits[0] / result.legs[0]).toFixed(1)}</span>
-                        </div>
-                        <div class="recap-item">
-                            <span class="recap-label">${player2.name} Avg Visits/Leg</span>
-                            <span class="recap-value">${(result.visits[1] / result.legs[1]).toFixed(1)}</span>
-                        </div>
-                        <div class="recap-item">
                             <span class="recap-label">${player1.name} Checkout %</span>
                             <span class="recap-value">${result.checkoutAttempts[0] > 0 ? ((result.legs[0] / result.checkoutAttempts[0]) * 100).toFixed(1) : 0}%</span>
                         </div>
