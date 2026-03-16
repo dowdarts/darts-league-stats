@@ -1,11 +1,11 @@
-[
+﻿[
     {
         "name":  "Tom Holden",
         "nickname":  "The Power House",
         "hometown":  "Pugwash, Nova Scotia",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  "results/images/players/tom-holden.png"
+        "imageBase64":  "tom-holden.png"
     },
     {
         "name":  "Dee Cormier",
@@ -13,7 +13,7 @@
         "hometown":  "Cocagne, New Brunswick",
         "dartsSetup":  "23 G with condor axe flight setup",
         "bio":  "",
-        "imageBase64":  "results/images/players/darrell-cormier.png"
+        "imageBase64":  "darrell-cormier.png"
     },
     {
         "name":  "Tyler Stewart",
@@ -21,7 +21,7 @@
         "hometown":  "Sussex, NewBrunswick",
         "dartsSetup":  "23g Red Dragon fusion, 45mm Punk Points Cosmo Shafts and Shaped Cosmo Flights",
         "bio":  "",
-        "imageBase64":  "results/images/players/tyler-stewart.png"
+        "imageBase64":  "tyler-stewart.png"
     },
     {
         "name":  "Cory Wallace",
@@ -29,7 +29,7 @@
         "hometown":  "Mississauga, Ontario",
         "dartsSetup":  "straight barrel 24G Josh Rock",
         "bio":  "",
-        "imageBase64":  "results/images/players/cory-wallace.png"
+        "imageBase64":  "cory-wallace.png"
     },
     {
         "name":  "Steve Rushton",
@@ -37,7 +37,7 @@
         "hometown":  "Oxford, Nova Scotia",
         "dartsSetup":  "John Part Straight Barrel 26G 45mm Points with shot flight deck stem and flight system",
         "bio":  "",
-        "imageBase64":  "results/images/players/steve-rushton.png"
+        "imageBase64":  "steve-rushton.png"
     },
     {
         "name":  "Miguel Velasquez",
@@ -45,7 +45,7 @@
         "hometown":  "Shediac",
         "dartsSetup":  "26g Aspinall Black Kflex Flights",
         "bio":  "",
-        "imageBase64":  "results/images/players/miguel-velasquez.png"
+        "imageBase64":  "miguel-velasquez.png"
     },
     {
         "name":  "Gerry Johnston",
@@ -53,15 +53,15 @@
         "hometown":  "Riverveiw",
         "dartsSetup":  "Terry Jenkins 21.5g Straight barrel, pear shaped Cuesoul system",
         "bio":  "",
-        "imageBase64":  "results/images/players/gerry-johnston.png"
+        "imageBase64":  "gerry-johnston.png"
     },
     {
         "name":  "Denis Leblanc",
         "nickname":  "The Acadian Punisher",
         "hometown":  "Ti-Cap, New Brunswick",
-        "dartsSetup":  "Rob Piercy's punisher phase 2 signature 23.5 g with condor axe medium",
+        "dartsSetup":  "Rob Piercy\u0027s punisher phase 2 signature 23.5 g with condor axe medium",
         "bio":  "",
-        "imageBase64":  "results/images/players/denis-leblanc.png"
+        "imageBase64":  "denis-leblanc.png"
     },
     {
         "name":  "Michel Leger",
@@ -69,7 +69,7 @@
         "hometown":  "Moncton, new Brunswick",
         "dartsSetup":  "21g Bully Boys",
         "bio":  "",
-        "imageBase64":  "results/images/players/michel-leger.png"
+        "imageBase64":  "michel-leger.png"
     },
     {
         "name":  "Royce Milliea",
@@ -77,7 +77,7 @@
         "hometown":  "Elsipogtog",
         "dartsSetup":  "Stephen Bunting 18g",
         "bio":  "",
-        "imageBase64":  "results/images/players/royce-milliea.png"
+        "imageBase64":  "royce-milliea.png"
     },
     {
         "name":  "Tyler Cyr",
@@ -85,7 +85,7 @@
         "hometown":  "Riverview New Brunswick",
         "dartsSetup":  "21.5g Phenix Sport Tyler Cyr Signature",
         "bio":  "",
-        "imageBase64":  "results/images/players/tyler cyr.png"
+        "imageBase64":  "tyler cyr.png"
     },
     {
         "name":  "Kyle Gray",
@@ -93,15 +93,15 @@
         "hometown":  "Sussex New Brunswick",
         "dartsSetup":  "21g unicorn 42mm points",
         "bio":  "",
-        "imageBase64":  "results/images/players/kylegray.png"
+        "imageBase64":  "kylegray.png"
     },
     {
-        "name":  "Corey O'Brien",
+        "name":  "Corey O\u0027Brien",
         "nickname":  "Bigg Rigg",
         "hometown":  "River Hebert Nova Scotia",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  "results/images/players/corey-obrien.png"
+        "imageBase64":  "corey-obrien.png"
     },
     {
         "name":  "Fernand Pellerin",
@@ -109,7 +109,7 @@
         "hometown":  "St Marie du Kent NewBrunswick",
         "dartsSetup":  "kyley Edmonds",
         "bio":  "",
-        "imageBase64":  "results/images/players/fernand pellerin.png"
+        "imageBase64":  "fernand pellerin.png"
     },
     {
         "name":  "Drake Berry",
@@ -117,7 +117,7 @@
         "hometown":  "Springhill Nova Scotia",
         "dartsSetup":  "26g Unicorn John Part WC Ambassadors, 36mm points, flight",
         "bio":  "",
-        "imageBase64":  "results/images/players/drake berry.png"
+        "imageBase64":  "drake berry.png"
     },
     {
         "name":  "Don Higgins",
@@ -125,7 +125,7 @@
         "hometown":  "Norton New Brunswick",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  "results/images/players/don higgins.png"
+        "imageBase64":  "don higgins.png"
     },
     {
         "name":  "Wayne Chapman",
@@ -133,7 +133,7 @@
         "hometown":  "Canterbury",
         "dartsSetup":  "Winmau Darryl Gurneys, 23g, 45mm points, Matt Campbell Standard Condor flights",
         "bio":  "",
-        "imageBase64":  "results/images/players/wayne chapman.png"
+        "imageBase64":  "wayne chapman.png"
     },
     {
         "name":  "Jon Casey",
@@ -141,7 +141,7 @@
         "hometown":  "Springhill New Brunswick",
         "dartsSetup":  "Currently using 22 gram BULLS darts",
         "bio":  "",
-        "imageBase64":  "results/images/players/jon casey.png"
+        "imageBase64":  "jon casey.png"
     },
     {
         "name":  "Maceachern, Mark",
@@ -149,7 +149,7 @@
         "hometown":  "Summerside PEI",
         "dartsSetup":  "24 Gram Target with Condor flights 35 mm points",
         "bio":  "",
-        "imageBase64":  "results/images/players/mark-maceachern.png"
+        "imageBase64":  "mark-maceachern.png"
     },
     {
         "name":  "Zach Davis",
@@ -157,7 +157,7 @@
         "hometown":  "Sussex New Brunswick",
         "dartsSetup":  "22G Unicorn Michael Smith",
         "bio":  "",
-        "imageBase64":  "results/images/players/zach davis.png"
+        "imageBase64":  "zach davis.png"
     },
     {
         "name":  "Ricky Chaission",
@@ -165,7 +165,7 @@
         "hometown":  "Summerside PEI",
         "dartsSetup":  "Straight barrel 24 gm van Gerwens",
         "bio":  "",
-        "imageBase64":  "results/images/players/Ricky chaission.png"
+        "imageBase64":  "Ricky chaission.png"
     },
     {
         "name":  "Colby Burke",
@@ -173,7 +173,7 @@
         "hometown":  "Labrador City",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  ""
+        "imageBase64":  "colby-burke.png"
     },
     {
         "name":  "Jordan Boyd",
@@ -181,7 +181,7 @@
         "hometown":  "",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  ""
+        "imageBase64":  "jordan-boyd.png"
     },
     {
         "name":  "Dana Moss",
@@ -189,7 +189,7 @@
         "hometown":  "",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  ""
+        "imageBase64":  "dana-moss.png"
     },
     {
         "name":  "Kevin Blanchard",
@@ -197,6 +197,6 @@
         "hometown":  "",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  ""
+        "imageBase64":  "kevin-blanchard.png"
     }
 ]

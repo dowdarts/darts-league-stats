@@ -1,4 +1,4 @@
-{
+﻿{
   "metadata": {
     "series_id": 1,
     "event_id": 1,
@@ -22,7 +22,7 @@
       "high_finish": 122
     },
     {
-      "name": "Cormier, Darrell",
+      "name": "Cormier, Dee",
       "total_matches": 7,
       "wins": 6,
       "losses": 1,
@@ -153,7 +153,7 @@
       "groupA": [
         {
           "rank": 1,
-          "name": "Cormier, Darrell",
+          "name": "Cormier, Dee",
           "matches_played": 4,
           "matches_won": 4,
           "matches_lost": 0,
@@ -248,7 +248,7 @@
     "matches": {
       "groupA": [
         {
-          "player1": "Cormier, Darrell",
+          "player1": "Cormier, Dee",
           "player2": "Velasquez, Miguel",
           "player1_legs": 3,
           "player2_legs": 1,
@@ -275,7 +275,7 @@
           }
         },
         {
-          "player1": "Cormier, Darrell",
+          "player1": "Cormier, Dee",
           "player2": "Johnston, Gerry",
           "player1_legs": 3,
           "player2_legs": 0,
@@ -302,7 +302,7 @@
           }
         },
         {
-          "player1": "Cormier, Darrell",
+          "player1": "Cormier, Dee",
           "player2": "Rushton, Steve",
           "player1_legs": 3,
           "player2_legs": 1,
@@ -329,7 +329,7 @@
           }
         },
         {
-          "player1": "Cormier, Darrell",
+          "player1": "Cormier, Dee",
           "player2": "Stewart, Tyler",
           "player1_legs": 3,
           "player2_legs": 1,
@@ -796,13 +796,13 @@
     "quarterFinals": [
       {
         "match_id": "QF1",
-        "player1": "Cormier, Darrell",
+        "player1": "Cormier, Dee",
         "player2": "Leger, Michel",
         "player1_sets": 3,
         "player2_sets": 1,
         "player1_total_legs": 7,
         "player2_total_legs": 4,
-        "winner": "Cormier, Darrell",
+        "winner": "Cormier, Dee",
         "start_time": "16:18",
         "player1_details": {
           "three_dart_avg": 64.77,
@@ -922,13 +922,13 @@
     "semiFinals": [
       {
         "match_id": "SF1",
-        "player1": "Cormier, Darrell",
+        "player1": "Cormier, Dee",
         "player2": "Leblanc, Denis",
         "player1_sets": 3,
         "player2_sets": 0,
         "player1_total_legs": 6,
         "player2_total_legs": 2,
-        "winner": "Cormier, Darrell",
+        "winner": "Cormier, Dee",
         "start_time": "17:55",
         "player1_details": {
           "three_dart_avg": 67.23,
@@ -985,7 +985,7 @@
     ],
     "final": {
       "match_id": "FINAL",
-      "player1": "Cormier, Darrell",
+      "player1": "Cormier, Dee",
       "player2": "Holden, Tom",
       "player1_sets": 2,
       "player2_sets": 3,
