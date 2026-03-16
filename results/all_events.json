@@ -1,4 +1,4 @@
-﻿{
+{
     "events":  [
                    {
                        "metadata":  {
@@ -2146,7 +2146,7 @@
                                                       "high_finish":  115
                                                   },
                                                   {
-                                                      "name":  "Maceachern Mark",
+                                                      "name":  "Maceachern, Mark",
                                                       "total_matches":  6,
                                                       "wins":  1,
                                                       "losses":  5,
@@ -2220,7 +2220,7 @@
                                                                             },
                                                                             {
                                                                                 "rank":  4,
-                                                                                "name":  "Maceachern Mark",
+                                                                                "name":  "Maceachern, Mark",
                                                                                 "matches_played":  4,
                                                                                 "matches_won":  1,
                                                                                 "matches_lost":  3,
@@ -2289,7 +2289,7 @@
                                                            "groupA":  [
                                                                           {
                                                                               "player1":  "Davis, Zach",
-                                                                              "player2":  "Maceachern Mark",
+                                                                              "player2":  "Maceachern, Mark",
                                                                               "player1_legs":  0,
                                                                               "player2_legs":  3,
                                                                               "start_time":  "10:11",
@@ -2396,7 +2396,7 @@
                                                                                                   }
                                                                           },
                                                                           {
-                                                                              "player1":  "Maceachern Mark",
+                                                                              "player1":  "Maceachern, Mark",
                                                                               "player2":  "Berry, Drake",
                                                                               "player1_legs":  0,
                                                                               "player2_legs":  3,
@@ -2423,7 +2423,7 @@
                                                                                                   }
                                                                           },
                                                                           {
-                                                                              "player1":  "Maceachern Mark",
+                                                                              "player1":  "Maceachern, Mark",
                                                                               "player2":  "Casey, Jon",
                                                                               "player1_legs":  1,
                                                                               "player2_legs":  3,
@@ -2450,7 +2450,7 @@
                                                                                                   }
                                                                           },
                                                                           {
-                                                                              "player1":  "Maceachern Mark",
+                                                                              "player1":  "Maceachern, Mark",
                                                                               "player2":  "Chapman, Wayne",
                                                                               "player1_legs":  0,
                                                                               "player2_legs":  3,
@@ -2899,7 +2899,7 @@
                                                               {
                                                                   "match_id":  "QF3",
                                                                   "player1":  "Pellerin, Fernand",
-                                                                  "player2":  "Maceachern Mark",
+                                                                  "player2":  "Maceachern, Mark",
                                                                   "player1_sets":  0,
                                                                   "player2_sets":  2,
                                                                   "player1_total_legs":  1,
@@ -2993,7 +2993,7 @@
                                                            },
                                                            {
                                                                "match_id":  "SF2",
-                                                               "player1":  "Maceachern Mark",
+                                                               "player1":  "Maceachern, Mark",
                                                                "player2":  "Chapman, Wayne",
                                                                "player1_sets":  2,
                                                                "player2_sets":  3,
