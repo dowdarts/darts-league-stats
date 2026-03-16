@@ -1161,7 +1161,7 @@
     <div class="container">
         <!-- Back to Index Button -->
         <div style="margin-bottom: 15px;">
-            <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #374151 0%, #1f2937 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s; border: 2px solid #4b5563;">
+            <a href="display.html" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #374151 0%, #1f2937 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s; border: 2px solid #4b5563;">
                 <span style="font-size: 1.2em;">←</span>
                 <span>Back to Dashboard</span>
             </a>
@@ -1882,7 +1882,7 @@
         }
 
         // Embedded data for offline use (fallback if fetch fails)
-        const EMBEDDED_MANIFEST = {"available_events": [1, 2, 3], "series_name": "Atlantic Amateur Darts Series", "series_id": 1, "current_event": 3, "last_updated": "2026-01-02"};
+        const EMBEDDED_MANIFEST = {"available_events": [1, 2, 3, 4], "series_name": "Atlantic Amateur Darts Series", "series_id": 1, "current_event": 4, "last_updated": "2026-03-16"};
         
         // Manual data upload handler
         document.getElementById('loadManualDataBtn').addEventListener('click', async function() {
@@ -2073,7 +2073,7 @@
                     console.log(`LocalStorage check: ${hasData ? 'Found' : 'No'} event data. Events loaded:`, Object.keys(eventDataCache));
                     
                     if (!hasData) {
-                        throw new Error('No data available in localStorage. Please sync data first from index.html');
+                        throw new Error('No data available in localStorage. Please sync data first from display.html');
                     }
                 }
                 
@@ -2166,7 +2166,7 @@
                 
             } catch (error) {
                 console.error('Error loading player data:', error);
-                alert('⚠️ Unable to load player data.\n\nFor OFFLINE use:\n1. Open index.html in your browser\n2. Click "Sync Data for Offline Use"\n3. Then open simulator.html again\n\nOr use a local web server to access the files.');
+                alert('⚠️ Unable to load player data.\n\nFor OFFLINE use:\n1. Open display.html in your browser\n2. Click "Sync Data for Offline Use"\n3. Then open simulator.html again\n\nOr use a local web server to access the files.');
             }
         }
 
