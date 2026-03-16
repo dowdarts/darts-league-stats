@@ -8,12 +8,12 @@
         "imageBase64":  "tom-holden.png"
     },
     {
-        "name":  "Darrell Cormier",
+        "name":  "Dee Cormier",
         "nickname":  "DEE",
         "hometown":  "Cocagne, New Brunswick",
         "dartsSetup":  "23 G with condor axe flight setup",
         "bio":  "",
-        "imageBase64":  "darrell-cormier.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Tyler Stewart",
@@ -29,7 +29,7 @@
         "hometown":  "Mississauga, Ontario",
         "dartsSetup":  "straight barrel 24G Josh Rock",
         "bio":  "",
-        "imageBase64":  "cory-wallace.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Steve Rushton",
@@ -59,7 +59,7 @@
         "name":  "Denis Leblanc",
         "nickname":  "The Acadian Punisher",
         "hometown":  "Ti-Cap, New Brunswick",
-        "dartsSetup":  "Rob Piercy\u0027s punisher phase 2 signature 23.5 g with condor axe medium",
+        "dartsSetup":  "Rob Piercy's punisher phase 2 signature 23.5 g with condor axe medium",
         "bio":  "",
         "imageBase64":  "denis-leblanc.png"
     },
@@ -96,7 +96,7 @@
         "imageBase64":  "kylegray.png"
     },
     {
-        "name":  "Corey O\u0027Brien",
+        "name":  "Corey O'Brien",
         "nickname":  "Bigg Rigg",
         "hometown":  "River Hebert Nova Scotia",
         "dartsSetup":  "",
@@ -117,7 +117,7 @@
         "hometown":  "Springhill Nova Scotia",
         "dartsSetup":  "26g Unicorn John Part WC Ambassadors, 36mm points, flight",
         "bio":  "",
-        "imageBase64":  "drake berry.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Don Higgins",
@@ -125,7 +125,7 @@
         "hometown":  "Norton New Brunswick",
         "dartsSetup":  "",
         "bio":  "",
-        "imageBase64":  "don higgins.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Wayne Chapman",
@@ -133,7 +133,7 @@
         "hometown":  "Canterbury",
         "dartsSetup":  "Winmau Darryl Gurneys, 23g, 45mm points, Matt Campbell Standard Condor flights",
         "bio":  "",
-        "imageBase64":  "wayne chapman.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Jon Casey",
@@ -141,15 +141,15 @@
         "hometown":  "Springhill New Brunswick",
         "dartsSetup":  "Currently using 22 gram BULLS darts",
         "bio":  "",
-        "imageBase64":  "jon casey.png"
+        "imageBase64":  ""
     },
     {
-        "name":  "Maceachern Mark",
+        "name":  "Maceachern, Mark",
         "nickname":  "",
         "hometown":  "Summerside PEI",
         "dartsSetup":  "24 Gram Target with Condor flights 35 mm points",
         "bio":  "",
-        "imageBase64":  "mark-maceachern.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Zach Davis",
@@ -157,7 +157,7 @@
         "hometown":  "Sussex New Brunswick",
         "dartsSetup":  "22G Unicorn Michael Smith",
         "bio":  "",
-        "imageBase64":  "zach davis.png"
+        "imageBase64":  ""
     },
     {
         "name":  "Ricky Chaission",
@@ -165,6 +165,38 @@
         "hometown":  "Summerside PEI",
         "dartsSetup":  "Straight barrel 24 gm van Gerwens",
         "bio":  "",
-        "imageBase64":  "Ricky chaission.png"
+        "imageBase64":  ""
+    },
+    {
+        "name":  "Colby Burke",
+        "nickname":  "The Keeper",
+        "hometown":  "Labrador City",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  ""
+    },
+    {
+        "name":  "Jordan Boyd",
+        "nickname":  "Trouble Maker",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  ""
+    },
+    {
+        "name":  "Dana Moss",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  ""
+    },
+    {
+        "name":  "Kevin Blanchard",
+        "nickname":  "",
+        "hometown":  "",
+        "dartsSetup":  "",
+        "bio":  "",
+        "imageBase64":  ""
     }
 ]
