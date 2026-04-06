@@ -6,16 +6,16 @@
     "event_date": "2026-04-04"
   },
   "player_event_stats": [
-    {"name": "Berry, Drake", "total_matches": 7, "wins": 6, "losses": 1, "final_event_3da": 71.24, "scores_100plus": 47, "scores_140plus": 13, "scores_180": 2, "co_opportunities": 84, "co_completed": 31, "co_pct": 36.9, "high_finish": 117},
-    {"name": "Oliver, Rhyder", "total_matches": 6, "wins": 3, "losses": 3, "final_event_3da": 68.64, "scores_100plus": 47, "scores_140plus": 13, "scores_180": 3, "co_opportunities": 79, "co_completed": 18, "co_pct": 22.78, "high_finish": 112},
-    {"name": "Hicks, Stephen", "total_matches": 7, "wins": 6, "losses": 1, "final_event_3da": 60.92, "scores_100plus": 41, "scores_140plus": 9, "scores_180": 1, "co_opportunities": 100, "co_completed": 25, "co_pct": 25.0, "high_finish": 92},
-    {"name": "Ferdinand, Scott", "total_matches": 6, "wins": 3, "losses": 3, "final_event_3da": 65.20, "scores_100plus": 35, "scores_140plus": 6, "scores_180": 0, "co_opportunities": 68, "co_completed": 16, "co_pct": 23.53, "high_finish": 96},
-    {"name": "jon casey", "total_matches": 5, "wins": 3, "losses": 2, "final_event_3da": 64.05, "scores_100plus": 28, "scores_140plus": 3, "scores_180": 2, "co_opportunities": 63, "co_completed": 14, "co_pct": 22.22, "high_finish": 117},
-    {"name": "michel leger", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 59.44, "scores_100plus": 21, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 48, "co_completed": 8, "co_pct": 16.67, "high_finish": 96},
-    {"name": "steve rushton", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 55.33, "scores_100plus": 13, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 56, "co_completed": 8, "co_pct": 14.29, "high_finish": 99},
-    {"name": "corey obrien", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 60.40, "scores_100plus": 16, "scores_140plus": 4, "scores_180": 0, "co_opportunities": 50, "co_completed": 9, "co_pct": 18.0, "high_finish": 0},
+    {"name": "Drake Berry", "total_matches": 7, "wins": 6, "losses": 1, "final_event_3da": 71.24, "scores_100plus": 47, "scores_140plus": 13, "scores_180": 2, "co_opportunities": 84, "co_completed": 31, "co_pct": 36.9, "high_finish": 117},
+    {"name": "Rhyder Oliver", "total_matches": 6, "wins": 3, "losses": 3, "final_event_3da": 68.64, "scores_100plus": 47, "scores_140plus": 13, "scores_180": 3, "co_opportunities": 79, "co_completed": 18, "co_pct": 22.78, "high_finish": 112},
+    {"name": "Stephen Hicks", "total_matches": 7, "wins": 6, "losses": 1, "final_event_3da": 60.92, "scores_100plus": 41, "scores_140plus": 9, "scores_180": 1, "co_opportunities": 100, "co_completed": 25, "co_pct": 25.0, "high_finish": 92},
+    {"name": "Scott Ferdinand", "total_matches": 6, "wins": 3, "losses": 3, "final_event_3da": 65.20, "scores_100plus": 35, "scores_140plus": 6, "scores_180": 0, "co_opportunities": 68, "co_completed": 16, "co_pct": 23.53, "high_finish": 96},
+    {"name": "Jon Casey", "total_matches": 5, "wins": 3, "losses": 2, "final_event_3da": 64.05, "scores_100plus": 28, "scores_140plus": 3, "scores_180": 2, "co_opportunities": 63, "co_completed": 14, "co_pct": 22.22, "high_finish": 117},
+    {"name": "Michel Leger", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 59.44, "scores_100plus": 21, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 48, "co_completed": 8, "co_pct": 16.67, "high_finish": 96},
+    {"name": "Steve Rushton", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 55.33, "scores_100plus": 13, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 56, "co_completed": 8, "co_pct": 14.29, "high_finish": 99},
+    {"name": "Corey O'Brien", "total_matches": 5, "wins": 2, "losses": 3, "final_event_3da": 60.40, "scores_100plus": 16, "scores_140plus": 4, "scores_180": 0, "co_opportunities": 50, "co_completed": 9, "co_pct": 18.0, "high_finish": 0},
     {"name": "Ricky Chaission", "total_matches": 5, "wins": 1, "losses": 4, "final_event_3da": 52.04, "scores_100plus": 11, "scores_140plus": 2, "scores_180": 1, "co_opportunities": 39, "co_completed": 4, "co_pct": 10.26, "high_finish": 0},
-    {"name": "Spencer, Craig", "total_matches": 5, "wins": 0, "losses": 5, "final_event_3da": 62.56, "scores_100plus": 12, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 37, "co_completed": 6, "co_pct": 16.22, "high_finish": 71}
+    {"name": "Craig Spencer", "total_matches": 5, "wins": 0, "losses": 5, "final_event_3da": 62.56, "scores_100plus": 12, "scores_140plus": 2, "scores_180": 0, "co_opportunities": 37, "co_completed": 6, "co_pct": 16.22, "high_finish": 71}
   ],
   "round_robin": {
     "standings": {
