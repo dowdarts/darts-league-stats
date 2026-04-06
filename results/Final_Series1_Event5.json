@@ -860,7 +860,7 @@
       "player2_sets": 4,
       "player1_total_legs": 6,
       "player2_total_legs": 13,
-      "winner": "Berry, Drake",
+      "winner": "Drake Berry",
       "start_time": "17:31",
       "player1_details": {
         "three_dart_avg": 69.85,
@@ -883,6 +883,6 @@
         "high_finish": 85
       }
     },
-    "champion": "Berry, Drake"
+    "champion": "Drake Berry"
   }
 }
