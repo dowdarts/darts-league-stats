@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "series_id": 1,
+    "event_id": 5,
+    "event_name": "Series 1 - Event 5",
+    "event_date": "2026-04-04"
+  },
+  "round_robin": {
+    "standings": {
+      "groupA": [
+        {"rank": 1, "name": "jon casey", "matches_played": 4, "matches_won": 3, "matches_lost": 1, "legs_won": 9, "legs_lost": 4},
+        {"rank": 2, "name": "steve rushton", "matches_played": 4, "matches_won": 2, "matches_lost": 2, "legs_won": 9, "legs_lost": 7},
+        {"rank": 3, "name": "michel leger", "matches_played": 4, "matches_won": 2, "matches_lost": 2, "legs_won": 9, "legs_lost": 7},
+        {"rank": 4, "name": "corey obrien", "matches_played": 4, "matches_won": 2, "matches_lost": 2, "legs_won": 6, "legs_lost": 8},
+        {"rank": 5, "name": "Ricky Chaission", "matches_played": 4, "matches_won": 1, "matches_lost": 3, "legs_won": 4, "legs_lost": 11}
+      ],
+      "groupB": [
+        {"rank": 1, "name": "Ferdinand, Scott", "matches_played": 4, "matches_won": 2, "matches_lost": 2, "legs_won": 10, "legs_lost": 8},
+        {"rank": 2, "name": "Berry, Drake", "matches_played": 4, "matches_won": 3, "matches_lost": 1, "legs_won": 10, "legs_lost": 5},
+        {"rank": 3, "name": "Hicks, Stephen", "matches_played": 4, "matches_won": 3, "matches_lost": 1, "legs_won": 9, "legs_lost": 9},
+        {"rank": 4, "name": "Oliver, Rhyder", "matches_played": 4, "matches_won": 2, "matches_lost": 2, "legs_won": 8, "legs_lost": 10},
+        {"rank": 5, "name": "Spencer, Craig", "matches_played": 4, "matches_won": 0, "matches_lost": 4, "legs_won": 7, "legs_lost": 12}
+      ]
+    }
+  },
+  "knockout": {
+    "champion": "Berry, Drake"
+  }
+}
