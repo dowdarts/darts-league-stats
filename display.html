@@ -1806,12 +1806,69 @@
         let currentChart = null;
         const MAX_EVENTS = 20; // Maximum number of events to check for
         const CACHE_VERSION = 'v6'; // Increment this when data structure changes
+        const IMAGE_CACHE_VERSION = '2026-04-06-2';
+        let availableImages = new Set(); // Cache of available images
+
+        // Initialize available images on page load
+        async function initializeImageCache() {
+            try {
+                const response = await fetch('images/players/');
+                // Note: This requires server to support directory listing, fallback to predefined list
+                availableImages = new Set([
+                    'colby-burke', 'corey-obrien', 'cory-wallace', 'craig-spencer',
+                    'dana-moss', 'darrell-cormier', 'dee-cormier', 'denis-leblanc',
+                    'don-higgins', 'drake-berry', 'fernand-pellerin', 'gerry-johnston',
+                    'jon-casey', 'jordan-boyd', 'kevin-blanchard', 'kyle-gray',
+                    'mark-maceachern', 'michel-leger', 'miguel-velasquez', 'pituo-pellerine',
+                    'rhyder-oliver', 'ricky-chaission', 'royce-milliea', 'scott-ferdinand',
+                    'stephen-hicks', 'steve-rushton', 'tom-holden', 'tyler-cyr',
+                    'tyler-stewart', 'wayne-chapman', 'zach-davis'
+                ]);
+            } catch (e) {
+                console.warn('Could not fetch image directory');
+            }
+        }
+
+        // Helper function to convert player name to image filename
+        function getPlayerImageFilename(playerName) {
+            if (!playerName) return null;
+                return playerName
+                    .toLowerCase()
+                    .replace(/[',.]/g, '')
+                    .replace(/&/g, 'and')
+                    .replace(/[\s_]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+        }
 
         // Helper function to get image source (supports both base64 and filenames)
         function getImageSrc(imageBase64) {
             if (!imageBase64 || imageBase64 === '') return null;
             if (imageBase64.startsWith('data:')) return imageBase64;
             return `images/players/${imageBase64}`;
+        }
+
+        // Helper function to get player image path from normalized name
+        function getPlayerImagePath(playerName) {
+            if (!playerName) return null;
+            const baseFilename = getPlayerImageFilename(playerName);
+            if (!baseFilename) return null;
+
+            const imagePath = `images/players/${baseFilename}.png`;
+            if (window.location.protocol === 'file:') {
+                return imagePath;
+            }
+
+            return `${imagePath}?v=${IMAGE_CACHE_VERSION}`;
+        }
+
+        function replaceBrokenImage(imageElement, placeholderClass) {
+            if (!imageElement || !imageElement.parentNode) return;
+
+            const placeholder = document.createElement('div');
+            placeholder.className = placeholderClass;
+            placeholder.textContent = '👤';
+            imageElement.replaceWith(placeholder);
         }
 
         // Helper function to fetch with suppressed 404 logging
@@ -2071,8 +2128,8 @@
             const profileB = playerProfiles.find(p => p.name === playerBName);
 
             // Update UI
-            const imgSrcA = getImageSrc(profileA?.imageBase64);
-            const imgSrcB = getImageSrc(profileB?.imageBase64);
+            const imgSrcA = getPlayerImagePath(playerAName);
+            const imgSrcB = getPlayerImagePath(playerBName);
 
             document.getElementById('playerAPhoto').src = imgSrcA || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">👤</text></svg>';
             document.getElementById('playerBPhoto').src = imgSrcB || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">👤</text></svg>';
@@ -2339,6 +2396,16 @@
                         });
                         eventFiles = allEventsData.events;
                         calculateCareerStats();
+
+                        // If the merged file is stale, pull in any events listed in the manifest
+                        // that are missing from the merged payload before rendering the UI.
+                        const missingEvents = availableEvents.filter(eventNum => !eventFilesCache[eventNum]);
+                        if (missingEvents.length > 0) {
+                            console.log('Merged file missing events, loading individually:', missingEvents);
+                            for (const eventNum of missingEvents) {
+                                await loadEvent(eventNum);
+                            }
+                        }
                     }
                 } else {
                     // Fallback: Load only the first event individually
@@ -2593,6 +2660,16 @@
             return date.toLocaleDateString('en-US', options);
         }
 
+        function getEventChampion(event) {
+            if (!event) return null;
+            return event.metadata?.champion || event.knockout_results?.champion || event.knockout?.champion || event.champion || null;
+        }
+
+        function getEventDateValue(event) {
+            if (!event) return null;
+            return event.metadata?.date || event.metadata?.event_date || event.date || event.event_date || null;
+        }
+
         // Convert display name back to JSON format (FirstName LastName -> LastName, FirstName)
         function formatNameForJSON(displayName) {
             const parts = displayName.trim().split(' ');
@@ -2679,8 +2756,9 @@
             const event7 = eventFiles.find(e => e.metadata.event_id === 7);
             const championShowcase = document.getElementById('championShowcase');
             
-            if (event7 && event7.metadata.champion) {
-                const championName = formatNameForDisplay(event7.metadata.champion);
+            const event7Champion = getEventChampion(event7);
+            if (event7 && event7Champion) {
+                const championName = formatNameForDisplay(event7Champion);
                 const champion = careerStats[championName];
                 const profile = playerProfiles.find(p => p.name === championName);
 
@@ -2691,7 +2769,7 @@
                 document.getElementById('championWins').textContent = champion?.totalWins || 0;
 
                 const photoEl = document.getElementById('championPhoto');
-                const imgSrc = getImageSrc(profile?.imageBase64);
+                const imgSrc = getPlayerImagePath(championName);
                 if (imgSrc) {
                     photoEl.src = imgSrc;
                     photoEl.loading = 'lazy';
@@ -2720,9 +2798,9 @@
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
 
                 let photoHtml;
-                const imgSrc = getImageSrc(profile?.imageBase64);
+                const imgSrc = getPlayerImagePath(player.name);
                 if (imgSrc) {
-                    photoHtml = `<img src="${imgSrc}" class="player-photo">`;
+                    photoHtml = `<img src="${imgSrc}" class="player-photo" loading="lazy" alt="${player.name}" onerror="replaceBrokenImage(this, 'player-photo-placeholder')">`;
                 } else {
                     photoHtml = `<div class="player-photo-placeholder">👤</div>`;
                 }
@@ -3273,9 +3351,9 @@
                 const profile = playerProfiles.find(p => p.name === player.name);
 
                 let photoHtml;
-                const imgSrc = getImageSrc(profile?.imageBase64);
-                if (imgSrc) {
-                    photoHtml = `<img src="${imgSrc}" class="player-card-photo" loading="lazy">`;
+                const imgPath = getPlayerImagePath(player.name);
+                if (imgPath) {
+                    photoHtml = `<img src="${imgPath}" class="player-card-photo" loading="lazy" alt="${player.name}" onerror="replaceBrokenImage(this, 'player-card-placeholder')">`;
                 } else {
                     photoHtml = `<div class="player-card-placeholder">👤</div>`;
                 }
@@ -3324,19 +3402,19 @@
 
             // Render Event Winners
             const eventWinners = eventFiles
-                .filter(event => event.metadata.champion)
+                .filter(event => getEventChampion(event))
                 .sort((a, b) => a.metadata.event_id - b.metadata.event_id)
                 .map(event => {
-                    const championName = formatNameForDisplay(event.metadata.champion);
+                    const championName = formatNameForDisplay(getEventChampion(event));
                     const championStats = event.player_event_stats.find(p => 
                         formatNameForDisplay(p.name) === championName
                     );
                     const profile = playerProfiles.find(p => p.name === championName);
 
                     let photoHtml;
-                    const imgSrc = getImageSrc(profile?.imageBase64);
-                    if (imgSrc) {
-                        photoHtml = `<img src="${imgSrc}" class="winner-photo" loading="lazy">`;
+                    const imgPath = getPlayerImagePath(championName);
+                    if (imgPath) {
+                        photoHtml = `<img src="${imgPath}" class="winner-photo" loading="lazy" alt="${championName}" onerror="replaceBrokenImage(this, 'winner-photo-placeholder')">`;
                     } else {
                         photoHtml = `<div class="winner-photo-placeholder">👤</div>`;
                     }
@@ -3346,7 +3424,7 @@
                             <div class="winner-card-header">
                                 <span class="winner-trophy">🏆</span>
                                 <div class="winner-event-name">${event.metadata.event_name}</div>
-                                <div class="winner-date">${formatDate(event.metadata.date)}</div>
+                                <div class="winner-date">${formatDate(getEventDateValue(event))}</div>
                             </div>
                             <div class="winner-photo-container">
                                 ${photoHtml}
@@ -3378,16 +3456,17 @@
 
             // Check for series winner (Event 7 - TOC)
             const tocEvent = eventFiles.find(e => e.metadata.event_id === 7);
+            const tocChampion = getEventChampion(tocEvent);
             
-            if (tocEvent && tocEvent.metadata.champion) {
-                const seriesChampionName = formatNameForDisplay(tocEvent.metadata.champion);
+            if (tocEvent && tocChampion) {
+                const seriesChampionName = formatNameForDisplay(tocChampion);
                 const seriesChampionStats = careerStats[seriesChampionName];
                 const profile = playerProfiles.find(p => p.name === seriesChampionName);
 
                 let photoHtml;
-                const imgSrc = getImageSrc(profile?.imageBase64);
-                if (imgSrc) {
-                    photoHtml = `<img src="${imgSrc}" class="winner-photo" loading="lazy">`;
+                const imgPath = getPlayerImagePath(seriesChampionName);
+                if (imgPath) {
+                    photoHtml = `<img src="${imgPath}" class="winner-photo" loading="lazy" alt="${seriesChampionName}" onerror="replaceBrokenImage(this, 'winner-photo-placeholder')">`;
                 } else {
                     photoHtml = `<div class="winner-photo-placeholder">👤</div>`;
                 }
@@ -3556,9 +3635,9 @@
             document.getElementById('modalPlayerName').textContent = playerName;
             
             const photoContainer = document.getElementById('modalPhotoContainer');
-            const imgSrc = getImageSrc(profile?.imageBase64);
-            if (imgSrc) {
-                photoContainer.innerHTML = `<img src="${imgSrc}" class="modal-photo">`;
+            const imgPath = getPlayerImagePath(playerName);
+            if (imgPath) {
+                photoContainer.innerHTML = `<img src="${imgPath}" class="modal-photo" alt="${playerName}" onerror="replaceBrokenImage(this, 'modal-photo-placeholder')">`;
             } else {
                 photoContainer.innerHTML = `<div class="modal-photo-placeholder">👤</div>`;
             }
