@@ -1806,7 +1806,7 @@
         let currentChart = null;
         const MAX_EVENTS = 20; // Maximum number of events to check for
         const CACHE_VERSION = 'v6'; // Increment this when data structure changes
-        const IMAGE_CACHE_VERSION = '2026-04-06-2';
+        const IMAGE_CACHE_VERSION = '2026-04-07-1';
         let availableImages = new Set(); // Cache of available images
 
         // Initialize available images on page load
@@ -1832,13 +1832,19 @@
         // Helper function to convert player name to image filename
         function getPlayerImageFilename(playerName) {
             if (!playerName) return null;
-                return playerName
+            const normalizedName = playerName
                     .toLowerCase()
                     .replace(/[',.]/g, '')
                     .replace(/&/g, 'and')
                     .replace(/[\s_]+/g, '-')
                     .replace(/-+/g, '-')
                     .replace(/^-|-$/g, '');
+
+            const imageAliases = {
+                'dee-cormier': 'darrell-cormier'
+            };
+
+            return imageAliases[normalizedName] || normalizedName;
         }
 
         // Helper function to get image source (supports both base64 and filenames)

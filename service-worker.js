@@ -1,5 +1,5 @@
 // Service Worker for AADS Stats - Aggressive caching for performance
-const CACHE_NAME = 'aads-stats-v6';
+const CACHE_NAME = 'aads-stats-v7';
 const CACHE_URLS = [
     '/darts-league-stats/',
     '/darts-league-stats/display.html',
@@ -48,13 +48,10 @@ self.addEventListener('fetch', (event) => {
     
     // Cache strategy for different resource types
     if (url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg') || url.pathname.endsWith('.jpeg')) {
-        // Images: Cache first, network fallback (they rarely change)
+        // Images: Network first so updated player photos replace older cached assets.
         event.respondWith(
-            caches.match(event.request).then((response) => {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).then((response) => {
+            fetch(event.request)
+                .then((response) => {
                     if (response.status === 200) {
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then((cache) => {
@@ -62,8 +59,10 @@ self.addEventListener('fetch', (event) => {
                         });
                     }
                     return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request);
                 });
-            })
         );
     } else if (url.pathname.endsWith('.json')) {
         // JSON: Network first, cache fallback (data changes frequently)
