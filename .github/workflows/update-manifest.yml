@@ -1,0 +1,36 @@
+name: Auto-update results/manifest.json
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run manifest updater
+        run: |
+          python scripts/update_manifest.py
+
+      - name: Commit manifest if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add results/manifest.json
+            git commit -m "chore: auto-update results/manifest.json"
+            git push
+          else
+            echo "No changes to commit"
+          fi
