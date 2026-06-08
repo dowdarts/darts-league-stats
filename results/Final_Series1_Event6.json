@@ -1,0 +1,1018 @@
+{
+  "metadata": {
+    "series_id": 1,
+    "event_id": 6,
+    "event_name": "Series 1 - Event 6",
+    "event_date": "2026-05-09"
+  },
+  "player_event_stats": [
+    {
+      "name": "Rob Sibbick",
+      "total_matches": 7,
+      "wins": 6,
+      "losses": 1,
+      "final_event_3da": 74.06,
+      "scores_100plus": 94,
+      "scores_140plus": 26,
+      "scores_180": 2,
+      "co_opportunities": 115,
+      "co_completed": 38,
+      "co_pct": 33.04,
+      "high_finish": 144
+    },
+    {
+      "name": "Corey LeFort",
+      "total_matches": 7,
+      "wins": 4,
+      "losses": 3,
+      "final_event_3da": 58.0,
+      "scores_100plus": 47,
+      "scores_140plus": 9,
+      "scores_180": 0,
+      "co_opportunities": 137,
+      "co_completed": 25,
+      "co_pct": 18.25,
+      "high_finish": 114
+    },
+    {
+      "name": "Dana Moss",
+      "total_matches": 6,
+      "wins": 3,
+      "losses": 3,
+      "final_event_3da": 70.16,
+      "scores_100plus": 73,
+      "scores_140plus": 9,
+      "scores_180": 1,
+      "co_opportunities": 75,
+      "co_completed": 20,
+      "co_pct": 26.67,
+      "high_finish": 112
+    },
+    {
+      "name": "Brayden Smith",
+      "total_matches": 6,
+      "wins": 4,
+      "losses": 2,
+      "final_event_3da": 57.01,
+      "scores_100plus": 34,
+      "scores_140plus": 3,
+      "scores_180": 0,
+      "co_opportunities": 94,
+      "co_completed": 21,
+      "co_pct": 22.34,
+      "high_finish": 104
+    },
+    {
+      "name": "Chris MacDonald",
+      "total_matches": 5,
+      "wins": 3,
+      "losses": 2,
+      "final_event_3da": 64.58,
+      "scores_100plus": 35,
+      "scores_140plus": 6,
+      "scores_180": 0,
+      "co_opportunities": 58,
+      "co_completed": 18,
+      "co_pct": 31.03,
+      "high_finish": 142
+    },
+    {
+      "name": "Dylan Jenkins",
+      "total_matches": 5,
+      "wins": 3,
+      "losses": 2,
+      "final_event_3da": 70.02,
+      "scores_100plus": 36,
+      "scores_140plus": 9,
+      "scores_180": 1,
+      "co_opportunities": 65,
+      "co_completed": 17,
+      "co_pct": 26.15,
+      "high_finish": 117
+    },
+    {
+      "name": "Tyler Stewart",
+      "total_matches": 5,
+      "wins": 2,
+      "losses": 3,
+      "final_event_3da": 62.99,
+      "scores_100plus": 25,
+      "scores_140plus": 4,
+      "scores_180": 2,
+      "co_opportunities": 67,
+      "co_completed": 14,
+      "co_pct": 20.9,
+      "high_finish": 75
+    },
+    {
+      "name": "Denis LeBlanc",
+      "total_matches": 5,
+      "wins": 1,
+      "losses": 4,
+      "final_event_3da": 58.96,
+      "scores_100plus": 21,
+      "scores_140plus": 6,
+      "scores_180": 0,
+      "co_opportunities": 54,
+      "co_completed": 9,
+      "co_pct": 16.67,
+      "high_finish": 0
+    },
+    {
+      "name": "Aaron Gilbert",
+      "total_matches": 4,
+      "wins": 1,
+      "losses": 3,
+      "final_event_3da": 56.03,
+      "scores_100plus": 18,
+      "scores_140plus": 4,
+      "scores_180": 0,
+      "co_opportunities": 51,
+      "co_completed": 6,
+      "co_pct": 11.76,
+      "high_finish": 0
+    },
+    {
+      "name": "Kenzee Rushton",
+      "total_matches": 4,
+      "wins": 0,
+      "losses": 4,
+      "final_event_3da": 50.09,
+      "scores_100plus": 2,
+      "scores_140plus": 0,
+      "scores_180": 0,
+      "co_opportunities": 7,
+      "co_completed": 1,
+      "co_pct": 14.29,
+      "high_finish": 0
+    }
+  ],
+  "round_robin": {
+    "standings": {
+      "groupA": [
+        {
+          "rank": 1,
+          "name": "Dylan Jenkins",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 11,
+          "legs_lost": 4
+        },
+        {
+          "rank": 2,
+          "name": "Rob Sibbick",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 10,
+          "legs_lost": 4
+        },
+        {
+          "rank": 3,
+          "name": "Tyler Stewart",
+          "matches_played": 4,
+          "matches_won": 2,
+          "matches_lost": 2,
+          "legs_won": 8,
+          "legs_lost": 9
+        },
+        {
+          "rank": 4,
+          "name": "Dana Moss",
+          "matches_played": 4,
+          "matches_won": 2,
+          "matches_lost": 2,
+          "legs_won": 7,
+          "legs_lost": 8
+        },
+        {
+          "rank": 5,
+          "name": "Kenzee Rushton",
+          "matches_played": 4,
+          "matches_won": 0,
+          "matches_lost": 4,
+          "legs_won": 1,
+          "legs_lost": 12
+        }
+      ],
+      "groupB": [
+        {
+          "rank": 1,
+          "name": "Chris MacDonald",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 11,
+          "legs_lost": 5
+        },
+        {
+          "rank": 2,
+          "name": "Brayden Smith",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 9,
+          "legs_lost": 6
+        },
+        {
+          "rank": 3,
+          "name": "Denis LeBlanc",
+          "matches_played": 4,
+          "matches_won": 1,
+          "matches_lost": 3,
+          "legs_won": 9,
+          "legs_lost": 10
+        },
+        {
+          "rank": 4,
+          "name": "Corey LeFort",
+          "matches_played": 4,
+          "matches_won": 2,
+          "matches_lost": 2,
+          "legs_won": 7,
+          "legs_lost": 10
+        },
+        {
+          "rank": 5,
+          "name": "Aaron Gilbert",
+          "matches_played": 4,
+          "matches_won": 1,
+          "matches_lost": 3,
+          "legs_won": 6,
+          "legs_lost": 11
+        }
+      ]
+    },
+    "matches": {
+      "groupA": [
+        {
+          "player1": "Tyler Stewart",
+          "player2": "Dylan Jenkins",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "13:24",
+          "player1_details": {
+            "three_dart_avg": 70.89,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 38,
+            "scores_100plus": 6,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 75.16,
+            "co_opportunities": 8,
+            "co_completed": 2,
+            "co_pct": 25,
+            "scores_100plus": 5,
+            "scores_140plus": 0,
+            "scores_180": 1,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Dylan Jenkins",
+          "player2": "Dana Moss",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "11:48",
+          "player1_details": {
+            "three_dart_avg": 75.15,
+            "co_opportunities": 5,
+            "co_completed": 3,
+            "co_pct": 60,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 117
+          },
+          "player2_details": {
+            "three_dart_avg": 74.67,
+            "co_opportunities": 3,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Rob Sibbick",
+          "player2": "Kenzee Rushton",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "09:54",
+          "player1_details": {
+            "three_dart_avg": 81.98,
+            "co_opportunities": 6,
+            "co_completed": 3,
+            "co_pct": 50,
+            "scores_100plus": 7,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 144
+          },
+          "player2_details": {
+            "three_dart_avg": 55.76,
+            "co_opportunities": 1,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Dana Moss",
+          "player2": "Tyler Stewart",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "10:23",
+          "player1_details": {
+            "three_dart_avg": 70.44,
+            "co_opportunities": 11,
+            "co_completed": 3,
+            "co_pct": 27,
+            "scores_100plus": 8,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 63.4,
+            "co_opportunities": 9,
+            "co_completed": 2,
+            "co_pct": 22,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Dylan Jenkins",
+          "player2": "Rob Sibbick",
+          "player1_legs": 3,
+          "player2_legs": 1,
+          "start_time": "10:50",
+          "player1_details": {
+            "three_dart_avg": 76.46,
+            "co_opportunities": 10,
+            "co_completed": 3,
+            "co_pct": 30,
+            "scores_100plus": 6,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 71.09,
+            "co_opportunities": 10,
+            "co_completed": 1,
+            "co_pct": 10,
+            "scores_100plus": 8,
+            "scores_140plus": 2,
+            "scores_180": 1,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Dana Moss",
+          "player2": "Kenzee Rushton",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "11:19",
+          "player1_details": {
+            "three_dart_avg": 63.51,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 38,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 89
+          },
+          "player2_details": {
+            "three_dart_avg": 47.7,
+            "co_opportunities": 1,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Rob Sibbick",
+          "player2": "Tyler Stewart",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "09:29",
+          "player1_details": {
+            "three_dart_avg": 75.15,
+            "co_opportunities": 6,
+            "co_completed": 3,
+            "co_pct": 50,
+            "scores_100plus": 6,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 60.21,
+            "co_opportunities": 1,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Dylan Jenkins",
+          "player2": "Kenzee Rushton",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "09:06",
+          "player1_details": {
+            "three_dart_avg": 72.73,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 38,
+            "scores_100plus": 4,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 55.45,
+            "co_opportunities": 2,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Rob Sibbick",
+          "player2": "Dana Moss",
+          "player1_legs": 3,
+          "player2_legs": 1,
+          "start_time": "12:41",
+          "player1_details": {
+            "three_dart_avg": 93.52,
+            "co_opportunities": 6,
+            "co_completed": 3,
+            "co_pct": 50,
+            "scores_100plus": 10,
+            "scores_140plus": 4,
+            "scores_180": 0,
+            "high_finish": 116
+          },
+          "player2_details": {
+            "three_dart_avg": 77.85,
+            "co_opportunities": 3,
+            "co_completed": 1,
+            "co_pct": 33,
+            "scores_100plus": 7,
+            "scores_140plus": 1,
+            "scores_180": 1,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Tyler Stewart",
+          "player2": "Kenzee Rushton",
+          "player1_legs": 3,
+          "player2_legs": 1,
+          "start_time": "12:18",
+          "player1_details": {
+            "three_dart_avg": 56.43,
+            "co_opportunities": 14,
+            "co_completed": 3,
+            "co_pct": 21,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 45.81,
+            "co_opportunities": 3,
+            "co_completed": 1,
+            "co_pct": 33,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        }
+      ],
+      "groupB": [
+        {
+          "player1": "Denis LeBlanc",
+          "player2": "Brayden Smith",
+          "player1_legs": 2,
+          "player2_legs": 3,
+          "start_time": "09:54",
+          "player1_details": {
+            "three_dart_avg": 58.89,
+            "co_opportunities": 13,
+            "co_completed": 2,
+            "co_pct": 15,
+            "scores_100plus": 6,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 60.32,
+            "co_opportunities": 12,
+            "co_completed": 3,
+            "co_pct": 25,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 60
+          }
+        },
+        {
+          "player1": "Brayden Smith",
+          "player2": "Chris MacDonald",
+          "player1_legs": 0,
+          "player2_legs": 3,
+          "start_time": "12:18",
+          "player1_details": {
+            "three_dart_avg": 63.0,
+            "co_opportunities": 2,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 3,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 76.42,
+            "co_opportunities": 7,
+            "co_completed": 3,
+            "co_pct": 43,
+            "scores_100plus": 5,
+            "scores_140plus": 3,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Chris MacDonald",
+          "player2": "Denis LeBlanc",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "12:50",
+          "player1_details": {
+            "three_dart_avg": 58.66,
+            "co_opportunities": 12,
+            "co_completed": 3,
+            "co_pct": 25,
+            "scores_100plus": 7,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 59.01,
+            "co_opportunities": 12,
+            "co_completed": 2,
+            "co_pct": 17,
+            "scores_100plus": 4,
+            "scores_140plus": 3,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Corey LeFort",
+          "player2": "Aaron Gilbert",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "10:21",
+          "player1_details": {
+            "three_dart_avg": 47.39,
+            "co_opportunities": 17,
+            "co_completed": 3,
+            "co_pct": 18,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 50.53,
+            "co_opportunities": 23,
+            "co_completed": 2,
+            "co_pct": 9,
+            "scores_100plus": 6,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Brayden Smith",
+          "player2": "Corey LeFort",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "10:54",
+          "player1_details": {
+            "three_dart_avg": 70.45,
+            "co_opportunities": 6,
+            "co_completed": 3,
+            "co_pct": 50,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 60
+          },
+          "player2_details": {
+            "three_dart_avg": 62.57,
+            "co_opportunities": 4,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Aaron Gilbert",
+          "player2": "Chris MacDonald",
+          "player1_legs": 0,
+          "player2_legs": 3,
+          "start_time": "11:20",
+          "player1_details": {
+            "three_dart_avg": 54.07,
+            "co_opportunities": 10,
+            "co_completed": 0,
+            "co_pct": 0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 56.36,
+            "co_opportunities": 11,
+            "co_completed": 3,
+            "co_pct": 27,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Denis LeBlanc",
+          "player2": "Corey LeFort",
+          "player1_legs": 3,
+          "player2_legs": 1,
+          "start_time": "11:47",
+          "player1_details": {
+            "three_dart_avg": 64.83,
+            "co_opportunities": 11,
+            "co_completed": 3,
+            "co_pct": 27,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 53.7,
+            "co_opportunities": 9,
+            "co_completed": 1,
+            "co_pct": 11,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Aaron Gilbert",
+          "player2": "Brayden Smith",
+          "player1_legs": 1,
+          "player2_legs": 3,
+          "start_time": "13:25",
+          "player1_details": {
+            "three_dart_avg": 59.21,
+            "co_opportunities": 9,
+            "co_completed": 1,
+            "co_pct": 11,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 58.68,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 38,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 100
+          }
+        },
+        {
+          "player1": "Corey LeFort",
+          "player2": "Chris MacDonald",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "09:27",
+          "player1_details": {
+            "three_dart_avg": 69.12,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 38,
+            "scores_100plus": 4,
+            "scores_140plus": 3,
+            "scores_180": 0,
+            "high_finish": 90
+          },
+          "player2_details": {
+            "three_dart_avg": 69.3,
+            "co_opportunities": 8,
+            "co_completed": 2,
+            "co_pct": 25,
+            "scores_100plus": 7,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Aaron Gilbert",
+          "player2": "Denis LeBlanc",
+          "player1_legs": 3,
+          "player2_legs": 2,
+          "start_time": "09:06",
+          "player1_details": {
+            "three_dart_avg": 61.79,
+            "co_opportunities": 9,
+            "co_completed": 3,
+            "co_pct": 33,
+            "scores_100plus": 7,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 59.36,
+            "co_opportunities": 8,
+            "co_completed": 2,
+            "co_pct": 25,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        }
+      ]
+    }
+  },
+  "knockout": {
+    "quarterFinals": [
+      {
+        "match_id": "QF1",
+        "player1": "Rob Sibbick",
+        "player2": "Denis LeBlanc",
+        "player1_sets": 2,
+        "player2_sets": 0,
+        "player1_total_legs": 6,
+        "player2_total_legs": 0,
+        "winner": "Rob Sibbick",
+        "start_time": "15:08",
+        "player1_details": {
+          "three_dart_avg": 66.31,
+          "co_opportunities": 22,
+          "co_completed": 6,
+          "co_pct": 27,
+          "scores_100plus": 15,
+          "scores_140plus": 4,
+          "scores_180": 0,
+          "high_finish": 0
+        },
+        "player2_details": {
+          "three_dart_avg": 54.57,
+          "co_opportunities": 10,
+          "co_completed": 0,
+          "co_pct": 0,
+          "scores_100plus": 3,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      },
+      {
+        "match_id": "QF2",
+        "player1": "Dana Moss",
+        "player2": "Chris MacDonald",
+        "player1_sets": 2,
+        "player2_sets": 1,
+        "player1_total_legs": 7,
+        "player2_total_legs": 7,
+        "winner": "Dana Moss",
+        "start_time": "15:08",
+        "player1_details": {
+          "three_dart_avg": 69.2,
+          "co_opportunities": 26,
+          "co_completed": 7,
+          "co_pct": 27,
+          "scores_100plus": 26,
+          "scores_140plus": 3,
+          "scores_180": 0,
+          "high_finish": 100
+        },
+        "player2_details": {
+          "three_dart_avg": 65.24,
+          "co_opportunities": 20,
+          "co_completed": 7,
+          "co_pct": 35,
+          "scores_100plus": 13,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 142
+        }
+      },
+      {
+        "match_id": "QF3",
+        "player1": "Brayden Smith",
+        "player2": "Tyler Stewart",
+        "player1_sets": 2,
+        "player2_sets": 1,
+        "player1_total_legs": 7,
+        "player2_total_legs": 6,
+        "winner": "Brayden Smith",
+        "start_time": "14:03",
+        "player1_details": {
+          "three_dart_avg": 61.64,
+          "co_opportunities": 21,
+          "co_completed": 7,
+          "co_pct": 33,
+          "scores_100plus": 15,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 104
+        },
+        "player2_details": {
+          "three_dart_avg": 63.18,
+          "co_opportunities": 35,
+          "co_completed": 6,
+          "co_pct": 17,
+          "scores_100plus": 13,
+          "scores_140plus": 2,
+          "scores_180": 2,
+          "high_finish": 75
+        }
+      },
+      {
+        "match_id": "QF4",
+        "player1": "Dylan Jenkins",
+        "player2": "Corey LeFort",
+        "player1_sets": 1,
+        "player2_sets": 2,
+        "player1_total_legs": 6,
+        "player2_total_legs": 6,
+        "winner": "Corey LeFort",
+        "start_time": "13:59",
+        "player1_details": {
+          "three_dart_avg": 64.63,
+          "co_opportunities": 34,
+          "co_completed": 6,
+          "co_pct": 18,
+          "scores_100plus": 17,
+          "scores_140plus": 4,
+          "scores_180": 0,
+          "high_finish": 78
+        },
+        "player2_details": {
+          "three_dart_avg": 61.14,
+          "co_opportunities": 23,
+          "co_completed": 6,
+          "co_pct": 26,
+          "scores_100plus": 10,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 114
+        }
+      }
+    ],
+    "semiFinals": [
+      {
+        "match_id": "SF1",
+        "player1": "Corey LeFort",
+        "player2": "Brayden Smith",
+        "player1_sets": 3,
+        "player2_sets": 1,
+        "player1_total_legs": 11,
+        "player2_total_legs": 5,
+        "winner": "Corey LeFort",
+        "start_time": "16:32",
+        "player1_details": {
+          "three_dart_avg": 53.86,
+          "co_opportunities": 58,
+          "co_completed": 11,
+          "co_pct": 19,
+          "scores_100plus": 13,
+          "scores_140plus": 4,
+          "scores_180": 0,
+          "high_finish": 62
+        },
+        "player2_details": {
+          "three_dart_avg": 49.79,
+          "co_opportunities": 45,
+          "co_completed": 5,
+          "co_pct": 11,
+          "scores_100plus": 7,
+          "scores_140plus": 2,
+          "scores_180": 0,
+          "high_finish": 60
+        }
+      },
+      {
+        "match_id": "SF2",
+        "player1": "Dana Moss",
+        "player2": "Rob Sibbick",
+        "player1_sets": 1,
+        "player2_sets": 3,
+        "player1_total_legs": 6,
+        "player2_total_legs": 10,
+        "winner": "Rob Sibbick",
+        "start_time": "18:09",
+        "player1_details": {
+          "three_dart_avg": 70.15,
+          "co_opportunities": 24,
+          "co_completed": 6,
+          "co_pct": 25,
+          "scores_100plus": 24,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 112
+        },
+        "player2_details": {
+          "three_dart_avg": 74.13,
+          "co_opportunities": 30,
+          "co_completed": 10,
+          "co_pct": 33,
+          "scores_100plus": 26,
+          "scores_140plus": 7,
+          "scores_180": 1,
+          "high_finish": 92
+        }
+      }
+    ],
+    "final": {
+      "match_id": "FINAL",
+      "player1": "Corey LeFort",
+      "player2": "Rob Sibbick",
+      "player1_sets": 0,
+      "player2_sets": 4,
+      "player1_total_legs": 1,
+      "player2_total_legs": 12,
+      "winner": "Rob Sibbick",
+      "start_time": "19:15",
+      "player1_details": {
+        "three_dart_avg": 63.86,
+        "co_opportunities": 18,
+        "co_completed": 1,
+        "co_pct": 6,
+        "scores_100plus": 13,
+        "scores_140plus": 1,
+        "scores_180": 0,
+        "high_finish": 0
+      },
+      "player2_details": {
+        "three_dart_avg": 72.34,
+        "co_opportunities": 35,
+        "co_completed": 12,
+        "co_pct": 34,
+        "scores_100plus": 22,
+        "scores_140plus": 7,
+        "scores_180": 0,
+        "high_finish": 108
+      }
+    },
+    "champion": "Rob Sibbick"
+  }
+}
