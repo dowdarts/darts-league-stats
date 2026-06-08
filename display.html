@@ -1586,6 +1586,7 @@
                 <div class="table-header">
                     <h2>Career Rankings</h2>
                     <div style="display: flex; align-items: center; gap: 15px;">
+                        <button onclick="exportLeaderboardCsv()" style="padding: 8px 16px; background: rgba(255, 107, 0, 0.1); border: 1px solid var(--primary-orange); color: var(--primary-orange); border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Download the current rankings as a CSV file">Export CSV</button>
                         <span style="color: var(--text-secondary); font-size: 0.9em;">Sort by:</span>
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                             <span style="color: var(--text-secondary); font-size: 0.9em;">Career 3DA</span>
@@ -1877,20 +1878,129 @@
             imageElement.replaceWith(placeholder);
         }
 
-        // Helper function to fetch with suppressed 404 logging
-        async function fetchEventFile(eventNumber) {
-            try {
-                // Add cache-busting parameter to always get fresh data
-                const response = await fetch(`results/Final_Series1_Event${eventNumber}.json?t=${Date.now()}`);
-                if (!response.ok) return null;
-                return await response.json();
-            } catch (error) {
-                // Silently handle errors (expected for non-existent event files)
+        function getEventDefKey(eventDef) {
+            if (typeof eventDef === 'number') {
+                return `1_${eventDef}`;
+            }
+            if (!eventDef || typeof eventDef !== 'object') {
                 return null;
             }
+            const seriesId = eventDef.series_id ?? 1;
+            const eventId = eventDef.event_id ?? (eventDef.event || 0);
+            return `${seriesId}_${eventId}`;
         }
 
-        // LocalStorage caching functions
+        function getEventDefFilename(eventDef) {
+            if (typeof eventDef === 'number') {
+                return `results/Final_Series1_Event${eventDef}.json`;
+            }
+            const seriesId = eventDef.series_id ?? 1;
+            const eventId = eventDef.event_id;
+            if (!eventId) return null;
+            return `results/Final_Series${seriesId}_Event${eventId}.json`;
+        }
+
+        function normalizeManifestEvents(rawEvents) {
+            if (!Array.isArray(rawEvents)) return [];
+            return rawEvents
+                .map(entry => {
+                    if (typeof entry === 'number') {
+                        return { series_id: 1, event_id: entry };
+                    }
+                    if (entry && typeof entry === 'object') {
+                        return { series_id: entry.series_id ?? 1, event_id: entry.event_id };
+                    }
+                    return null;
+                })
+                .filter(entry => entry && Number.isFinite(entry.event_id));
+        }
+
+        function getEventDefKey(eventDef) {
+            // Keys use '::' delimiter to safely include string series ids
+            if (typeof eventDef === 'number') {
+                return `1::${eventDef}`;
+            }
+            if (!eventDef || typeof eventDef !== 'object') {
+                return null;
+            }
+            const seriesId = eventDef.series_id ?? eventDef.series ?? 1;
+            const eventId = eventDef.event_id ?? (eventDef.event || 0);
+            return `${seriesId}::${eventId}`;
+        }
+
+        function getEventDefFilename(eventDef) {
+            // Support numeric series (legacy) and string-based custom series naming
+            if (typeof eventDef === 'number') {
+                return `results/Final_Series1_Event${eventDef}.json`;
+            }
+            const seriesId = eventDef.series_id ?? eventDef.series ?? 1;
+            const eventId = eventDef.event_id;
+            if (!eventId) return null;
+
+            if (typeof seriesId === 'number') {
+                // Legacy numeric series naming
+                return `results/Final_Series${seriesId}_Event${eventId}.json`;
+            }
+
+            // String series naming: final_{seriesKey}_series{n}_event{m}.json
+            const seriesKey = String(seriesId).toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            const seriesNum = eventDef.series_num ?? eventDef.series_index ?? 1;
+            return `results/final_${seriesKey}_series${seriesNum}_event${eventId}.json`;
+        }
+
+        function normalizeManifestEvents(rawEvents) {
+            if (!Array.isArray(rawEvents)) return [];
+            return rawEvents
+                .map(entry => {
+                    // Number -> legacy series 1
+                    if (typeof entry === 'number') {
+                        return { series_id: 1, event_id: entry };
+                    }
+
+                    // String: could be a filename or a simple series/event key
+                    if (typeof entry === 'string') {
+                        // If string looks like a filename final_womans_series1_event1.json
+                        const fnMatch = entry.match(/final_([a-z0-9_]+)_series(\d+)_event(\d+)\.json/i);
+                        if (fnMatch) {
+                            return { series_id: fnMatch[1], series_num: Number(fnMatch[2]), event_id: Number(fnMatch[3]) };
+                        }
+
+                        // If it's a plain number string
+                        const n = Number(entry);
+                        if (Number.isFinite(n)) return { series_id: 1, event_id: n };
+
+                        // Try parse like 'women::7' or 'women_7'
+                        const parts = entry.split(/[:_]{1,2}/);
+                        if (parts.length === 2 && Number.isFinite(Number(parts[1]))) {
+                            return { series_id: parts[0], event_id: Number(parts[1]) };
+                        }
+                    }
+
+                    // Object: may contain series_id (number or string), event_id, or filename
+                    if (entry && typeof entry === 'object') {
+                        if (entry.filename && typeof entry.filename === 'string') {
+                            const fnMatch = entry.filename.match(/final_([a-z0-9_]+)_series(\d+)_event(\d+)\.json/i);
+                            if (fnMatch) {
+                                return { series_id: fnMatch[1], series_num: Number(fnMatch[2]), event_id: Number(fnMatch[3]) };
+                            }
+                        }
+                        return { series_id: entry.series_id ?? entry.series ?? 1, series_num: entry.series_num ?? entry.series_index, event_id: entry.event_id };
+                    }
+
+                    return null;
+                })
+                .filter(entry => entry && Number.isFinite(entry.event_id));
+        }
+        function parseEventKey(eventKey) {
+            if (!eventKey) return null;
+            const parts = eventKey.split('::');
+            if (parts.length !== 2) return null;
+            const seriesId = isNaN(Number(parts[0])) ? parts[0] : Number(parts[0]);
+            const eventId = Number(parts[1]);
+            if (!Number.isFinite(eventId)) return null;
+            return { series_id: seriesId, event_id: eventId };
+        }
+
         function getCachedData(key) {
             try {
                 const cached = localStorage.getItem(key);
@@ -2356,7 +2466,7 @@
                 }
                 
                 if (cachedManifest) {
-                    availableEvents = cachedManifest.available_events || [1];
+                    availableEvents = normalizeManifestEvents(cachedManifest.available_events || [1]);
                     console.log('Loaded manifest from cache');
                 }
 
@@ -2365,14 +2475,14 @@
                 const manifestRes = await fetch(`results/manifest.json?t=${Date.now()}`);
                 if (manifestRes.ok) {
                     const manifest = await manifestRes.json();
-                    availableEvents = manifest.available_events || [1];
+                    availableEvents = normalizeManifestEvents(manifest.available_events || [1]);
                     setCachedData('manifest', manifest);
                 } else if (!cachedManifest) {
                     // Fallback: just try Event 1
-                    availableEvents = [1];
+                    availableEvents = normalizeManifestEvents([1]);
                 }
                 
-                console.log('Available events:', availableEvents);
+                console.log('Available events:', availableEvents.map(getEventDefKey));
 
                 if (availableEvents.length === 0) {
                     throw new Error('No event files found in results/ folder');
@@ -2394,22 +2504,24 @@
                     // Process all events from merged file
                     if (allEventsData.events && Array.isArray(allEventsData.events)) {
                         allEventsData.events.forEach(event => {
+                            const seriesId = event.metadata?.series_id ?? 1;
                             const eventId = event.metadata?.event_id;
                             if (eventId) {
-                                eventFilesCache[eventId] = event;
-                                setCachedData(`event_${eventId}`, event);
+                                const eventKey = getEventDefKey({ series_id: seriesId, event_id: eventId });
+                                eventFilesCache[eventKey] = event;
+                                setCachedData(`event_${eventKey}`, event);
                             }
                         });
-                        eventFiles = allEventsData.events;
+                        eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                         calculateCareerStats();
 
                         // If the merged file is stale, pull in any events listed in the manifest
                         // that are missing from the merged payload before rendering the UI.
-                        const missingEvents = availableEvents.filter(eventNum => !eventFilesCache[eventNum]);
+                        const missingEvents = availableEvents.filter(def => !eventFilesCache[getEventDefKey(def)]);
                         if (missingEvents.length > 0) {
-                            console.log('Merged file missing events, loading individually:', missingEvents);
-                            for (const eventNum of missingEvents) {
-                                await loadEvent(eventNum);
+                            console.log('Merged file missing events, loading individually:', missingEvents.map(getEventDefKey));
+                            for (const eventDef of missingEvents) {
+                                await loadEvent(eventDef);
                             }
                         }
                     }
@@ -2446,27 +2558,30 @@
         }
 
         // Load a specific event file
-        async function loadEvent(eventNum) {
-            if (eventFilesCache[eventNum]) {
-                return eventFilesCache[eventNum];
+        async function loadEvent(eventDef) {
+            const eventKey = getEventDefKey(eventDef);
+            if (!eventKey) return null;
+
+            if (eventFilesCache[eventKey]) {
+                return eventFilesCache[eventKey];
             }
 
             // Check cache first
-            const cachedEvent = getCachedData(`event_${eventNum}`);
+            const cachedEvent = getCachedData(`event_${eventKey}`);
             if (cachedEvent) {
-                eventFilesCache[eventNum] = cachedEvent;
-                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                eventFilesCache[eventKey] = cachedEvent;
+                eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                 calculateCareerStats();
-                console.log(`Loaded Event ${eventNum} from cache`);
+                console.log(`Loaded Event ${eventKey} from cache`);
                 return cachedEvent;
             }
 
             // Fetch from network
-            const event = await fetchEventFile(eventNum);
+            const event = await fetchEventFile(eventDef);
             if (event) {
-                eventFilesCache[eventNum] = event;
-                setCachedData(`event_${eventNum}`, event);
-                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                eventFilesCache[eventKey] = event;
+                setCachedData(`event_${eventKey}`, event);
+                eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                 calculateCareerStats();
             }
             return event;
@@ -2475,10 +2590,11 @@
         // Load remaining events in background
         async function loadRemainingEvents() {
             for (let i = 1; i < availableEvents.length; i++) {
-                const eventNum = availableEvents[i];
-                if (!eventFilesCache[eventNum]) {
-                    await loadEvent(eventNum);
-                    console.log(`Background loaded Event ${eventNum}`);
+                const eventDef = availableEvents[i];
+                const eventKey = getEventDefKey(eventDef);
+                if (!eventFilesCache[eventKey]) {
+                    await loadEvent(eventDef);
+                    console.log(`Background loaded Event ${eventKey}`);
                 }
             }
             console.log('All events loaded');
@@ -2733,6 +2849,102 @@
             renderLeaderboard();
         }
 
+        function getSortedLeaderboardPlayers() {
+            return Object.values(careerStats).sort((a, b) => {
+                if (rankingMode === 'p4p') {
+                    return calculateP4PScore(b) - calculateP4PScore(a);
+                }
+                return b.career3DA - a.career3DA;
+            });
+        }
+
+        function csvEscape(value) {
+            const stringValue = String(value ?? '');
+            return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+
+        function downloadCsv(filename, rows) {
+            const csvContent = rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportLeaderboardCsv() {
+            const sortedPlayers = getSortedLeaderboardPlayers();
+            const primaryHeader = rankingMode === 'p4p' ? 'P4P Score' : 'Career 3DA';
+            const today = new Date().toISOString().slice(0, 10);
+            const fileName = `aads-career-rankings-${rankingMode}-${today}.csv`;
+            const rows = [[
+                'Rank',
+                'Player',
+                'Events',
+                primaryHeader,
+                '100+',
+                '140+',
+                '180s',
+                'MP',
+                'MW',
+                'ML',
+                'MW%',
+                'SP',
+                'SW',
+                'SL',
+                'SW%',
+                'LP',
+                'LW',
+                'LL',
+                'LW%',
+                'CO Opp',
+                'CO Comp',
+                'CO%'
+            ]];
+
+            sortedPlayers.forEach((player, index) => {
+                const mwPct = player.totalMatches > 0 ? ((player.totalWins / player.totalMatches) * 100).toFixed(1) : '0.0';
+                const swPct = player.totalSets > 0 ? ((player.totalSetsWon / player.totalSets) * 100).toFixed(1) : '0.0';
+                const lwPct = player.totalLegs > 0 ? ((player.totalLegsWon / player.totalLegs) * 100).toFixed(1) : '0.0';
+                const coPct = player.coRate.toFixed(1);
+                const primaryStat = rankingMode === 'p4p'
+                    ? calculateP4PScore(player).toFixed(1)
+                    : player.career3DA.toFixed(2);
+
+                rows.push([
+                    index + 1,
+                    player.name,
+                    player.events.length,
+                    primaryStat,
+                    player.total100s + player.total140s + player.total180s,
+                    player.total140s + player.total180s,
+                    player.total180s,
+                    player.totalMatches,
+                    player.totalWins,
+                    player.totalLosses,
+                    `${mwPct}%`,
+                    player.totalSets,
+                    player.totalSetsWon,
+                    player.totalSetsLost,
+                    `${swPct}%`,
+                    player.totalLegs,
+                    player.totalLegsWon,
+                    player.totalLegsLost,
+                    `${lwPct}%`,
+                    player.coOpportunities,
+                    player.coCompleted,
+                    `${coPct}%`
+                ]);
+            });
+
+            downloadCsv(fileName, rows);
+        }
+
         // Calculate P4P (Pound-for-Pound) score
         function calculateP4PScore(player) {
             // Extract win rates (as decimals 0-1)
@@ -2749,14 +2961,7 @@
 
         // Render leaderboard
         function renderLeaderboard() {
-            // Sort based on selected ranking mode
-            const sortedPlayers = Object.values(careerStats).sort((a, b) => {
-                if (rankingMode === 'p4p') {
-                    return calculateP4PScore(b) - calculateP4PScore(a);
-                } else {
-                    return b.career3DA - a.career3DA;
-                }
-            });
+            const sortedPlayers = getSortedLeaderboardPlayers();
 
             // Champion showcase - Look for Event 7 (TOC) winner
             const event7 = eventFiles.find(e => e.metadata.event_id === 7);
@@ -2859,31 +3064,36 @@
         // Populate event selector
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
-            
-            availableEvents.forEach((eventNum) => {
+            selector.innerHTML = '';
+
+            availableEvents.forEach((eventDef) => {
                 const option = document.createElement('option');
-                option.value = eventNum;
-                // Use cached event name if available, otherwise use placeholder
-                const event = eventFilesCache[eventNum];
-                option.textContent = event ? event.metadata.event_name : `Series 1 - Event ${eventNum}`;
+                const eventKey = getEventDefKey(eventDef);
+                option.value = eventKey;
+                const event = eventFilesCache[eventKey];
+                option.textContent = getEventLabel(eventDef, event);
                 selector.appendChild(option);
             });
         }
 
         // Show event details
         async function showEventDetails() {
-            const eventNum = parseInt(document.getElementById('eventSelector').value);
-            if (isNaN(eventNum) || !availableEvents.includes(eventNum)) {
+            const eventKey = document.getElementById('eventSelector').value;
+            const eventDef = parseEventKey(eventKey);
+            if (!eventDef || !availableEvents.some(def => getEventDefKey(def) === eventKey)) {
                 document.getElementById('eventDetails').style.display = 'none';
                 return;
             }
 
-            // Load event if not cached
-            if (!eventFilesCache[eventNum]) {
-                await loadEvent(eventNum);
+            if (!eventFilesCache[eventKey]) {
+                await loadEvent(eventDef);
             }
 
-            const event = eventFilesCache[eventNum];
+            const event = eventFilesCache[eventKey];
+            if (!event) {
+                document.getElementById('eventDetails').style.display = 'none';
+                return;
+            }
             document.getElementById('eventDetails').style.display = 'block';
             document.getElementById('eventTitle').textContent = event.metadata.event_name;
             
