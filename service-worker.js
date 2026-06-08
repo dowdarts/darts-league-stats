@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(() => {
                     return caches.match(event.request);
-                });
+                })
         );
     } else if (url.pathname.endsWith('.json')) {
         // JSON: Network first, cache fallback (data changes frequently)
