@@ -1,7 +1,7 @@
 {
-  "available_events": [1, 2, 3, 4, 5, 6],
+  "available_events": [1, 2, 3, 4, 5, 6, "final_womans_series1_event1.json"],
   "series_name": "Atlantic Amateur Darts Series",
   "series_id": 1,
   "current_event": 6,
-  "last_updated": "2026-05-09"
+  "last_updated": "2026-06-08"
 }

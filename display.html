@@ -733,6 +733,28 @@
             box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
         }
 
+        .series-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .series-tab {
+            padding: 12px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .series-tab.active,
+        .series-tab:hover {
+            background: rgba(255, 107, 0, 0.16);
+            border-color: var(--primary-orange);
+        }
+
         /* Player Cards */
         .players-grid {
             display: grid;
@@ -1633,6 +1655,12 @@
         <!-- Events Section -->
         <div id="section-events" class="section active">
             <div class="event-selector-container">
+                <label>Select Series:</label>
+                <div class="series-tabs">
+                    <button id="menSeriesTab" class="series-tab active" type="button" onclick="setEventSeriesFilter('men')">Men's Series</button>
+                    <button id="womenSeriesTab" class="series-tab" type="button" onclick="setEventSeriesFilter('women')">Women's Series</button>
+                </div>
+
                 <label>Select Event:</label>
                 <select id="eventSelector" onchange="showEventDetails()">
                     <option value="">Choose an event...</option>
@@ -1670,6 +1698,15 @@
 
         <!-- Players Section -->
         <div id="section-players" class="section">
+            <div class="event-selector-container">
+                <label>Select Series:</label>
+                <div class="series-tabs">
+                    <button id="allPlayersTab" class="series-tab active" type="button" onclick="setPlayersSeriesFilter('all')">All Players</button>
+                    <button id="menPlayersTab" class="series-tab" type="button" onclick="setPlayersSeriesFilter('men')">Men's Series</button>
+                    <button id="womenPlayersTab" class="series-tab" type="button" onclick="setPlayersSeriesFilter('women')">Women's Series</button>
+                </div>
+            </div>
+
             <div class="search-container">
                 <input 
                     type="text" 
@@ -1692,9 +1729,17 @@
                 <p>Celebrating Excellence in the Atlantic Amateur Darts Series</p>
             </div>
 
+            <div class="event-selector-container">
+                <label>Select Series:</label>
+                <div class="series-tabs">
+                    <button id="menWinnersTab" class="series-tab active" type="button" onclick="setWinnersSeriesFilter('men')">Men's Series</button>
+                    <button id="womenWinnersTab" class="series-tab" type="button" onclick="setWinnersSeriesFilter('women')">Women's Series</button>
+                </div>
+            </div>
+
             <!-- Event Winners -->
             <div class="winners-section">
-                <h2 class="winners-section-title">Event Champions</h2>
+                <h2 id="eventWinnersTitle" class="winners-section-title">Event Champions</h2>
                 <div class="winner-cards-grid" id="eventWinnersGrid">
                     <!-- Populated by JS -->
                 </div>
@@ -1702,7 +1747,7 @@
 
             <!-- Series Winners -->
             <div class="winners-section">
-                <h2 class="winners-section-title">Series Champions</h2>
+                <h2 id="seriesWinnersTitle" class="winners-section-title">Series Champions</h2>
                 <div class="winner-cards-grid" id="seriesWinnersGrid">
                     <!-- Populated by JS -->
                 </div>
@@ -1742,7 +1787,7 @@
             <div class="copyright">
                 <p>&copy; 2026 Atlantic Amateur Darts Series (AADS). All rights reserved.</p>
                 <p>Powered by <a href="https://www.aadsdarts.com/" target="_blank" rel="noopener noreferrer">AADSDarts.com</a> | <a href="https://cgcdarts.com" target="_blank" rel="noopener noreferrer">CGCDarts.com</a></p>
-                <p>Statistics System v2.2.1 | Designed for competitive amateur darts</p>
+                <p>Statistics System v2.3.0 | Designed for competitive amateur darts</p>
             </div>
         </div>
     </div>
@@ -1789,8 +1834,12 @@
     </div>
 
     <script>
+        function canUseServiceWorker() {
+            return 'serviceWorker' in navigator && ['http:', 'https:'].includes(window.location.protocol);
+        }
+
         // Register Service Worker for caching
-        if ('serviceWorker' in navigator) {
+        if (canUseServiceWorker()) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
                     .then(reg => console.log('Service Worker registered for caching'))
@@ -1800,19 +1849,43 @@
 
         let eventFiles = [];
         let eventFilesCache = {}; // Cache for loaded event data
-        let availableEvents = []; // List of event numbers that exist
+        let availableEvents = []; // List of event definitions that exist
+        let currentSeriesFilter = 'men';
+        let currentPlayersSeriesFilter = 'all';
+        let currentWinnersSeriesFilter = 'men';
         let playerProfiles = [];
         let careerStats = {};
         let currentChart = null;
         const MAX_EVENTS = 20; // Maximum number of events to check for
-        const CACHE_VERSION = 'v6'; // Increment this when data structure changes
-        const IMAGE_CACHE_VERSION = '2026-04-07-1';
+        const APP_VERSION = '2.3.0-rr-match-time-order';
+        const CACHE_VERSION = 'v15'; // Increment this when data structure changes
+        const IMAGE_CACHE_VERSION = '2026-06-08-women-images';
         let availableImages = new Set(); // Cache of available images
+
+        console.log(`AADS display loaded: ${APP_VERSION}`, window.location.href);
+
+        function getFetchUrl(url) {
+            if (window.location.protocol !== 'file:' || /^https?:\/\//i.test(url)) {
+                return url;
+            }
+
+            return `http://127.0.0.1:8000/${url.replace(/^\/+/, '')}`;
+        }
+
+        async function safeFetch(url, options) {
+            const fetchUrl = getFetchUrl(url);
+            try {
+                return await fetch(fetchUrl, options);
+            } catch (error) {
+                console.warn(`Fetch failed for ${fetchUrl}:`, error);
+                return null;
+            }
+        }
 
         // Initialize available images on page load
         async function initializeImageCache() {
             try {
-                const response = await fetch('images/players/');
+                const response = await safeFetch('images/players/');
                 // Note: This requires server to support directory listing, fallback to predefined list
                 availableImages = new Set([
                     'colby-burke', 'corey-obrien', 'cory-wallace', 'craig-spencer',
@@ -1877,15 +1950,152 @@
             imageElement.replaceWith(placeholder);
         }
 
-        // Helper function to fetch with suppressed 404 logging
-        async function fetchEventFile(eventNumber) {
+        function normalizeManifestEntries(entries) {
+            if (!Array.isArray(entries)) return [];
+            return entries.map(entry => {
+                if (typeof entry === 'number') {
+                    return {
+                        series_key: 'men',
+                        series_id: 1,
+                        series_num: 1,
+                        event_id: entry,
+                        filename: `results/Final_Series1_Event${entry}.json`
+                    };
+                }
+
+                if (typeof entry === 'string') {
+                    const trimmed = entry.trim();
+                    const filename = trimmed.startsWith('results/') ? trimmed.slice(8) : trimmed;
+                    const match = filename.match(/^final_(.*?)_series(\d+)_event(\d+)\.json$/i);
+                    if (match) {
+                        const series_key = match[1].toLowerCase();
+                        return {
+                            series_key,
+                            series_id: series_key,
+                            series_num: parseInt(match[2], 10),
+                            event_id: parseInt(match[3], 10),
+                            filename: `results/${filename}`
+                        };
+                    }
+
+                    return {
+                        series_key: 'custom',
+                        series_id: 'custom',
+                        series_num: 0,
+                        event_id: filename,
+                        filename: `results/${filename}`
+                    };
+                }
+
+                if (entry && typeof entry === 'object') {
+                    const seriesKey = normalizeSeriesKey(entry.series_key || entry.series_id || entry.series || 'men');
+                    const eventId = parseInt(entry.event_id || entry.event || entry.event_num || 1, 10);
+                    return {
+                        series_key: seriesKey,
+                        series_id: entry.series_id || seriesKey,
+                        series_num: parseInt(entry.series_num || entry.series_number || 1, 10),
+                        event_id: eventId,
+                        filename: entry.filename || entry.file || null
+                    };
+                }
+
+                return null;
+            }).filter(Boolean);
+        }
+
+        function normalizeSeriesKey(seriesKey) {
+            if (seriesKey === 1 || seriesKey === '1' || seriesKey === 'men') return 'men';
+            return String(seriesKey || 'custom').toLowerCase();
+        }
+
+        function getEventDefKey(eventDef) {
+            return `${eventDef.series_key}::${eventDef.event_id}`;
+        }
+
+        function getEventDefFilename(eventDef) {
+            if (!eventDef) return null;
+            if (eventDef.filename) return eventDef.filename;
+            if (eventDef.series_key === 'men' || eventDef.series_id === 1) {
+                return `results/Final_Series1_Event${eventDef.event_id}.json`;
+            }
+            return `results/final_${eventDef.series_key}_series${eventDef.series_num || 1}_event${eventDef.event_id}.json`;
+        }
+
+        function isWomenSeries(eventDef) {
+            return typeof eventDef?.series_key === 'string' && /wom[ae]n/i.test(eventDef.series_key);
+        }
+
+        function parseEventKey(eventKey) {
+            if (!eventKey || typeof eventKey !== 'string') return null;
+            const [series_key, eventId] = eventKey.split('::');
+            if (!series_key || !eventId) return null;
+            return {
+                series_key: normalizeSeriesKey(series_key),
+                series_id: series_key,
+                series_num: 1,
+                event_id: parseInt(eventId, 10),
+                filename: null
+            };
+        }
+
+        function getCachedEventKey(eventKey) {
+            return `event_${encodeURIComponent(eventKey)}`;
+        }
+
+        function normalizeEventData(event, eventDef) {
+            if (!event || !eventDef) return event;
+
+            const metadata = event.metadata || {
+                series_id: event.series_id || eventDef.series_id,
+                event_id: isWomenSeries(eventDef) ? eventDef.event_id : (event.event_id || eventDef.event_id),
+                event_name: event.event_title || event.event_name || getEventLabel(eventDef, event),
+                event_date: event.event_date || event.date || '',
+                location: event.location || '',
+                format: event.format || ''
+            };
+
+            const finalAction = Array.isArray(event.actions)
+                ? event.actions.find(action => Array.isArray(action.rows))
+                : null;
+            const finalRows = event.final_results || finalAction?.rows || null;
+
+            if (!finalRows) {
+                return {
+                    ...event,
+                    metadata
+                };
+            }
+
+            return {
+                ...event,
+                metadata,
+                final_results: finalRows,
+                knockout_results: {
+                    champion: finalRows[0]?.player_name || finalRows[0]?.name || null
+                },
+                player_event_stats: finalRows.map(row => ({
+                    name: row.player_name || row.name,
+                    total_matches: 1,
+                    wins: row.rank === 1 ? 1 : 0,
+                    losses: row.rank === 1 ? 0 : 1,
+                    final_event_3da: row.score || 0,
+                    scores_100plus: 0,
+                    scores_140plus: 0,
+                    scores_180: 0,
+                    co_opportunities: 0,
+                    co_completed: 0,
+                    co_pct: 0,
+                    high_finish: row.high_finish || 0
+                }))
+            };
+        }
+
+        async function fetchEventFile(eventDef) {
             try {
-                // Add cache-busting parameter to always get fresh data
-                const response = await fetch(`results/Final_Series1_Event${eventNumber}.json?t=${Date.now()}`);
+                const response = await safeFetch(`${getEventDefFilename(eventDef)}?t=${Date.now()}`);
                 if (!response.ok) return null;
-                return await response.json();
+                return normalizeEventData(await response.json(), eventDef);
             } catch (error) {
-                // Silently handle errors (expected for non-existent event files)
                 return null;
             }
         }
@@ -1919,6 +2129,24 @@
         }
 
         // Head-to-Head Comparison Functions
+        function normalizePlayerNameForMatch(name) {
+            return formatNameForDisplay(name || '').trim().toLowerCase();
+        }
+
+        function isSamePlayerName(a, b) {
+            return normalizePlayerNameForMatch(a) === normalizePlayerNameForMatch(b);
+        }
+
+        function getMatchWinner(match) {
+            if (!match) return '';
+            if (match.winner) return match.winner;
+
+            const p1Legs = match.player1_legs ?? match.player1Legs ?? 0;
+            const p2Legs = match.player2_legs ?? match.player2Legs ?? 0;
+            if (p1Legs === p2Legs) return '';
+            return p1Legs > p2Legs ? match.player1 : match.player2;
+        }
+
         function getSortedMatches(playerAName, playerBName = null) {
             let matchPool = [];
             
@@ -1940,8 +2168,8 @@
                             event.round_robin.matches[group].forEach(match => {
                                 console.log('Match players:', match.player1, 'vs', match.player2);
                                 const sortKey = `${eventDate}T${match.start_time || '00:00'}`;
-                                const hasPlayerA = match.player1 === playerAName || match.player2 === playerAName;
-                                const hasPlayerB = playerBName ? (match.player1 === playerBName || match.player2 === playerBName) : true;
+                                const hasPlayerA = isSamePlayerName(match.player1, playerAName) || isSamePlayerName(match.player2, playerAName);
+                                const hasPlayerB = playerBName ? (isSamePlayerName(match.player1, playerBName) || isSamePlayerName(match.player2, playerBName)) : true;
 
                                 if (hasPlayerA && hasPlayerB) {
                                     matchPool.push({
@@ -1958,14 +2186,16 @@
                 }
 
                 // Process Knockout matches
-                if (event.knockout) {
+                const koData = event.knockout || event.knockout_results;
+                if (koData) {
                     ['quarterFinals', 'semiFinals'].forEach(round => {
-                        if (event.knockout[round]) {
-                            event.knockout[round].forEach(match => {
+                        const roundMatches = koData[round] || koData[round === 'quarterFinals' ? 'quarter_finals' : 'semi_finals'];
+                        if (roundMatches) {
+                            roundMatches.forEach(match => {
                                 if (match) {
                                     const sortKey = `${eventDate}T${match.start_time || '00:00'}`;
-                                    const hasPlayerA = match.player1 === playerAName || match.player2 === playerAName;
-                                    const hasPlayerB = playerBName ? (match.player1 === playerBName || match.player2 === playerBName) : true;
+                                    const hasPlayerA = isSamePlayerName(match.player1, playerAName) || isSamePlayerName(match.player2, playerAName);
+                                    const hasPlayerB = playerBName ? (isSamePlayerName(match.player1, playerBName) || isSamePlayerName(match.player2, playerBName)) : true;
 
                                     if (hasPlayerA && hasPlayerB) {
                                         matchPool.push({
@@ -1982,11 +2212,11 @@
                     });
 
                     // Final
-                    if (event.knockout.final) {
-                        const match = event.knockout.final;
+                    if (koData.final) {
+                        const match = koData.final;
                         const sortKey = `${eventDate}T${match.start_time || '00:00'}`;
-                        const hasPlayerA = match.player1 === playerAName || match.player2 === playerAName;
-                        const hasPlayerB = playerBName ? (match.player1 === playerBName || match.player2 === playerBName) : true;
+                        const hasPlayerA = isSamePlayerName(match.player1, playerAName) || isSamePlayerName(match.player2, playerAName);
+                        const hasPlayerB = playerBName ? (isSamePlayerName(match.player1, playerBName) || isSamePlayerName(match.player2, playerBName)) : true;
 
                         if (hasPlayerA && hasPlayerB) {
                             matchPool.push({
@@ -2006,17 +2236,11 @@
         }
 
         function getFormBadges(playerName, matches) {
-            const last10 = matches.slice(0, 10);
+            const latestFive = matches.slice(0, 5);
             let badges = '';
 
-            last10.forEach((match, index) => {
-                let won = false;
-                if (match.type === 'RR') {
-                    if (match.player1 === playerName && match.player1_legs >= 3) won = true;
-                    if (match.player2 === playerName && match.player2_legs >= 3) won = true;
-                } else {
-                    if (match.winner === playerName) won = true;
-                }
+            latestFive.forEach((match, index) => {
+                const won = isSamePlayerName(getMatchWinner(match), playerName);
 
                 // Add "Latest" label above first badge
                 const label = index === 0 ? '<div style="font-size: 0.7em; color: var(--primary-orange); margin-bottom: 2px; font-weight: 600;">Latest →</div>' : '';
@@ -2036,21 +2260,22 @@
 
             matches.forEach(match => {
                 let details = null;
-                if (match.player1 === playerName) {
+                if (isSamePlayerName(match.player1, playerName)) {
                     details = match.player1_details;
-                } else if (match.player2 === playerName) {
+                } else if (isSamePlayerName(match.player2, playerName)) {
                     details = match.player2_details;
                 }
 
                 if (details) {
-                    if (details.three_dart_avg > 0) {
-                        total3DA += details.three_dart_avg;
+                    const threeDartAvg = details.three_dart_avg || details.threeDartAvg || 0;
+                    if (threeDartAvg > 0) {
+                        total3DA += threeDartAvg;
                         count++;
                     }
-                    total180s += details.scores_180 || 0;
-                    if (details.high_finish > highFinish) highFinish = details.high_finish;
-                    totalCOOpp += details.co_opportunities || 0;
-                    totalCOComp += details.co_completed || 0;
+                    total180s += details.scores_180 || details.scores180 || 0;
+                    highFinish = Math.max(highFinish, details.high_finish || details.highFinish || details.high_checkout || details.highCheckout || 0);
+                    totalCOOpp += details.co_opportunities || details.coOpportunities || 0;
+                    totalCOComp += details.co_completed || details.coCompleted || 0;
                 }
             });
 
@@ -2079,9 +2304,9 @@
                 return;
             }
 
-            // Convert display names to JSON format for matching
-            const playerANameJSON = formatNameForJSON(playerAName);
-            const playerBNameJSON = formatNameForJSON(playerBName);
+            // Match by normalized display names so both "First Last" and "Last, First" data shapes work.
+            const playerANameJSON = playerAName;
+            const playerBNameJSON = playerBName;
 
             console.log('Display names:', playerAName, playerBName);
             console.log('JSON names:', playerANameJSON, playerBNameJSON);
@@ -2118,15 +2343,9 @@
             let playerBH2HWins = 0;
 
             h2hMatches.forEach(match => {
-                if (match.type === 'RR') {
-                    if (match.player1 === playerANameJSON && match.player1_legs >= 3) playerAH2HWins++;
-                    if (match.player2 === playerANameJSON && match.player2_legs >= 3) playerAH2HWins++;
-                    if (match.player1 === playerBNameJSON && match.player1_legs >= 3) playerBH2HWins++;
-                    if (match.player2 === playerBNameJSON && match.player2_legs >= 3) playerBH2HWins++;
-                } else {
-                    if (match.winner === playerANameJSON) playerAH2HWins++;
-                    if (match.winner === playerBNameJSON) playerBH2HWins++;
-                }
+                const winner = getMatchWinner(match);
+                if (isSamePlayerName(winner, playerANameJSON)) playerAH2HWins++;
+                if (isSamePlayerName(winner, playerBNameJSON)) playerBH2HWins++;
             });
 
             // Get profiles
@@ -2198,14 +2417,14 @@
                 bLast10Elem.classList.remove('highlight');
             }
 
-            document.getElementById('playerA180s').textContent = playerAStats.total180s;
-            document.getElementById('playerB180s').textContent = playerBStats.total180s;
+            document.getElementById('playerA180s').textContent = careerAStats?.total180s || 0;
+            document.getElementById('playerB180s').textContent = careerBStats?.total180s || 0;
 
-            document.getElementById('playerAHighFinish').textContent = playerAStats.highFinish;
-            document.getElementById('playerBHighFinish').textContent = playerBStats.highFinish;
+            document.getElementById('playerAHighFinish').textContent = careerAStats?.highCheckout || 0;
+            document.getElementById('playerBHighFinish').textContent = careerBStats?.highCheckout || 0;
 
-            document.getElementById('playerACO').textContent = playerAStats.coPct + '%';
-            document.getElementById('playerBCO').textContent = playerBStats.coPct + '%';
+            document.getElementById('playerACO').textContent = `${(careerAStats?.coRate || 0).toFixed(1)}%`;
+            document.getElementById('playerBCO').textContent = `${(careerBStats?.coRate || 0).toFixed(1)}%`;
 
             // Display match history
             const matchesList = document.getElementById('h2hMatchesList');
@@ -2218,14 +2437,9 @@
                         ? `${match.player1_legs} - ${match.player2_legs} Legs`
                         : `${match.player1_sets} - ${match.player2_sets} Sets`;
                     
-                    let winner = '';
-                    if (match.type === 'RR') {
-                        winner = match.player1_legs >= 3 ? match.player1 : match.player2;
-                    } else {
-                        winner = match.winner;
-                    }
+                    const winner = getMatchWinner(match);
 
-                    const winnerClass = winner === playerANameJSON ? 'color: #22c55e' : 'color: #ef4444';
+                    const winnerClass = isSamePlayerName(winner, playerANameJSON) ? 'color: #22c55e' : 'color: #ef4444';
 
                     // Get match details
                     const p1Details = match.player1_details || {};
@@ -2356,20 +2570,20 @@
                 }
                 
                 if (cachedManifest) {
-                    availableEvents = cachedManifest.available_events || [1];
+                    availableEvents = normalizeManifestEntries(cachedManifest.available_events || [1]);
                     console.log('Loaded manifest from cache');
                 }
 
                 // Load manifest to see which events exist (tiny file, no 404s)
                 // Add cache-busting parameter to always get fresh data
-                const manifestRes = await fetch(`results/manifest.json?t=${Date.now()}`);
-                if (manifestRes.ok) {
+                const manifestRes = await safeFetch(`results/manifest.json?t=${Date.now()}`);
+                if (manifestRes?.ok) {
                     const manifest = await manifestRes.json();
-                    availableEvents = manifest.available_events || [1];
+                    availableEvents = normalizeManifestEntries(manifest.available_events || [1]);
                     setCachedData('manifest', manifest);
                 } else if (!cachedManifest) {
                     // Fallback: just try Event 1
-                    availableEvents = [1];
+                    availableEvents = normalizeManifestEntries([1]);
                 }
                 
                 console.log('Available events:', availableEvents);
@@ -2379,37 +2593,41 @@
                 }
 
                 // Load player profiles (small file)
-                const profileRes = await fetch('results/player_profiles.json');
-                if (profileRes.ok) {
+                const profileRes = await safeFetch('results/player_profiles.json');
+                if (profileRes?.ok) {
                     playerProfiles = await profileRes.json();
                     setCachedData('player_profiles', playerProfiles);
                 }
 
                 // Try to load merged all_events.json first
-                const allEventsRes = await fetch(`results/all_events.json?t=${Date.now()}`);
-                if (allEventsRes.ok) {
+                const allEventsRes = await safeFetch(`results/all_events.json?t=${Date.now()}`);
+                if (allEventsRes?.ok) {
                     const allEventsData = await allEventsRes.json();
                     console.log('Loaded merged all_events.json');
                     
                     // Process all events from merged file
                     if (allEventsData.events && Array.isArray(allEventsData.events)) {
                         allEventsData.events.forEach(event => {
-                            const eventId = event.metadata?.event_id;
+                            const eventId = event.metadata?.event_id || event.event_id;
+                            const rawSeriesId = event.metadata?.series_id || event.series_id;
                             if (eventId) {
-                                eventFilesCache[eventId] = event;
-                                setCachedData(`event_${eventId}`, event);
+                                const seriesKey = normalizeSeriesKey(rawSeriesId);
+                                const eventKey = `${seriesKey}::${eventId}`;
+                                const normalizedEvent = normalizeEventData(event, parseEventKey(eventKey));
+                                eventFilesCache[eventKey] = normalizedEvent;
+                                setCachedData(getCachedEventKey(eventKey), normalizedEvent);
                             }
                         });
-                        eventFiles = allEventsData.events;
+                        eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                         calculateCareerStats();
 
                         // If the merged file is stale, pull in any events listed in the manifest
                         // that are missing from the merged payload before rendering the UI.
-                        const missingEvents = availableEvents.filter(eventNum => !eventFilesCache[eventNum]);
+                        const missingEvents = availableEvents.filter(def => !eventFilesCache[getEventDefKey(def)]);
                         if (missingEvents.length > 0) {
-                            console.log('Merged file missing events, loading individually:', missingEvents);
-                            for (const eventNum of missingEvents) {
-                                await loadEvent(eventNum);
+                            console.log('Merged file missing events, loading individually:', missingEvents.map(def => getEventDefKey(def)));
+                            for (const eventDef of missingEvents) {
+                                await loadEvent(eventDef);
                             }
                         }
                     }
@@ -2446,27 +2664,33 @@
         }
 
         // Load a specific event file
-        async function loadEvent(eventNum) {
-            if (eventFilesCache[eventNum]) {
-                return eventFilesCache[eventNum];
+        async function loadEvent(eventDef) {
+            const eventKey = getEventDefKey(eventDef);
+            if (eventFilesCache[eventKey]) {
+                return eventFilesCache[eventKey];
             }
 
             // Check cache first
-            const cachedEvent = getCachedData(`event_${eventNum}`);
+            let cachedEvent = getCachedData(getCachedEventKey(eventKey));
+            if (!cachedEvent && eventDef.series_key === 'men') {
+                cachedEvent = getCachedData(`event_${eventDef.event_id}`);
+            }
+
             if (cachedEvent) {
-                eventFilesCache[eventNum] = cachedEvent;
-                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                const normalizedEvent = normalizeEventData(cachedEvent, eventDef);
+                eventFilesCache[eventKey] = normalizedEvent;
+                eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                 calculateCareerStats();
-                console.log(`Loaded Event ${eventNum} from cache`);
-                return cachedEvent;
+                console.log(`Loaded Event ${eventKey} from cache`);
+                return normalizedEvent;
             }
 
             // Fetch from network
-            const event = await fetchEventFile(eventNum);
+            const event = await fetchEventFile(eventDef);
             if (event) {
-                eventFilesCache[eventNum] = event;
-                setCachedData(`event_${eventNum}`, event);
-                eventFiles = availableEvents.map(n => eventFilesCache[n]).filter(e => e);
+                eventFilesCache[eventKey] = event;
+                setCachedData(getCachedEventKey(eventKey), event);
+                eventFiles = availableEvents.map(def => eventFilesCache[getEventDefKey(def)]).filter(e => e);
                 calculateCareerStats();
             }
             return event;
@@ -2475,10 +2699,11 @@
         // Load remaining events in background
         async function loadRemainingEvents() {
             for (let i = 1; i < availableEvents.length; i++) {
-                const eventNum = availableEvents[i];
-                if (!eventFilesCache[eventNum]) {
-                    await loadEvent(eventNum);
-                    console.log(`Background loaded Event ${eventNum}`);
+                const eventDef = availableEvents[i];
+                const eventKey = getEventDefKey(eventDef);
+                if (!eventFilesCache[eventKey]) {
+                    await loadEvent(eventDef);
+                    console.log(`Background loaded ${eventKey}`);
                 }
             }
             console.log('All events loaded');
@@ -2529,16 +2754,19 @@
         // Calculate career statistics
         function calculateCareerStats() {
             const playerMap = new Map();
+            careerStats = {};
 
             eventFiles.forEach((event, eventIndex) => {
                 if (event.player_event_stats) {
                     event.player_event_stats.forEach(playerStats => {
                         const name = formatNameForDisplay(playerStats.name);
+                        const seriesKey = isWomenEvent(event) ? 'women' : 'men';
                         
                         if (!playerMap.has(name)) {
                             playerMap.set(name, {
                                 name: name,
                                 events: [],
+                                seriesKeys: new Set(),
                                 totalMatches: 0,
                                 total3DASum: 0,
                                 total180s: 0,
@@ -2559,9 +2787,11 @@
                         }
 
                         const player = playerMap.get(name);
+                        player.seriesKeys.add(seriesKey);
                         player.events.push({
                             eventIndex: eventIndex,
                             eventName: event.metadata.event_name,
+                            seriesKey,
                             avg3DA: playerStats.final_event_3da,
                             matches: playerStats.total_matches,
                             wins: playerStats.wins,
@@ -2645,6 +2875,7 @@
                 player.career3DA = player.totalMatches > 0 ? player.total3DASum / player.totalMatches : 0;
                 player.winRate = player.totalMatches > 0 ? (player.totalWins / player.totalMatches) * 100 : 0;
                 player.coRate = player.coOpportunities > 0 ? (player.coCompleted / player.coOpportunities) * 100 : 0;
+                player.seriesKeys = Array.from(player.seriesKeys);
                 careerStats[name] = player;
             });
         }
@@ -2856,64 +3087,129 @@
             }).join('');
         }
 
-        function getEventLabel(eventNum, event) {
+        function getEventLabel(eventDef, event) {
             if (event && event.metadata && event.metadata.event_name) {
                 return event.metadata.event_name;
             }
-            return `Series 1 - Event ${eventNum}`;
+            const seriesLabel = isWomenSeries(eventDef) ? "Women's Series" : "Men's Series";
+            return `${seriesLabel} - Event ${eventDef.event_id}`;
+        }
+
+        function setEventSeriesFilter(filter) {
+            currentSeriesFilter = filter;
+            document.getElementById('menSeriesTab').classList.toggle('active', filter === 'men');
+            document.getElementById('womenSeriesTab').classList.toggle('active', filter === 'women');
+            populateEventSelector();
+            document.getElementById('eventDetails').style.display = 'none';
         }
 
         // Populate event selector
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
-            
-            availableEvents.forEach((eventNum) => {
+            selector.innerHTML = '<option value="">Choose an event...</option>';
+            const filteredEvents = availableEvents.filter(def => {
+                return currentSeriesFilter === 'men' ? def.series_key === 'men' : isWomenSeries(def);
+            });
+
+            if (filteredEvents.length === 0) {
                 const option = document.createElement('option');
-                option.value = eventNum;
-                // Use cached event name if available, otherwise use placeholder
-                const event = eventFilesCache[eventNum];
-                option.textContent = getEventLabel(eventNum, event);
+                option.value = '';
+                option.textContent = `No ${currentSeriesFilter === 'men' ? 'men' : 'women'} events available`;
+                selector.appendChild(option);
+                return;
+            }
+
+            filteredEvents.sort((a, b) => a.event_id - b.event_id).forEach((eventDef) => {
+                const option = document.createElement('option');
+                option.value = getEventDefKey(eventDef);
+                const event = eventFilesCache[getEventDefKey(eventDef)];
+                option.textContent = getEventLabel(eventDef, event);
                 selector.appendChild(option);
             });
         }
 
         // Show event details
         async function showEventDetails() {
-            const eventNum = parseInt(document.getElementById('eventSelector').value);
-            if (isNaN(eventNum) || !availableEvents.includes(eventNum)) {
+            const eventKey = document.getElementById('eventSelector').value;
+            const eventDef = availableEvents.find(def => getEventDefKey(def) === eventKey) || parseEventKey(eventKey);
+            if (!eventDef || !availableEvents.some(def => getEventDefKey(def) === eventKey)) {
                 document.getElementById('eventDetails').style.display = 'none';
                 return;
             }
 
-            // Load event if not cached
-            if (!eventFilesCache[eventNum]) {
-                await loadEvent(eventNum);
+            if (!eventFilesCache[eventKey]) {
+                await loadEvent(eventDef);
             }
 
-            const event = eventFilesCache[eventNum];
+            const event = eventFilesCache[eventKey];
+            if (!event) {
+                document.getElementById('eventDetails').style.display = 'none';
+                return;
+            }
+
             document.getElementById('eventDetails').style.display = 'block';
-            document.getElementById('eventTitle').textContent = event.metadata.event_name;
-            
-            // Show event champion prominently if available
+            document.getElementById('eventTitle').textContent = event.metadata.event_name || getEventLabel(eventDef, event);
+
             const ko = event.knockout_results || event.knockout;
             const champion = ko?.champion;
-            const eventId = event.metadata.event_id || 0;
-            const championTitle = eventId === 7 ? 'TOC Champion' : 'Event Champion';
-            
-            const metaHtml = champion ? 
-                `Series ${event.metadata.series_id} - Event ${event.metadata.event_id} | <span style="color: var(--primary-orange); font-weight: 700;">🏆 ${championTitle}: ${formatNameForDisplay(champion)}</span>` :
-                `Series ${event.metadata.series_id} - Event ${event.metadata.event_id}`;
-            
+            const seriesLabel = isWomenSeries(eventDef) ? "Women's Invitational" : `Series ${event.metadata.series_id}`;
+            const championTitle = event.metadata.event_id === 7 ? 'TOC Champion' : 'Event Champion';
+
+            const metaHtml = champion ?
+                `${seriesLabel} - Event ${event.metadata.event_id} | <span style="color: var(--primary-orange); font-weight: 700;">🏆 ${championTitle}: ${formatNameForDisplay(champion)}</span>` :
+                `${seriesLabel} - Event ${event.metadata.event_id}`;
+
             document.getElementById('eventMeta').innerHTML = metaHtml;
 
             renderRRStandings(event);
             renderKOBracket(event);
         }
 
+        function renderFinalResults(event) {
+            const rows = event.final_results || [];
+            document.getElementById('rrMatchResults').innerHTML = '';
+            document.getElementById('rrStandings').innerHTML = `
+                <div class="table-header"><h2>Final Results</h2></div>
+                <div style="padding: 20px; overflow-x: auto;">
+                    <table style="width: 100%; min-width: 760px;">
+                        <thead>
+                            <tr>
+                                <th class="center">Rank</th>
+                                <th>Player</th>
+                                <th class="center">Score</th>
+                                <th class="center">Points</th>
+                                <th class="center">Checkout</th>
+                                <th class="center">High Finish</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(row => `
+                                <tr class="${row.rank === 1 ? 'qualified' : ''}">
+                                    <td class="center rank-cell ${row.rank === 1 ? 'rank-1' : row.rank === 2 ? 'rank-2' : row.rank === 3 ? 'rank-3' : ''}">${row.rank || ''}</td>
+                                    <td class="player-name">${formatNameForDisplay(row.player_name || row.name)}</td>
+                                    <td class="center highlight-stat">${row.score ?? '-'}</td>
+                                    <td class="center">${row.points ?? '-'}</td>
+                                    <td class="center">${row.checkout ?? '-'}</td>
+                                    <td class="center">${row.high_finish ?? '-'}</td>
+                                    <td>${row.notes || ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         // Render RR standings
         function renderRRStandings(event) {
             const container = document.getElementById('rrStandings');
             const groups = ['A', 'B'];
+
+            if (event.final_results && !(event.round_robin_results || event.round_robin)) {
+                renderFinalResults(event);
+                return;
+            }
             
             // Handle both old and new data structures
             const rrData = event.round_robin_results || event.round_robin;
@@ -2925,119 +3221,121 @@
             const standings = rrData.standings || rrData;
             const matches = rrData.matches || {};
             
-            // Create match results in one container
-            let matchResultsHTML = '<div class="table-header"><h2>Match Results</h2></div><div style="padding: 20px;"><div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">';
-            let matchNumber = 1;
-            
-            groups.forEach(group => {
-                const groupMatches = matches[`group${group}`] || [];
-                
-                // Match results for this group
-                if (groupMatches.length > 0) {
-                    matchResultsHTML += `
-                        <div style="flex: 1; min-width: 500px; max-width: 650px;">
-                            <h3 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Group ${group}</h3>
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse;">
+            const allRRMatches = groups.flatMap(group => {
+                return (matches[`group${group}`] || []).map((match, idx) => ({
+                    ...match,
+                    group,
+                    originalIndex: idx
+                }));
+            }).sort((a, b) => {
+                const timeCompare = (a.start_time || '00:00').localeCompare(b.start_time || '00:00');
+                if (timeCompare !== 0) return timeCompare;
+                return a.group.localeCompare(b.group) || a.originalIndex - b.originalIndex;
+            });
+
+            const renderMatchDetails = (match, matchNumber) => {
+                const p1 = formatNameForDisplay(match.player1);
+                const p2 = formatNameForDisplay(match.player2);
+                const p1Legs = match.player1_legs || 0;
+                const p2Legs = match.player2_legs || 0;
+                const winner = getMatchWinner(match);
+                const p1Details = match.player1_details || match.details?.player1 || {};
+                const p2Details = match.player2_details || match.details?.player2 || {};
+                const matchId = `rr-match-${matchNumber}`;
+
+                return `
+                    <tr class="match-row" style="cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255, 255, 255, 0.1);"
+                        onmouseover="this.style.background='rgba(255, 107, 0, 0.1)'"
+                        onmouseout="this.style.background=''"
+                        onclick="toggleMatchDetails('${matchId}')">
+                        <td class="center" style="padding: 10px; text-align: center;">${matchNumber}</td>
+                        <td class="center" style="padding: 10px; text-align: center;">${match.start_time || '-'}</td>
+                        <td class="center" style="padding: 10px; text-align: center;">${match.group}</td>
+                        <td class="center" style="padding: 10px; text-align: center; ${isSamePlayerName(winner, p1) ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
+                        <td class="center" style="padding: 10px; text-align: center; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
+                        <td class="center" style="padding: 10px; text-align: center; ${isSamePlayerName(winner, p2) ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
+                    </tr>
+                    <tr id="${matchId}" class="match-details-row" style="display: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td colspan="6" style="padding: 0;">
+                            <div style="background: rgba(255, 107, 0, 0.05); padding: 20px; border-left: 4px solid var(--primary-orange);">
+                                <h4 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Match Details</h4>
+                                <table style="width: 100%; max-width: 600px; margin: 0 auto; font-size: 0.95em; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background: rgba(0, 0, 0, 0.2);">
-                                            <th class="center" style="padding: 10px; width: 50px; text-align: center;">#</th>
-                                            <th class="center" style="padding: 10px; text-align: center;">Player 1</th>
-                                            <th class="center" style="padding: 10px; width: 80px; text-align: center;">Score</th>
-                                            <th class="center" style="padding: 10px; text-align: center;">Player 2</th>
+                                            <th style="padding: 10px; text-align: left;">Stat</th>
+                                            <th style="padding: 10px; text-align: center;">${p1}</th>
+                                            <th style="padding: 10px; text-align: center;">${p2}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${groupMatches.map((match, idx) => {
-                                            const p1 = formatNameForDisplay(match.player1);
-                                            const p2 = formatNameForDisplay(match.player2);
-                                            const p1Legs = match.player1_legs || 0;
-                                            const p2Legs = match.player2_legs || 0;
-                                            const winner = p1Legs > p2Legs ? match.player1 : match.player2;
-                                            const p1Details = match.player1_details || match.details?.player1 || {};
-                                            const p2Details = match.player2_details || match.details?.player2 || {};
-                                            const matchId = `match-${group}-${idx}`;
-                                            
-                                            return `
-                                                <tr class="match-row" style="cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" 
-                                                    onmouseover="this.style.background='rgba(255, 107, 0, 0.1)'" 
-                                                    onmouseout="this.style.background=''"
-                                                    onclick="toggleMatchDetails('${matchId}')">
-                                                    <td class="center" style="padding: 10px; text-align: center;">${matchNumber++}</td>
-                                                    <td class="center" style="padding: 10px; text-align: center; ${formatNameForDisplay(winner) === p1 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p1}</td>
-                                                    <td class="center" style="padding: 10px; text-align: center; font-weight: 700; color: var(--primary-orange);">${p1Legs} - ${p2Legs}</td>
-                                                    <td class="center" style="padding: 10px; text-align: center; ${formatNameForDisplay(winner) === p2 ? 'font-weight: 600; color: var(--success-green);' : ''}">${p2}</td>
-                                                </tr>
-                                                <tr id="${matchId}" class="match-details-row" style="display: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                                                    <td colspan="4" style="padding: 0;">
-                                                        <div style="background: rgba(255, 107, 0, 0.05); padding: 20px; border-left: 4px solid var(--primary-orange);">
-                                                            <h4 style="color: var(--primary-orange); margin-bottom: 15px; text-align: center;">Match Details</h4>
-                                                            <table style="width: 100%; max-width: 600px; margin: 0 auto; font-size: 0.95em; border-collapse: collapse;">
-                                                                <thead>
-                                                                    <tr style="background: rgba(0, 0, 0, 0.2);">
-                                                                        <th style="padding: 10px; text-align: left;">Stat</th>
-                                                                        <th style="padding: 10px; text-align: center;">${p1}</th>
-                                                                        <th style="padding: 10px; text-align: center;">${p2}</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>3-Dart Average</strong></td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${(p1Details.three_dart_avg || p1Details.threeDartAvg || 0).toFixed(2)}</td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${(p2Details.three_dart_avg || p2Details.threeDartAvg || 0).toFixed(2)}</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>CO Opportunities</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.co_opportunities || p1Details.coOpportunities || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.co_opportunities || p2Details.coOpportunities || 0}</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>CO Completed</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.co_completed || p1Details.coCompleted || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.co_completed || p2Details.coCompleted || 0}</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>Checkout %</strong></td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p1Details.co_pct || p1Details.coPct || 0).toFixed(1)}%</td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p2Details.co_pct || p2Details.coPct || 0).toFixed(1)}%</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>180s</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_180 || p1Details.scores180 || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_180 || p2Details.scores180 || 0}</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>140+ Scores</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_140plus || p1Details.scores140plus || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_140plus || p2Details.scores140plus || 0}</td>
-                                                                    </tr>
-                                                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                                                                        <td style="padding: 8px;"><strong>100+ Scores</strong></td>
-                                                                        <td style="padding: 8px; text-align: center;">${p1Details.scores_100plus || p1Details.scores100plus || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center;">${p2Details.scores_100plus || p2Details.scores100plus || 0}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td style="padding: 8px;"><strong>High Finish</strong></td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${p1Details.high_finish || p1Details.highFinish || 0}</td>
-                                                                        <td style="padding: 8px; text-align: center; font-weight: 600;">${p2Details.high_finish || p2Details.highFinish || 0}</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            `;
-                                        }).join('')}
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>3-Dart Average</strong></td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600;">${(p1Details.three_dart_avg || p1Details.threeDartAvg || 0).toFixed(2)}</td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600;">${(p2Details.three_dart_avg || p2Details.threeDartAvg || 0).toFixed(2)}</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>CO Opportunities</strong></td>
+                                            <td style="padding: 8px; text-align: center;">${p1Details.co_opportunities || p1Details.coOpportunities || 0}</td>
+                                            <td style="padding: 8px; text-align: center;">${p2Details.co_opportunities || p2Details.coOpportunities || 0}</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>CO Completed</strong></td>
+                                            <td style="padding: 8px; text-align: center;">${p1Details.co_completed || p1Details.coCompleted || 0}</td>
+                                            <td style="padding: 8px; text-align: center;">${p2Details.co_completed || p2Details.coCompleted || 0}</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>Checkout %</strong></td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p1Details.co_pct || p1Details.coPct || 0).toFixed(1)}%</td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600; color: var(--primary-orange);">${(p2Details.co_pct || p2Details.coPct || 0).toFixed(1)}%</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>180s</strong></td>
+                                            <td style="padding: 8px; text-align: center;">${p1Details.scores_180 || p1Details.scores180 || 0}</td>
+                                            <td style="padding: 8px; text-align: center;">${p2Details.scores_180 || p2Details.scores180 || 0}</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>140+ Scores</strong></td>
+                                            <td style="padding: 8px; text-align: center;">${p1Details.scores_140plus || p1Details.scores140plus || 0}</td>
+                                            <td style="padding: 8px; text-align: center;">${p2Details.scores_140plus || p2Details.scores140plus || 0}</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                            <td style="padding: 8px;"><strong>100+ Scores</strong></td>
+                                            <td style="padding: 8px; text-align: center;">${p1Details.scores_100plus || p1Details.scores100plus || 0}</td>
+                                            <td style="padding: 8px; text-align: center;">${p2Details.scores_100plus || p2Details.scores100plus || 0}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px;"><strong>High Finish</strong></td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600;">${p1Details.high_finish || p1Details.highFinish || 0}</td>
+                                            <td style="padding: 8px; text-align: center; font-weight: 600;">${p2Details.high_finish || p2Details.highFinish || 0}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    `;
-                    matchNumber += groupMatches.length;
-                }
-            });
-            
-            matchResultsHTML += '</div></div></div>';
+                        </td>
+                    </tr>
+                `;
+            };
+
+            let matchResultsHTML = `
+                <div class="table-header"><h2>Match Results</h2></div>
+                <div style="padding: 20px; overflow-x: auto;">
+                    <table style="width: 100%; min-width: 820px; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(0, 0, 0, 0.2);">
+                                <th class="center" style="padding: 10px; width: 70px; text-align: center;">Match</th>
+                                <th class="center" style="padding: 10px; width: 80px; text-align: center;">Time</th>
+                                <th class="center" style="padding: 10px; width: 80px; text-align: center;">Group</th>
+                                <th class="center" style="padding: 10px; text-align: center;">Player 1</th>
+                                <th class="center" style="padding: 10px; width: 80px; text-align: center;">Score</th>
+                                <th class="center" style="padding: 10px; text-align: center;">Player 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allRRMatches.map((match, index) => renderMatchDetails(match, index + 1)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
             
             // Now create standings in a separate container
             let standingsHTML = '';
@@ -3208,6 +3506,11 @@
             const ko = event.knockout_results || event.knockout;
             const container = document.getElementById('koBracket');
 
+            if (event.final_results && !ko?.final && !ko?.quarterFinals && !ko?.quarter_finals && !ko?.semiFinals && !ko?.semi_finals) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No bracket match data available</p>';
+                return;
+            }
+
             if (!ko) {
                 container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No knockout data available</p>';
                 return;
@@ -3355,10 +3658,36 @@
             container.innerHTML = html;
         }
 
+        function setPlayersSeriesFilter(filter) {
+            currentPlayersSeriesFilter = filter;
+            document.getElementById('allPlayersTab').classList.toggle('active', filter === 'all');
+            document.getElementById('menPlayersTab').classList.toggle('active', filter === 'men');
+            document.getElementById('womenPlayersTab').classList.toggle('active', filter === 'women');
+            renderPlayerCards();
+            filterPlayers();
+        }
+
+        function playerIsInCurrentSeries(player) {
+            if (currentPlayersSeriesFilter === 'all') return true;
+            return (player.seriesKeys || ['men']).includes(currentPlayersSeriesFilter);
+        }
+
         // Render player cards
         function renderPlayerCards() {
             const container = document.getElementById('playersGrid');
-            const sortedPlayers = Object.values(careerStats).sort((a, b) => b.career3DA - a.career3DA);
+            const sortedPlayers = Object.values(careerStats)
+                .filter(playerIsInCurrentSeries)
+                .sort((a, b) => b.career3DA - a.career3DA);
+
+            document.getElementById('allPlayersTab').classList.toggle('active', currentPlayersSeriesFilter === 'all');
+            document.getElementById('menPlayersTab').classList.toggle('active', currentPlayersSeriesFilter === 'men');
+            document.getElementById('womenPlayersTab').classList.toggle('active', currentPlayersSeriesFilter === 'women');
+
+            if (sortedPlayers.length === 0) {
+                const emptyLabel = currentPlayersSeriesFilter === 'all' ? 'player' : currentPlayersSeriesFilter;
+                container.innerHTML = `<div class="no-series-winner"><div class="no-series-winner-icon">-</div><div class="no-series-winner-text">No ${emptyLabel} profiles available</div></div>`;
+                return;
+            }
 
             container.innerHTML = sortedPlayers.map(player => {
                 const profile = playerProfiles.find(p => p.name === player.name);
@@ -3408,18 +3737,38 @@
             });
         }
 
+        function isWomenEvent(event) {
+            return /wom[ae]n/i.test(String(event?.metadata?.series_id || ''));
+        }
+
+        function setWinnersSeriesFilter(filter) {
+            currentWinnersSeriesFilter = filter;
+            document.getElementById('menWinnersTab').classList.toggle('active', filter === 'men');
+            document.getElementById('womenWinnersTab').classList.toggle('active', filter === 'women');
+            renderWinners();
+        }
+
         // Render Winners Hall of Fame
         function renderWinners() {
             const eventWinnersGrid = document.getElementById('eventWinnersGrid');
             const seriesWinnersGrid = document.getElementById('seriesWinnersGrid');
+            const isWomenFilter = currentWinnersSeriesFilter === 'women';
+            const seriesLabel = isWomenFilter ? "Women's Series" : "Men's Series";
+
+            document.getElementById('eventWinnersTitle').textContent = `${seriesLabel} Event Champions`;
+            document.getElementById('seriesWinnersTitle').textContent = `${seriesLabel} Champions`;
+            document.getElementById('menWinnersTab').classList.toggle('active', !isWomenFilter);
+            document.getElementById('womenWinnersTab').classList.toggle('active', isWomenFilter);
+
+            const filteredEvents = eventFiles.filter(event => isWomenEvent(event) === isWomenFilter);
 
             // Render Event Winners
-            const eventWinners = eventFiles
+            const eventWinners = filteredEvents
                 .filter(event => getEventChampion(event))
                 .sort((a, b) => a.metadata.event_id - b.metadata.event_id)
                 .map(event => {
                     const championName = formatNameForDisplay(getEventChampion(event));
-                    const championStats = event.player_event_stats.find(p => 
+                    const championStats = (event.player_event_stats || []).find(p => 
                         formatNameForDisplay(p.name) === championName
                     );
                     const profile = playerProfiles.find(p => p.name === championName);
@@ -3468,7 +3817,7 @@
             eventWinnersGrid.innerHTML = eventWinners || '<div class="no-series-winner"><div class="no-series-winner-icon">🎯</div><div class="no-series-winner-text">No event champions yet</div></div>';
 
             // Check for series winner (Event 7 - TOC)
-            const tocEvent = eventFiles.find(e => e.metadata.event_id === 7);
+            const tocEvent = filteredEvents.find(e => e.metadata.event_id === 7);
             const tocChampion = getEventChampion(tocEvent);
             
             if (tocEvent && tocChampion) {
@@ -3488,7 +3837,7 @@
                     <div class="winner-card series-winner-card">
                         <div class="winner-card-header">
                             <span class="winner-trophy">👑</span>
-                            <div class="winner-event-name">Series 1 Champion</div>
+                            <div class="winner-event-name">${seriesLabel} Champion</div>
                             <div class="winner-date">Tournament of Champions Winner</div>
                         </div>
                         <div class="winner-photo-container">
@@ -3750,7 +4099,7 @@
         function clearCacheAndReload() {
             if (confirm('This will clear all cached data and reload fresh from the server. Continue?')) {
                 localStorage.clear();
-                if ('serviceWorker' in navigator && 'caches' in window) {
+                if (canUseServiceWorker() && 'caches' in window) {
                     caches.keys().then(keys => {
                         return Promise.all(keys.map(key => caches.delete(key)));
                     }).then(() => {
@@ -3768,7 +4117,10 @@
 
     <!-- Version Banner -->
     <div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.3); color: var(--text-secondary); font-size: 0.9em; border-top: 1px solid rgba(255,255,255,0.1);">
-        <span style="color: var(--primary-orange); font-weight: 600;">AADS Statistics</span> • Version 2.2.1
+        <span style="color: var(--primary-orange); font-weight: 600;">AADS Statistics</span> • Version 2.3.0
     </div>
 </body>
 </html>
+
+
+

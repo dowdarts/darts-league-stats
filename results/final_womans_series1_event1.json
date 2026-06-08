@@ -1,0 +1,1018 @@
+{
+  "metadata": {
+    "series_id": "women_invitational",
+    "event_id": 1,
+    "event_name": "Atlantic Amateur Darts Series Woman's Invitational Event 1",
+    "event_date": "2026-05-30"
+  },
+  "player_event_stats": [
+    {
+      "name": "Josianne Fenech",
+      "total_matches": 7,
+      "wins": 6,
+      "losses": 1,
+      "final_event_3da": 62.33,
+      "scores_100plus": 42,
+      "scores_140plus": 8,
+      "scores_180": 2,
+      "co_opportunities": 105,
+      "co_completed": 26,
+      "co_pct": 24.76,
+      "high_finish": 86
+    },
+    {
+      "name": "Joanne Luke",
+      "total_matches": 7,
+      "wins": 4,
+      "losses": 3,
+      "final_event_3da": 61.8,
+      "scores_100plus": 42,
+      "scores_140plus": 4,
+      "scores_180": 0,
+      "co_opportunities": 82,
+      "co_completed": 19,
+      "co_pct": 23.17,
+      "high_finish": 132
+    },
+    {
+      "name": "Danna Foster",
+      "total_matches": 6,
+      "wins": 5,
+      "losses": 1,
+      "final_event_3da": 56.38,
+      "scores_100plus": 31,
+      "scores_140plus": 3,
+      "scores_180": 1,
+      "co_opportunities": 84,
+      "co_completed": 17,
+      "co_pct": 20.24,
+      "high_finish": 100
+    },
+    {
+      "name": "Tina Ouellette",
+      "total_matches": 6,
+      "wins": 4,
+      "losses": 2,
+      "final_event_3da": 61.49,
+      "scores_100plus": 37,
+      "scores_140plus": 3,
+      "scores_180": 1,
+      "co_opportunities": 67,
+      "co_completed": 17,
+      "co_pct": 25.37,
+      "high_finish": 60
+    },
+    {
+      "name": "Darla Gallant",
+      "total_matches": 5,
+      "wins": 2,
+      "losses": 3,
+      "final_event_3da": 40.07,
+      "scores_100plus": 5,
+      "scores_140plus": 0,
+      "scores_180": 0,
+      "co_opportunities": 48,
+      "co_completed": 4,
+      "co_pct": 8.33,
+      "high_finish": 0
+    },
+    {
+      "name": "Emily Alford",
+      "total_matches": 5,
+      "wins": 1,
+      "losses": 4,
+      "final_event_3da": 55.32,
+      "scores_100plus": 16,
+      "scores_140plus": 4,
+      "scores_180": 0,
+      "co_opportunities": 33,
+      "co_completed": 5,
+      "co_pct": 15.15,
+      "high_finish": 90
+    },
+    {
+      "name": "Reece Williams",
+      "total_matches": 5,
+      "wins": 3,
+      "losses": 2,
+      "final_event_3da": 49.05,
+      "scores_100plus": 12,
+      "scores_140plus": 3,
+      "scores_180": 0,
+      "co_opportunities": 61,
+      "co_completed": 10,
+      "co_pct": 16.39,
+      "high_finish": 0
+    },
+    {
+      "name": "Kayla Melanson",
+      "total_matches": 5,
+      "wins": 0,
+      "losses": 5,
+      "final_event_3da": 42.42,
+      "scores_100plus": 3,
+      "scores_140plus": 0,
+      "scores_180": 0,
+      "co_opportunities": 52,
+      "co_completed": 6,
+      "co_pct": 11.54,
+      "high_finish": 0
+    },
+    {
+      "name": "Ashley Foster",
+      "total_matches": 4,
+      "wins": 1,
+      "losses": 3,
+      "final_event_3da": 52.49,
+      "scores_100plus": 7,
+      "scores_140plus": 1,
+      "scores_180": 0,
+      "co_opportunities": 25,
+      "co_completed": 3,
+      "co_pct": 12.0,
+      "high_finish": 0
+    },
+    {
+      "name": "Kathy Bourgeois",
+      "total_matches": 4,
+      "wins": 1,
+      "losses": 3,
+      "final_event_3da": 40.48,
+      "scores_100plus": 3,
+      "scores_140plus": 0,
+      "scores_180": 0,
+      "co_opportunities": 33,
+      "co_completed": 3,
+      "co_pct": 9.09,
+      "high_finish": 0
+    }
+  ],
+  "round_robin": {
+    "standings": {
+      "groupA": [
+        {
+          "rank": 1,
+          "name": "Tina Ouellette",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 10,
+          "legs_lost": 2
+        },
+        {
+          "rank": 2,
+          "name": "Josianne Fenech",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 7,
+          "legs_lost": 5
+        },
+        {
+          "rank": 3,
+          "name": "Joanne Luke",
+          "matches_played": 4,
+          "matches_won": 2,
+          "matches_lost": 2,
+          "legs_won": 6,
+          "legs_lost": 6
+        },
+        {
+          "rank": 4,
+          "name": "Emily Alford",
+          "matches_played": 4,
+          "matches_won": 1,
+          "matches_lost": 3,
+          "legs_won": 4,
+          "legs_lost": 8
+        },
+        {
+          "rank": 5,
+          "name": "Ashley Foster",
+          "matches_played": 4,
+          "matches_won": 1,
+          "matches_lost": 3,
+          "legs_won": 3,
+          "legs_lost": 9
+        }
+      ],
+      "groupB": [
+        {
+          "rank": 1,
+          "name": "Danna Foster",
+          "matches_played": 4,
+          "matches_won": 4,
+          "matches_lost": 0,
+          "legs_won": 10,
+          "legs_lost": 2
+        },
+        {
+          "rank": 2,
+          "name": "Reece Williams",
+          "matches_played": 4,
+          "matches_won": 3,
+          "matches_lost": 1,
+          "legs_won": 9,
+          "legs_lost": 3
+        },
+        {
+          "rank": 3,
+          "name": "Darla Gallant",
+          "matches_played": 4,
+          "matches_won": 2,
+          "matches_lost": 2,
+          "legs_won": 4,
+          "legs_lost": 8
+        },
+        {
+          "rank": 4,
+          "name": "Kayla Melanson",
+          "matches_played": 4,
+          "matches_won": 0,
+          "matches_lost": 4,
+          "legs_won": 4,
+          "legs_lost": 8
+        },
+        {
+          "rank": 5,
+          "name": "Kathy Bourgeois",
+          "matches_played": 4,
+          "matches_won": 1,
+          "matches_lost": 3,
+          "legs_won": 3,
+          "legs_lost": 9
+        }
+      ]
+    },
+    "matches": {
+      "groupA": [
+        {
+          "player1": "Josianne Fenech",
+          "player2": "Joanne Luke",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "09:58",
+          "player1_details": {
+            "three_dart_avg": 69.67,
+            "co_opportunities": 7,
+            "co_completed": 2,
+            "co_pct": 28.57,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 61.05,
+            "co_opportunities": 4,
+            "co_completed": 1,
+            "co_pct": 25.0,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 64
+          }
+        },
+        {
+          "player1": "Joanne Luke",
+          "player2": "Ashley Foster",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "12:37",
+          "player1_details": {
+            "three_dart_avg": 53.89,
+            "co_opportunities": 9,
+            "co_completed": 2,
+            "co_pct": 22.22,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 50.04,
+            "co_opportunities": 4,
+            "co_completed": 1,
+            "co_pct": 25.0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Josianne Fenech",
+          "player2": "Ashley Foster",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "12:15",
+          "player1_details": {
+            "three_dart_avg": 51.83,
+            "co_opportunities": 14,
+            "co_completed": 3,
+            "co_pct": 21.43,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 47.18,
+            "co_opportunities": 4,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Tina Ouellette",
+          "player2": "Emily Alford",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "09:07",
+          "player1_details": {
+            "three_dart_avg": 64.41,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 37.5,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 50.13,
+            "co_opportunities": 3,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Emily Alford",
+          "player2": "Joanne Luke",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "09:26",
+          "player1_details": {
+            "three_dart_avg": 62.83,
+            "co_opportunities": 6,
+            "co_completed": 2,
+            "co_pct": 33.33,
+            "scores_100plus": 5,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 90
+          },
+          "player2_details": {
+            "three_dart_avg": 55.08,
+            "co_opportunities": 5,
+            "co_completed": 1,
+            "co_pct": 20.0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Tina Ouellette",
+          "player2": "Ashley Foster",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "11:14",
+          "player1_details": {
+            "three_dart_avg": 57.81,
+            "co_opportunities": 9,
+            "co_completed": 3,
+            "co_pct": 33.33,
+            "scores_100plus": 5,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 56.44,
+            "co_opportunities": 9,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 3,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Josianne Fenech",
+          "player2": "Emily Alford",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "11:55",
+          "player1_details": {
+            "three_dart_avg": 80.11,
+            "co_opportunities": 5,
+            "co_completed": 2,
+            "co_pct": 40.0,
+            "scores_100plus": 6,
+            "scores_140plus": 0,
+            "scores_180": 1,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 56.89,
+            "co_opportunities": 2,
+            "co_completed": 1,
+            "co_pct": 50.0,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 70
+          }
+        },
+        {
+          "player1": "Joanne Luke",
+          "player2": "Tina Ouellette",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "11:36",
+          "player1_details": {
+            "three_dart_avg": 68.58,
+            "co_opportunities": 5,
+            "co_completed": 2,
+            "co_pct": 40.0,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 132
+          },
+          "player2_details": {
+            "three_dart_avg": 62.73,
+            "co_opportunities": 8,
+            "co_completed": 1,
+            "co_pct": 12.5,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 1,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Ashley Foster",
+          "player2": "Emily Alford",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "10:54",
+          "player1_details": {
+            "three_dart_avg": 57.16,
+            "co_opportunities": 8,
+            "co_completed": 2,
+            "co_pct": 25.0,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 60.38,
+            "co_opportunities": 8,
+            "co_completed": 1,
+            "co_pct": 12.5,
+            "scores_100plus": 5,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Tina Ouellette",
+          "player2": "Josianne Fenech",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "10:26",
+          "player1_details": {
+            "three_dart_avg": 60.93,
+            "co_opportunities": 11,
+            "co_completed": 3,
+            "co_pct": 27.27,
+            "scores_100plus": 6,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 56.54,
+            "co_opportunities": 7,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 2,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        }
+      ],
+      "groupB": [
+        {
+          "player1": "Darla Gallant",
+          "player2": "Kathy Bourgeois",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "09:59",
+          "player1_details": {
+            "three_dart_avg": 38.74,
+            "co_opportunities": 19,
+            "co_completed": 2,
+            "co_pct": 10.53,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 40.65,
+            "co_opportunities": 6,
+            "co_completed": 1,
+            "co_pct": 16.67,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Danna Foster",
+          "player2": "Reece Williams",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "11:55",
+          "player1_details": {
+            "three_dart_avg": 53.82,
+            "co_opportunities": 11,
+            "co_completed": 2,
+            "co_pct": 18.18,
+            "scores_100plus": 3,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 51.88,
+            "co_opportunities": 8,
+            "co_completed": 1,
+            "co_pct": 12.5,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Darla Gallant",
+          "player2": "Kayla Melanson",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "09:27",
+          "player1_details": {
+            "three_dart_avg": 38.74,
+            "co_opportunities": 19,
+            "co_completed": 2,
+            "co_pct": 10.53,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 37.85,
+            "co_opportunities": 13,
+            "co_completed": 1,
+            "co_pct": 7.69,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Reece Williams",
+          "player2": "Kathy Bourgeois",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "11:35",
+          "player1_details": {
+            "three_dart_avg": 51.83,
+            "co_opportunities": 12,
+            "co_completed": 3,
+            "co_pct": 25.0,
+            "scores_100plus": 4,
+            "scores_140plus": 1,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 41.66,
+            "co_opportunities": 5,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Danna Foster",
+          "player2": "Darla Gallant",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "10:57",
+          "player1_details": {
+            "three_dart_avg": 57.81,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 37.5,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 72
+          },
+          "player2_details": {
+            "three_dart_avg": 40.27,
+            "co_opportunities": 2,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Danna Foster",
+          "player2": "Kayla Melanson",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "12:16",
+          "player1_details": {
+            "three_dart_avg": 52.98,
+            "co_opportunities": 12,
+            "co_completed": 2,
+            "co_pct": 16.67,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 42.28,
+            "co_opportunities": 6,
+            "co_completed": 1,
+            "co_pct": 16.67,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Danna Foster",
+          "player2": "Kathy Bourgeois",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "12:37",
+          "player1_details": {
+            "three_dart_avg": 60.93,
+            "co_opportunities": 8,
+            "co_completed": 3,
+            "co_pct": 37.5,
+            "scores_100plus": 4,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 46.63,
+            "co_opportunities": 4,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 2,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Reece Williams",
+          "player2": "Darla Gallant",
+          "player1_legs": 3,
+          "player2_legs": 0,
+          "start_time": "10:25",
+          "player1_details": {
+            "three_dart_avg": 44.21,
+            "co_opportunities": 14,
+            "co_completed": 3,
+            "co_pct": 21.43,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 37.94,
+            "co_opportunities": 7,
+            "co_completed": 0,
+            "co_pct": 0.0,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Kathy Bourgeois",
+          "player2": "Kayla Melanson",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "11:13",
+          "player1_details": {
+            "three_dart_avg": 35.98,
+            "co_opportunities": 18,
+            "co_completed": 2,
+            "co_pct": 11.11,
+            "scores_100plus": 1,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 34.31,
+            "co_opportunities": 18,
+            "co_completed": 1,
+            "co_pct": 5.56,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        },
+        {
+          "player1": "Reece Williams",
+          "player2": "Kayla Melanson",
+          "player1_legs": 2,
+          "player2_legs": 1,
+          "start_time": "09:07",
+          "player1_details": {
+            "three_dart_avg": 52.98,
+            "co_opportunities": 14,
+            "co_completed": 2,
+            "co_pct": 14.29,
+            "scores_100plus": 5,
+            "scores_140plus": 2,
+            "scores_180": 0,
+            "high_finish": 0
+          },
+          "player2_details": {
+            "three_dart_avg": 47.23,
+            "co_opportunities": 6,
+            "co_completed": 1,
+            "co_pct": 16.67,
+            "scores_100plus": 0,
+            "scores_140plus": 0,
+            "scores_180": 0,
+            "high_finish": 0
+          }
+        }
+      ]
+    }
+  },
+  "knockout": {
+    "quarterFinals": [
+      {
+        "match_id": "QF1",
+        "player1": "Josianne Fenech",
+        "player2": "Darla Gallant",
+        "player1_sets": 2,
+        "player2_sets": 0,
+        "player1_total_legs": 4,
+        "player2_total_legs": 0,
+        "winner": "Josianne Fenech",
+        "start_time": "13:33",
+        "player1_details": {
+          "three_dart_avg": 61.35,
+          "co_opportunities": 14,
+          "co_completed": 4,
+          "co_pct": 28.57,
+          "scores_100plus": 4,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 0
+        },
+        "player2_details": {
+          "three_dart_avg": 45.31,
+          "co_opportunities": 1,
+          "co_completed": 0,
+          "co_pct": 0.0,
+          "scores_100plus": 3,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      },
+      {
+        "match_id": "QF2",
+        "player1": "Danna Foster",
+        "player2": "Emily Alford",
+        "player1_sets": 2,
+        "player2_sets": 0,
+        "player1_total_legs": 4,
+        "player2_total_legs": 1,
+        "winner": "Danna Foster",
+        "start_time": "13:07",
+        "player1_details": {
+          "three_dart_avg": 56.23,
+          "co_opportunities": 15,
+          "co_completed": 4,
+          "co_pct": 26.67,
+          "scores_100plus": 6,
+          "scores_140plus": 2,
+          "scores_180": 0,
+          "high_finish": 100
+        },
+        "player2_details": {
+          "three_dart_avg": 50.66,
+          "co_opportunities": 14,
+          "co_completed": 1,
+          "co_pct": 7.14,
+          "scores_100plus": 4,
+          "scores_140plus": 2,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      },
+      {
+        "match_id": "QF3",
+        "player1": "Joanne Luke",
+        "player2": "Reece Williams",
+        "player1_sets": 2,
+        "player2_sets": 0,
+        "player1_total_legs": 4,
+        "player2_total_legs": 1,
+        "winner": "Joanne Luke",
+        "start_time": "13:07",
+        "player1_details": {
+          "three_dart_avg": 52.65,
+          "co_opportunities": 17,
+          "co_completed": 4,
+          "co_pct": 23.53,
+          "scores_100plus": 2,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 66
+        },
+        "player2_details": {
+          "three_dart_avg": 46.81,
+          "co_opportunities": 13,
+          "co_completed": 1,
+          "co_pct": 7.69,
+          "scores_100plus": 2,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      },
+      {
+        "match_id": "QF4",
+        "player1": "Tina Ouellette",
+        "player2": "Kayla Melanson",
+        "player1_sets": 2,
+        "player2_sets": 0,
+        "player1_total_legs": 4,
+        "player2_total_legs": 2,
+        "winner": "Tina Ouellette",
+        "start_time": "13:33",
+        "player1_details": {
+          "three_dart_avg": 61.52,
+          "co_opportunities": 18,
+          "co_completed": 4,
+          "co_pct": 22.22,
+          "scores_100plus": 7,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 60
+        },
+        "player2_details": {
+          "three_dart_avg": 50.38,
+          "co_opportunities": 9,
+          "co_completed": 2,
+          "co_pct": 22.22,
+          "scores_100plus": 1,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      }
+    ],
+    "semiFinals": [
+      {
+        "match_id": "SF1",
+        "player1": "Josianne Fenech",
+        "player2": "Danna Foster",
+        "player1_sets": 3,
+        "player2_sets": 1,
+        "player1_total_legs": 7,
+        "player2_total_legs": 3,
+        "winner": "Josianne Fenech",
+        "start_time": "14:05",
+        "player1_details": {
+          "three_dart_avg": 58.48,
+          "co_opportunities": 36,
+          "co_completed": 7,
+          "co_pct": 19.44,
+          "scores_100plus": 8,
+          "scores_140plus": 1,
+          "scores_180": 1,
+          "high_finish": 0
+        },
+        "player2_details": {
+          "three_dart_avg": 56.65,
+          "co_opportunities": 30,
+          "co_completed": 3,
+          "co_pct": 10.0,
+          "scores_100plus": 13,
+          "scores_140plus": 1,
+          "scores_180": 1,
+          "high_finish": 0
+        }
+      },
+      {
+        "match_id": "SF2",
+        "player1": "Joanne Luke",
+        "player2": "Tina Ouellette",
+        "player1_sets": 3,
+        "player2_sets": 1,
+        "player1_total_legs": 7,
+        "player2_total_legs": 3,
+        "winner": "Joanne Luke",
+        "start_time": "14:53",
+        "player1_details": {
+          "three_dart_avg": 67.81,
+          "co_opportunities": 21,
+          "co_completed": 7,
+          "co_pct": 33.33,
+          "scores_100plus": 15,
+          "scores_140plus": 1,
+          "scores_180": 0,
+          "high_finish": 82
+        },
+        "player2_details": {
+          "three_dart_avg": 61.74,
+          "co_opportunities": 13,
+          "co_completed": 3,
+          "co_pct": 23.08,
+          "scores_100plus": 11,
+          "scores_140plus": 0,
+          "scores_180": 0,
+          "high_finish": 0
+        }
+      }
+    ],
+    "final": {
+      "match_id": "FINAL",
+      "player1": "Josianne Fenech",
+      "player2": "Joanne Luke",
+      "player1_sets": 4,
+      "player2_sets": 0,
+      "player1_total_legs": 8,
+      "player2_total_legs": 2,
+      "winner": "Josianne Fenech",
+      "start_time": "15:34",
+      "player1_details": {
+        "three_dart_avg": 66.81,
+        "co_opportunities": 22,
+        "co_completed": 8,
+        "co_pct": 36.36,
+        "scores_100plus": 15,
+        "scores_140plus": 5,
+        "scores_180": 0,
+        "high_finish": 86
+      },
+      "player2_details": {
+        "three_dart_avg": 65.84,
+        "co_opportunities": 21,
+        "co_completed": 2,
+        "co_pct": 9.52,
+        "scores_100plus": 17,
+        "scores_140plus": 2,
+        "scores_180": 0,
+        "high_finish": 0
+      }
+    },
+    "champion": "Josianne Fenech"
+  }
+}
