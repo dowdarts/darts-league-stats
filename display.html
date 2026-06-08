@@ -2001,6 +2001,30 @@
             return { series_id: seriesId, event_id: eventId };
         }
 
+        // Fetch an event file (supports legacy numeric and string/filename series)
+        async function fetchEventFile(eventDef) {
+            if (!eventDef) return null;
+            // If caller passed a parsed key string like 'womans::1', normalize
+            if (typeof eventDef === 'string') {
+                eventDef = parseEventKey(eventDef) || { series_id: 1, event_id: Number(eventDef) };
+            }
+            const filename = getEventDefFilename(eventDef);
+            if (!filename) return null;
+
+            try {
+                const res = await fetch(filename);
+                if (!res.ok) {
+                    console.warn('Failed to fetch event file', filename, res.status);
+                    return null;
+                }
+                const data = await res.json();
+                return data;
+            } catch (e) {
+                console.warn('Network error fetching event file', filename, e);
+                return null;
+            }
+        }
+
         function getCachedData(key) {
             try {
                 const cached = localStorage.getItem(key);
