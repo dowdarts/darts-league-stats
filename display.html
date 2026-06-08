@@ -3095,10 +3095,38 @@
                 const eventKey = getEventDefKey(eventDef);
                 option.value = eventKey;
                 const event = eventFilesCache[eventKey];
-                option.textContent = getEventLabel(eventDef, event);
+                        option.textContent = getEventLabel(eventDef, event);
                 selector.appendChild(option);
             });
         }
+
+                // Helper to produce a human-readable label for an event
+                function getEventLabel(eventDef, event) {
+                    try {
+                        if (!eventDef) return '';
+                        const seriesId = eventDef.series_id ?? eventDef.series ?? 1;
+                        const seriesNum = eventDef.series_num ?? eventDef.series_index ?? 1;
+                        const eventId = eventDef.event_id ?? eventDef.event ?? (typeof eventDef === 'number' ? eventDef : '');
+
+                        // Prefer explicit event name from metadata
+                        if (event && event.metadata && event.metadata.event_name) {
+                            let label = event.metadata.event_name;
+                            if (event.metadata.event_date || event.metadata.date) {
+                                label += ` — ${event.metadata.event_date || event.metadata.date}`;
+                            }
+                            return label;
+                        }
+
+                        // Fallback label
+                        if (typeof seriesId === 'number' || !isNaN(Number(seriesId))) {
+                            return `Series ${seriesId} Event ${eventId}`;
+                        }
+                        return `${String(seriesId)} Series ${seriesNum} Event ${eventId}`;
+                    } catch (e) {
+                        console.warn('getEventLabel error', e);
+                        return '';
+                    }
+                }
 
         // Show event details
         async function showEventDetails() {
