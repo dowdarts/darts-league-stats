@@ -1,5 +1,5 @@
 // Service Worker for AADS Stats - Aggressive caching for performance
-const CACHE_NAME = 'aads-stats-v7';
+const CACHE_NAME = 'aads-stats-v8';
 const CACHE_URLS = [
     '/darts-league-stats/',
     '/darts-league-stats/display.html',
@@ -66,6 +66,23 @@ self.addEventListener('fetch', (event) => {
         );
     } else if (url.pathname.endsWith('.json')) {
         // JSON: Network first, cache fallback (data changes frequently)
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    if (response.status === 200) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request);
+                })
+        );
+    } else if (url.pathname.endsWith('.html') || url.pathname === '/darts-league-stats/' || url.pathname === '/darts-league-stats/index.html') {
+        // HTML pages: Network first so users receive updates immediately
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
