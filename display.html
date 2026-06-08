@@ -2856,6 +2856,13 @@
             }).join('');
         }
 
+        function getEventLabel(eventNum, event) {
+            if (event && event.metadata && event.metadata.event_name) {
+                return event.metadata.event_name;
+            }
+            return `Series 1 - Event ${eventNum}`;
+        }
+
         // Populate event selector
         function populateEventSelector() {
             const selector = document.getElementById('eventSelector');
@@ -2865,7 +2872,7 @@
                 option.value = eventNum;
                 // Use cached event name if available, otherwise use placeholder
                 const event = eventFilesCache[eventNum];
-                option.textContent = event ? event.metadata.event_name : `Series 1 - Event ${eventNum}`;
+                option.textContent = getEventLabel(eventNum, event);
                 selector.appendChild(option);
             });
         }
