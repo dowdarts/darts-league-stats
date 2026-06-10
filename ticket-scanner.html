@@ -33,7 +33,7 @@
                     <button id="stopBtn" class="self-end bg-gray-800 hover:bg-gray-700 text-white font-bold rounded px-4 py-2">Stop</button>
                 </div>
 
-                <div id="reader" class="bg-black rounded-lg overflow-hidden min-h-[320px] flex items-center justify-center text-gray-500">
+                <div id="reader" class="bg-black rounded-lg overflow-hidden min-h-[380px] flex items-center justify-center text-gray-500">
                     Camera scanner loads here
                 </div>
 
@@ -289,9 +289,20 @@
             scanner = new Html5Qrcode('reader');
             await scanner.start(
                 { facingMode: 'environment' },
-                { fps: 10, qrbox: { width: 260, height: 260 } },
+                {
+                    fps: 15,
+                    qrbox: viewfinderSize,
+                    aspectRatio: 1,
+                    disableFlip: false
+                },
                 handleScan
             );
+        }
+
+        function viewfinderSize(viewfinderWidth, viewfinderHeight) {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const size = Math.floor(Math.min(Math.max(minEdge * 0.82, 260), 430));
+            return { width: size, height: size };
         }
 
         async function stopScanner() {

@@ -6,6 +6,7 @@
     <title>AADS Ticket Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @media print {
             body { background: #fff !important; color: #000 !important; }
@@ -70,6 +71,7 @@
 
             <div class="mt-4 flex flex-wrap gap-2">
                 <button id="printBtn" class="bg-emerald-600 hover:bg-emerald-500 font-bold rounded px-4 py-2">Print Tickets</button>
+                <button id="downloadQrBtn" class="bg-purple-600 hover:bg-purple-500 font-bold rounded px-4 py-2">Download All QR Codes</button>
                 <button id="exportBtn" class="bg-blue-600 hover:bg-blue-500 font-bold rounded px-4 py-2">Export Ticket List</button>
                 <button id="loadBtn" class="bg-gray-800 hover:bg-gray-700 font-bold rounded px-4 py-2">Load Saved Tickets</button>
             </div>
@@ -100,6 +102,7 @@
     <script>
         const STORAGE_KEY = 'aadsGeneratedTickets';
         const SIGNING_NAMESPACE = 'AADS-TICKET-v1';
+        const QR_EXPORT_SIZE = 1200;
         let tickets = [];
 
         function cleanEventCode(value) {
@@ -118,6 +121,10 @@
                 '"': '&quot;',
                 "'": '&#39;'
             }[char]));
+        }
+
+        function safeFileName(value) {
+            return String(value || 'ticket').replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 90) || 'ticket';
         }
 
         async function sha256(value) {
@@ -195,6 +202,7 @@
                             <div class="text-base font-bold mb-2">${escapeHtml(ticket.holderName || 'Guest')}</div>
                             <div class="text-xs font-bold uppercase text-gray-500">Ticket ID</div>
                             <div class="text-xs font-mono break-all">${escapeHtml(ticket.ticketId)}</div>
+                            <button data-ticket-index="${index}" class="download-single-qr no-print mt-3 bg-gray-950 hover:bg-gray-800 text-white text-sm font-bold rounded px-3 py-2">Download QR PNG</button>
                         </div>
                     </div>
                 </article>
@@ -208,9 +216,13 @@
                         text: ticket.qrText,
                         width: 140,
                         height: 140,
-                        correctLevel: QRCode.CorrectLevel.M
+                        correctLevel: QRCode.CorrectLevel.H
                     });
                 }
+            });
+
+            document.querySelectorAll('.download-single-qr').forEach(button => {
+                button.addEventListener('click', () => downloadQrImage(Number(button.dataset.ticketIndex)));
             });
         }
 
@@ -243,6 +255,95 @@
             URL.revokeObjectURL(url);
         }
 
+        function makeQrDataUrl(text, size = QR_EXPORT_SIZE) {
+            if (!window.QRCode) {
+                return Promise.reject(new Error('QR library did not load'));
+            }
+
+            return new Promise((resolve, reject) => {
+                const holder = document.createElement('div');
+                holder.style.position = 'fixed';
+                holder.style.left = '-9999px';
+                holder.style.top = '0';
+                holder.style.width = `${size}px`;
+                holder.style.height = `${size}px`;
+                document.body.appendChild(holder);
+
+                try {
+                    new QRCode(holder, {
+                        text,
+                        width: size,
+                        height: size,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    setTimeout(() => {
+                        const canvas = holder.querySelector('canvas');
+                        const img = holder.querySelector('img');
+                        if (canvas) {
+                            const dataUrl = canvas.toDataURL('image/png');
+                            holder.remove();
+                            resolve(dataUrl);
+                            return;
+                        }
+                        if (img?.src) {
+                            holder.remove();
+                            resolve(img.src);
+                            return;
+                        }
+                        holder.remove();
+                        reject(new Error('QR image was not created'));
+                    }, 80);
+                } catch (error) {
+                    holder.remove();
+                    reject(error);
+                }
+            });
+        }
+
+        function downloadDataUrl(dataUrl, fileName) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+
+        async function downloadQrImage(index) {
+            const ticket = tickets[index];
+            if (!ticket) return;
+            const dataUrl = await makeQrDataUrl(ticket.qrText);
+            downloadDataUrl(dataUrl, `${safeFileName(ticket.ticketId)}-qr.png`);
+        }
+
+        async function downloadAllQrImages() {
+            if (!tickets.length) return;
+            if (!window.JSZip) {
+                alert('ZIP export library did not load. Use the per-ticket QR download instead.');
+                return;
+            }
+
+            const zip = new JSZip();
+            for (const ticket of tickets) {
+                const dataUrl = await makeQrDataUrl(ticket.qrText);
+                const base64 = dataUrl.split(',')[1];
+                zip.file(`${safeFileName(ticket.ticketId)}-qr.png`, base64, { base64: true });
+            }
+
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${safeFileName(tickets[0].eventCode)}-qr-codes.zip`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
         document.getElementById('generateBtn').addEventListener('click', generateTickets);
         document.getElementById('clearBtn').addEventListener('click', () => {
             if (!confirm('Clear generated tickets from this browser?')) return;
@@ -251,6 +352,7 @@
             renderTickets();
         });
         document.getElementById('printBtn').addEventListener('click', () => window.print());
+        document.getElementById('downloadQrBtn').addEventListener('click', () => downloadAllQrImages().catch(error => alert(error.message)));
         document.getElementById('exportBtn').addEventListener('click', exportTickets);
         document.getElementById('loadBtn').addEventListener('click', loadTickets);
         document.getElementById('eventCode').addEventListener('input', () => {
