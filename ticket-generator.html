@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AADS Ticket Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .no-print { display: none !important; }
+            .ticket-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .ticket-card { break-inside: avoid; border: 2px solid #000 !important; box-shadow: none !important; color: #000 !important; background: #fff !important; }
+            .ticket-card * { color: #000 !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+    <header class="no-print border-b border-orange-500/40 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-black text-orange-400">AADS Ticket Generator</h1>
+                <p class="text-sm text-gray-400">Create QR tickets for event entry</p>
+            </div>
+            <nav class="flex flex-wrap gap-2 text-sm font-semibold">
+                <a class="px-4 py-2 rounded bg-gray-800 hover:bg-gray-700" href="index.html">Dashboard</a>
+                <a class="px-4 py-2 rounded bg-gray-800 hover:bg-gray-700" href="ticket-scanner.html">Admin Scanner</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-5 py-6">
+        <section class="no-print bg-gray-900 border border-gray-800 rounded-lg p-5 mb-6">
+            <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                <label class="block">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Event Name</span>
+                    <input id="eventName" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" value="AADS Event">
+                </label>
+                <label class="block">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Event Code</span>
+                    <input id="eventCode" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" value="AADS-2026-EVENT">
+                </label>
+                <label class="block">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Ticket Type</span>
+                    <select id="ticketType" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2">
+                        <option>General Admission</option>
+                        <option>VIP</option>
+                        <option>Player Guest</option>
+                        <option>Staff</option>
+                    </select>
+                </label>
+                <label class="block">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Quantity</span>
+                    <input id="quantity" type="number" min="1" max="500" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" value="10">
+                </label>
+                <label class="block md:col-span-2">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Holder Name Prefix</span>
+                    <input id="holderPrefix" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" placeholder="Optional, e.g. Online Sale">
+                </label>
+                <label class="block">
+                    <span class="block text-sm font-semibold text-gray-300 mb-1">Starting Number</span>
+                    <input id="startNumber" type="number" min="1" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" value="1">
+                </label>
+                <div class="flex items-end gap-2">
+                    <button id="generateBtn" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded px-4 py-2">Generate</button>
+                    <button id="clearBtn" class="bg-gray-800 hover:bg-gray-700 text-white font-bold rounded px-4 py-2">Clear</button>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button id="printBtn" class="bg-emerald-600 hover:bg-emerald-500 font-bold rounded px-4 py-2">Print Tickets</button>
+                <button id="exportBtn" class="bg-blue-600 hover:bg-blue-500 font-bold rounded px-4 py-2">Export Ticket List</button>
+                <button id="loadBtn" class="bg-gray-800 hover:bg-gray-700 font-bold rounded px-4 py-2">Load Saved Tickets</button>
+            </div>
+
+            <p class="mt-4 text-sm text-gray-400">
+                Use the same Event Code in the Admin Scanner. Tickets are saved in this browser and can also be exported.
+            </p>
+        </section>
+
+        <section class="no-print grid md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-sm text-gray-400">Generated Tickets</div>
+                <div id="ticketCount" class="text-3xl font-black text-orange-400">0</div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-sm text-gray-400">Current Event Code</div>
+                <div id="eventCodeLabel" class="text-xl font-black text-white truncate">-</div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-sm text-gray-400">Scanner Page</div>
+                <a class="text-xl font-black text-orange-400 hover:text-orange-300" href="ticket-scanner.html">Open Admin Scanner</a>
+            </div>
+        </section>
+
+        <section id="tickets" class="ticket-grid grid md:grid-cols-2 xl:grid-cols-3 gap-4"></section>
+    </main>
+
+    <script>
+        const STORAGE_KEY = 'aadsGeneratedTickets';
+        const SIGNING_NAMESPACE = 'AADS-TICKET-v1';
+        let tickets = [];
+
+        function cleanEventCode(value) {
+            return String(value || '').trim().replace(/\s+/g, '-').toUpperCase();
+        }
+
+        function base64UrlEncode(value) {
+            return btoa(unescape(encodeURIComponent(value))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        async function sha256(value) {
+            const bytes = new TextEncoder().encode(value);
+            const digest = await crypto.subtle.digest('SHA-256', bytes);
+            return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function signTicket(ticket) {
+            return sha256([
+                SIGNING_NAMESPACE,
+                ticket.eventCode,
+                ticket.eventName,
+                ticket.ticketId,
+                ticket.ticketType,
+                ticket.holderName,
+                ticket.issuedAt
+            ].join('|'));
+        }
+
+        async function createTicket(eventName, eventCode, ticketType, holderName, sequence) {
+            const issuedAt = new Date().toISOString();
+            const ticketId = `${eventCode}-${Date.now().toString(36).toUpperCase()}-${String(sequence).padStart(4, '0')}`;
+            const ticket = {
+                app: 'AADS-TICKET',
+                v: 1,
+                eventName,
+                eventCode,
+                ticketType,
+                holderName,
+                ticketId,
+                issuedAt
+            };
+            ticket.signature = await signTicket(ticket);
+            ticket.qrText = `AADS-TICKET:${base64UrlEncode(JSON.stringify(ticket))}`;
+            return ticket;
+        }
+
+        function saveTickets() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+        }
+
+        function loadTickets() {
+            try {
+                tickets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            } catch {
+                tickets = [];
+            }
+            renderTickets();
+        }
+
+        function renderTickets() {
+            const container = document.getElementById('tickets');
+            document.getElementById('ticketCount').textContent = tickets.length;
+            document.getElementById('eventCodeLabel').textContent = tickets[0]?.eventCode || cleanEventCode(document.getElementById('eventCode').value) || '-';
+
+            container.innerHTML = tickets.map((ticket, index) => `
+                <article class="ticket-card bg-white text-gray-950 border-4 border-gray-950 rounded-lg overflow-hidden shadow-xl">
+                    <div class="bg-gray-950 text-white px-4 py-3 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs uppercase tracking-wide text-orange-300">Atlantic Amateur Darts Series</div>
+                            <div class="text-xl font-black">${escapeHtml(ticket.eventName)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-300">Ticket</div>
+                            <div class="text-lg font-black">#${index + 1}</div>
+                        </div>
+                    </div>
+                    <div class="p-4 grid grid-cols-[140px_1fr] gap-4 items-center">
+                        <div id="qr-${index}" class="w-[140px] h-[140px] bg-white flex items-center justify-center"></div>
+                        <div>
+                            <div class="text-xs font-bold uppercase text-gray-500">Type</div>
+                            <div class="text-lg font-black mb-2">${escapeHtml(ticket.ticketType)}</div>
+                            <div class="text-xs font-bold uppercase text-gray-500">Holder</div>
+                            <div class="text-base font-bold mb-2">${escapeHtml(ticket.holderName || 'Guest')}</div>
+                            <div class="text-xs font-bold uppercase text-gray-500">Ticket ID</div>
+                            <div class="text-xs font-mono break-all">${escapeHtml(ticket.ticketId)}</div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            tickets.forEach((ticket, index) => {
+                const qrTarget = document.getElementById(`qr-${index}`);
+                if (qrTarget && window.QRCode) {
+                    qrTarget.innerHTML = '';
+                    new QRCode(qrTarget, {
+                        text: ticket.qrText,
+                        width: 140,
+                        height: 140,
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            });
+        }
+
+        async function generateTickets() {
+            const eventName = document.getElementById('eventName').value.trim() || 'AADS Event';
+            const eventCode = cleanEventCode(document.getElementById('eventCode').value) || 'AADS-EVENT';
+            const ticketType = document.getElementById('ticketType').value;
+            const quantity = Math.max(1, Math.min(500, Number(document.getElementById('quantity').value || 1)));
+            const startNumber = Math.max(1, Number(document.getElementById('startNumber').value || 1));
+            const prefix = document.getElementById('holderPrefix').value.trim();
+
+            tickets = [];
+            for (let i = 0; i < quantity; i++) {
+                const sequence = startNumber + i;
+                const holderName = prefix ? `${prefix} ${sequence}` : `Guest ${sequence}`;
+                tickets.push(await createTicket(eventName, eventCode, ticketType, holderName, sequence));
+            }
+            saveTickets();
+            renderTickets();
+        }
+
+        function exportTickets() {
+            if (!tickets.length) return;
+            const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), tickets }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${tickets[0].eventCode}-tickets.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', generateTickets);
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (!confirm('Clear generated tickets from this browser?')) return;
+            tickets = [];
+            saveTickets();
+            renderTickets();
+        });
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        document.getElementById('exportBtn').addEventListener('click', exportTickets);
+        document.getElementById('loadBtn').addEventListener('click', loadTickets);
+        document.getElementById('eventCode').addEventListener('input', () => {
+            document.getElementById('eventCodeLabel').textContent = cleanEventCode(document.getElementById('eventCode').value) || '-';
+        });
+
+        loadTickets();
+    </script>
+</body>
+</html>

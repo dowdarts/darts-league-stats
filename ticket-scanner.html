@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AADS Ticket Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" defer></script>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+    <header class="border-b border-orange-500/40 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-black text-orange-400">AADS Admin Ticket Scanner</h1>
+                <p class="text-sm text-gray-400">Scan tickets, count attendance, and block duplicate check-ins</p>
+            </div>
+            <nav class="flex flex-wrap gap-2 text-sm font-semibold">
+                <a class="px-4 py-2 rounded bg-gray-800 hover:bg-gray-700" href="index.html">Dashboard</a>
+                <a class="px-4 py-2 rounded bg-gray-800 hover:bg-gray-700" href="ticket-generator.html">Ticket Generator</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-5 py-6">
+        <section class="grid lg:grid-cols-[1fr_360px] gap-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-5">
+                <div class="grid md:grid-cols-[1fr_auto_auto] gap-3 mb-4">
+                    <label class="block">
+                        <span class="block text-sm font-semibold text-gray-300 mb-1">Event Code</span>
+                        <input id="eventCode" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" value="AADS-2026-EVENT">
+                    </label>
+                    <button id="startBtn" class="self-end bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded px-4 py-2">Start Camera</button>
+                    <button id="stopBtn" class="self-end bg-gray-800 hover:bg-gray-700 text-white font-bold rounded px-4 py-2">Stop</button>
+                </div>
+
+                <div id="reader" class="bg-black rounded-lg overflow-hidden min-h-[320px] flex items-center justify-center text-gray-500">
+                    Camera scanner loads here
+                </div>
+
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-gray-300 mb-1">Manual QR Text / Ticket ID</label>
+                    <div class="grid md:grid-cols-[1fr_auto] gap-2">
+                        <textarea id="manualInput" rows="2" class="w-full rounded bg-gray-950 border border-gray-700 px-3 py-2" placeholder="Paste QR text or ticket id here"></textarea>
+                        <button id="manualBtn" class="bg-orange-600 hover:bg-orange-500 text-white font-bold rounded px-4 py-2">Check In</button>
+                    </div>
+                </div>
+
+                <div id="scanResult" class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-5 text-center">
+                    <div id="scanIcon" class="text-5xl font-black text-gray-500">-</div>
+                    <div id="scanTitle" class="text-2xl font-black mt-2">Ready to scan</div>
+                    <div id="scanDetails" class="text-sm text-gray-400 mt-2">Start the camera or paste ticket text.</div>
+                </div>
+            </div>
+
+            <aside class="space-y-4">
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-5">
+                    <div class="text-sm text-gray-400">Audience Checked In</div>
+                    <div id="attendanceCount" class="text-5xl font-black text-emerald-400">0</div>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-5">
+                    <div class="text-sm text-gray-400">Duplicate Attempts</div>
+                    <div id="duplicateCount" class="text-5xl font-black text-red-400">0</div>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-5">
+                    <div class="text-sm text-gray-400">Active Event</div>
+                    <div id="activeEvent" class="text-lg font-black text-white break-all">AADS-2026-EVENT</div>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-5 space-y-2">
+                    <button id="exportBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded px-4 py-2">Export Scan Log</button>
+                    <button id="resetBtn" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold rounded px-4 py-2">Reset This Event</button>
+                </div>
+            </aside>
+        </section>
+
+        <section class="mt-6 bg-gray-900 border border-gray-800 rounded-lg p-5">
+            <h2 class="text-xl font-black text-orange-400 mb-3">Recent Scans</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="text-left text-gray-400 border-b border-gray-800">
+                        <tr>
+                            <th class="py-2 pr-3">Time</th>
+                            <th class="py-2 pr-3">Status</th>
+                            <th class="py-2 pr-3">Holder</th>
+                            <th class="py-2 pr-3">Type</th>
+                            <th class="py-2 pr-3">Ticket ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scanRows"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SIGNING_NAMESPACE = 'AADS-TICKET-v1';
+        let scanner = null;
+        let lastScanText = '';
+        let lastScanAt = 0;
+
+        function cleanEventCode(value) {
+            return String(value || '').trim().replace(/\s+/g, '-').toUpperCase();
+        }
+
+        function storageKey() {
+            return `aadsScans:${cleanEventCode(document.getElementById('eventCode').value)}`;
+        }
+
+        function loadScanState() {
+            try {
+                const state = JSON.parse(localStorage.getItem(storageKey()) || '{"scans":[],"duplicates":0,"recent":[]}');
+                state.scans = Array.isArray(state.scans) ? state.scans : [];
+                state.recent = Array.isArray(state.recent) ? state.recent : [];
+                state.duplicates = Number(state.duplicates || 0);
+                return state;
+            } catch {
+                return { scans: [], duplicates: 0, recent: [] };
+            }
+        }
+
+        function saveScanState(state) {
+            localStorage.setItem(storageKey(), JSON.stringify(state));
+        }
+
+        function base64UrlDecode(value) {
+            const padded = value.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - value.length % 4) % 4);
+            return decodeURIComponent(escape(atob(padded)));
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        async function sha256(value) {
+            const bytes = new TextEncoder().encode(value);
+            const digest = await crypto.subtle.digest('SHA-256', bytes);
+            return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function expectedSignature(ticket) {
+            return sha256([
+                SIGNING_NAMESPACE,
+                ticket.eventCode,
+                ticket.eventName,
+                ticket.ticketId,
+                ticket.ticketType,
+                ticket.holderName,
+                ticket.issuedAt
+            ].join('|'));
+        }
+
+        async function parseTicket(rawText) {
+            const text = String(rawText || '').trim();
+            if (!text) throw new Error('No ticket data found');
+
+            let ticket;
+            if (text.startsWith('AADS-TICKET:')) {
+                ticket = JSON.parse(base64UrlDecode(text.slice('AADS-TICKET:'.length)));
+            } else {
+                ticket = { ticketId: text, eventCode: cleanEventCode(document.getElementById('eventCode').value), holderName: 'Manual Entry', ticketType: 'Manual' };
+            }
+
+            if (ticket.app && ticket.app !== 'AADS-TICKET') throw new Error('Not an AADS ticket');
+            if (ticket.signature) {
+                const expected = await expectedSignature(ticket);
+                if (expected !== ticket.signature) throw new Error('Ticket signature is invalid');
+            }
+            return ticket;
+        }
+
+        function setResult(mode, title, details) {
+            const panel = document.getElementById('scanResult');
+            const icon = document.getElementById('scanIcon');
+            const titleEl = document.getElementById('scanTitle');
+            const detailsEl = document.getElementById('scanDetails');
+            panel.className = 'mt-4 rounded-lg border p-5 text-center';
+            if (mode === 'ok') {
+                panel.classList.add('border-emerald-500', 'bg-emerald-950');
+                icon.className = 'text-6xl font-black text-emerald-400';
+                icon.textContent = 'OK';
+            } else if (mode === 'duplicate') {
+                panel.classList.add('border-red-500', 'bg-red-950');
+                icon.className = 'text-6xl font-black text-red-400';
+                icon.textContent = 'X';
+            } else {
+                panel.classList.add('border-yellow-500', 'bg-yellow-950');
+                icon.className = 'text-6xl font-black text-yellow-300';
+                icon.textContent = '!';
+            }
+            titleEl.textContent = title;
+            detailsEl.textContent = details;
+        }
+
+        async function handleScan(rawText) {
+            const now = Date.now();
+            if (rawText === lastScanText && now - lastScanAt < 2000) return;
+            lastScanText = rawText;
+            lastScanAt = now;
+
+            const eventCode = cleanEventCode(document.getElementById('eventCode').value);
+            try {
+                const ticket = await parseTicket(rawText);
+                const state = loadScanState();
+                if (cleanEventCode(ticket.eventCode) !== eventCode) {
+                    setResult('invalid', 'Wrong Event', `Ticket is for ${ticket.eventCode || 'unknown'}, scanner is set to ${eventCode}.`);
+                    addRecent(state, 'Wrong Event', ticket);
+                    saveScanState(state);
+                    renderStats();
+                    return;
+                }
+
+                const alreadyScanned = state.scans.some(scan => scan.ticketId === ticket.ticketId);
+                if (alreadyScanned) {
+                    state.duplicates += 1;
+                    addRecent(state, 'Duplicate', ticket);
+                    saveScanState(state);
+                    setResult('duplicate', 'Already Scanned', `${ticket.holderName || 'Guest'} was already checked in.`);
+                    renderStats();
+                    return;
+                }
+
+                const scanRecord = {
+                    ticketId: ticket.ticketId,
+                    holderName: ticket.holderName || 'Guest',
+                    ticketType: ticket.ticketType || 'General Admission',
+                    eventName: ticket.eventName || '',
+                    scannedAt: new Date().toISOString()
+                };
+                state.scans.push(scanRecord);
+                addRecent(state, 'Checked In', ticket, scanRecord.scannedAt);
+                saveScanState(state);
+                setResult('ok', 'Checked In', `${ticket.holderName || 'Guest'} admitted.`);
+                renderStats();
+            } catch (error) {
+                setResult('invalid', 'Invalid Ticket', error.message);
+            }
+        }
+
+        function addRecent(state, status, ticket, scannedAt = new Date().toISOString()) {
+            state.recent.unshift({
+                status,
+                scannedAt,
+                ticketId: ticket.ticketId || '-',
+                holderName: ticket.holderName || '-',
+                ticketType: ticket.ticketType || '-'
+            });
+            state.recent = state.recent.slice(0, 50);
+        }
+
+        function renderStats() {
+            const state = loadScanState();
+            document.getElementById('attendanceCount').textContent = state.scans.length;
+            document.getElementById('duplicateCount').textContent = state.duplicates || 0;
+            document.getElementById('activeEvent').textContent = cleanEventCode(document.getElementById('eventCode').value);
+            const recent = state.recent.length ? state.recent : state.scans.slice().reverse().map(scan => ({
+                ...scan,
+                status: 'Checked In'
+            }));
+            const rows = recent.map(scan => {
+                const statusClass = scan.status === 'Checked In'
+                    ? 'text-emerald-400'
+                    : scan.status === 'Duplicate'
+                        ? 'text-red-400'
+                        : 'text-yellow-300';
+                return `
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 pr-3">${new Date(scan.scannedAt).toLocaleTimeString()}</td>
+                    <td class="py-2 pr-3 ${statusClass} font-bold">${escapeHtml(scan.status)}</td>
+                    <td class="py-2 pr-3">${escapeHtml(scan.holderName)}</td>
+                    <td class="py-2 pr-3">${escapeHtml(scan.ticketType)}</td>
+                    <td class="py-2 pr-3 font-mono">${escapeHtml(scan.ticketId)}</td>
+                </tr>
+            `;
+            }).join('');
+            document.getElementById('scanRows').innerHTML = rows;
+        }
+
+        async function startScanner() {
+            if (!window.Html5Qrcode) {
+                setResult('invalid', 'Scanner Library Not Loaded', 'Check your internet connection or use manual entry.');
+                return;
+            }
+            if (scanner) await stopScanner();
+            scanner = new Html5Qrcode('reader');
+            await scanner.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 260, height: 260 } },
+                handleScan
+            );
+        }
+
+        async function stopScanner() {
+            if (!scanner) return;
+            try {
+                await scanner.stop();
+                scanner.clear();
+            } finally {
+                scanner = null;
+            }
+        }
+
+        function exportScans() {
+            const state = loadScanState();
+            const lines = ['scannedAt,holderName,ticketType,ticketId'];
+            state.scans.forEach(scan => {
+                lines.push([scan.scannedAt, scan.holderName, scan.ticketType, scan.ticketId].map(value => `"${String(value || '').replace(/"/g, '""')}"`).join(','));
+            });
+            const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${cleanEventCode(document.getElementById('eventCode').value)}-scan-log.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => startScanner().catch(error => setResult('invalid', 'Camera Error', error.message)));
+        document.getElementById('stopBtn').addEventListener('click', () => stopScanner());
+        document.getElementById('manualBtn').addEventListener('click', () => handleScan(document.getElementById('manualInput').value));
+        document.getElementById('exportBtn').addEventListener('click', exportScans);
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            const eventCode = cleanEventCode(document.getElementById('eventCode').value);
+            if (!confirm(`Reset all scans for ${eventCode}?`)) return;
+            localStorage.removeItem(storageKey());
+            renderStats();
+            setResult('invalid', 'Scan Log Reset', `${eventCode} attendance count cleared.`);
+        });
+        document.getElementById('eventCode').addEventListener('input', renderStats);
+
+        renderStats();
+    </script>
+</body>
+</html>
